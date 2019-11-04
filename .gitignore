@@ -1,0 +1,12 @@
+*/.DS_Store
+.DS_Store
+Library/
+Logs/
+bin/
+obj/
+Temp/
+StreamingAssets/
+*.csproj
+*.sln
+.vs
+docs/_build
