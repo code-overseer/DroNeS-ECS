@@ -2,6 +2,7 @@
 {
     public enum Status
     {
+        New,
         Waiting,
         Delivering,
         Returning,

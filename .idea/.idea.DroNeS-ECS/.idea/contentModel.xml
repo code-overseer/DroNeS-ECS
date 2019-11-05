@@ -13,12 +13,16 @@
             <e p="Components" t="Include">
               <e p="DroneStatus.cs" t="Include" />
               <e p="DroneUID.cs" t="Include" />
+              <e p="Waypoint.cs" t="Include" />
             </e>
             <e p="DroneBootstrap.cs" t="Include" />
             <e p="Enums.cs" t="Include" />
             <e p="MonoBehaviours" t="Include">
               <e p="DroneMaker.cs" t="Include" />
-              <e p="WaypointManager.cs" t="Include" />
+            </e>
+            <e p="Systems" t="Include">
+              <e p="DroneMovementSystem.cs" t="Include" />
+              <e p="WaypointUpdateSystem.cs" t="Include" />
             </e>
           </e>
           <e p="Utils" t="Include">
