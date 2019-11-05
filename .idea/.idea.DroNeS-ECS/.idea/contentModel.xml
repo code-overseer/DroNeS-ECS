@@ -11,7 +11,9 @@
         <e p="Scripts" t="Include">
           <e p="DroNeS" t="Include">
             <e p="Components" t="Include">
+              <e p="DestructionTag.cs" t="Include" />
               <e p="DroneStatus.cs" t="Include" />
+              <e p="DroneTag.cs" t="Include" />
               <e p="DroneUID.cs" t="Include" />
               <e p="Waypoint.cs" t="Include" />
             </e>
@@ -21,6 +23,7 @@
               <e p="DroneMaker.cs" t="Include" />
             </e>
             <e p="Systems" t="Include">
+              <e p="DroneBuilderSystem.cs" t="Include" />
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="WaypointUpdateSystem.cs" t="Include" />
             </e>

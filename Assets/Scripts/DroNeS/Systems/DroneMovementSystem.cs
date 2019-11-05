@@ -11,7 +11,6 @@ namespace DroNeS.Systems
 {
     public class DroneMovementSystem : JobComponentSystem
     {
-        
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {

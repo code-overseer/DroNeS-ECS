@@ -1,14 +1,18 @@
 ﻿using System.Collections.Generic;
 using DroNeS.Components;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
+using Unity.Transforms;
+using UnityEngine;
 
 namespace DroNeS.Systems
 {
-    public class WaypointUpdateSystem : ComponentSystem
+    public class WaypointUpdateSystem : BarrierSystem
     {
         private readonly Dictionary<int, Queue<float3>> _wp = new Dictionary<int, Queue<float3>>();
-
+        
         protected override void OnUpdate()
         {
             ForEach((ref DroneUID id, ref DroneStatus status, ref Waypoint point) =>
@@ -35,6 +39,6 @@ namespace DroNeS.Systems
             }
             
         }
-        
+
     }
 }

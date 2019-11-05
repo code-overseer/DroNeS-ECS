@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DroNeS.Systems;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace DroNeS
@@ -11,7 +12,7 @@ namespace DroNeS
         private void Awake()
         {
             _button = GetComponent<Button>();
-            _button.onClick.AddListener(DroneBootstrap.AddDrone);
+            _button.onClick.AddListener(DroneBuilderSystem.AddDrone);
         }
     }
 }

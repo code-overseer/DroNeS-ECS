@@ -6,6 +6,7 @@
         Waiting,
         Delivering,
         Returning,
-        EnRoute
+        EnRoute,
+        Dead
     }
 }
