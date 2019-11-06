@@ -21,11 +21,11 @@ namespace DroNeS.Systems
             return job.Schedule(this, inputDeps);
         }
         
-        private struct DroneMovementJob : IJobProcessComponentData<DroneStatus, Position, Waypoint>
+        private struct DroneMovementJob : IJobForEach<DroneStatus, Translation, Waypoint>
         {
             public float Delta;
             private const float Speed = 5;
-            public void Execute(ref DroneStatus status, ref Position pos, ref Waypoint point)
+            public void Execute(ref DroneStatus status, ref Translation pos, ref Waypoint point)
             {
                 if (status.Value == Status.New) return;
                 if (math.lengthsq(pos.Value - point.waypoint) < 1e-3f)

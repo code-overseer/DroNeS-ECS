@@ -7,6 +7,7 @@
         Delivering,
         Returning,
         EnRoute,
-        Dead
+        Dead,
+        Destroy
     }
 }

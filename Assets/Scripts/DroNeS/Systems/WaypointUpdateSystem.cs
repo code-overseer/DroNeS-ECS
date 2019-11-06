@@ -9,19 +9,39 @@ using UnityEngine;
 
 namespace DroNeS.Systems
 {
-    public class WaypointUpdateSystem : BarrierSystem
+    public class WaypointUpdateSystem : ComponentSystem
     {
         private readonly Dictionary<int, Queue<float3>> _wp = new Dictionary<int, Queue<float3>>();
-        
+        /* TODO
+         * Change to NativeMultiHashMap
+         * Change waypoint to contain queue index and queue length
+         * Scan through using IJobChunk for 'Requesting' drones to generate new 'queue'
+        */
+        private EntityQuery _droneQuery;
+        protected override void OnCreate()
+        {
+            _droneQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    typeof(Waypoint),
+                    typeof(DroneStatus),
+                    ComponentType.ReadOnly<DroneTag>()
+                }
+            });
+            _droneQuery.SetFilterChanged(typeof(DroneStatus));
+        }
+
         protected override void OnUpdate()
         {
-            ForEach((ref DroneUID id, ref DroneStatus status, ref Waypoint point) =>
+            Entities.With(_droneQuery).ForEach((ref DroneUID id, ref DroneStatus status, ref Waypoint point) =>
             {
                 if (status.Value != Status.New && status.Value != Status.Waiting) return;
                 GenerateQueue(id.uid);
                 point = _wp[id.uid].Dequeue();
                 status.Value = Status.Waiting;
             });
+
         }
         
         private void GenerateQueue(int id)

@@ -13,12 +13,14 @@ namespace DroNeS
     public static class DroneBootstrap
     {
         private static EntityManager _manager;
-        
+        private static DroneBuilderSystem _builder;
+//        private static WaypointUpdateSystem _updater;
+//        private static DroneMovementSystem _movement;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
         {
-            _manager = World.Active.GetOrCreateManager<EntityManager>();
+//            _manager = World.Active.EntityManager;
 
         }
 

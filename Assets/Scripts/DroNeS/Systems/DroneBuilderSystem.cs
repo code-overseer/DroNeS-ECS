@@ -8,59 +8,55 @@ using UnityEngine;
 
 namespace DroNeS.Systems
 {
-    public class DroneBuilderBarrierSystem : BarrierSystem
+    public class DroneBuilderBarrierSystem : EntityCommandBufferSystem
     {
  
     }
     public class DroneBuilderSystem : ComponentSystem
     {
-        [Inject] private DroneBuilderBarrierSystem _barrier;
-        private static DroneBuilderSystem _instance;   
+        private static DroneBuilderBarrierSystem _barrier;
         private static EntityArchetype _drone;
         private static RenderMesh _droneMesh;
-        private static EntityManager _manager;
+        private static EntityManager Manager => World.Active.EntityManager;
         private static EntityCommandBuffer _buildCommands;
         private static int _droneUid;
-        private ComponentGroup _destructionQuery;
-        
-        protected override void OnCreateManager()
+
+        protected override void OnCreate()
         {
-            _manager = World.Active.GetOrCreateManager<EntityManager>();
-            _instance = this;
-            _drone = _manager.CreateArchetype(
-                ComponentType.Create<Position>(),
-                ComponentType.ReadOnly<DroneUID>(),
-                ComponentType.Create<DroneStatus>(),
-                ComponentType.Create<Waypoint>(),
-                ComponentType.ReadOnly<DroneTag>());
-            _droneMesh = new RenderMesh()
+            _barrier = World.Active.GetOrCreateSystem<DroneBuilderBarrierSystem>();
+            _drone = Manager.CreateArchetype(
+                typeof(Translation),
+                typeof(DroneUID),
+                typeof(DroneStatus),
+                typeof(Waypoint),
+                typeof(DroneTag),
+                typeof(LocalToWorld));
+            
+            _droneMesh = new RenderMesh
             {
                 mesh = Resources.Load("Meshes/Drone") as Mesh,
                 material = Resources.Load("Materials/Drone") as Material
             };
-            for (var i = 0; i < 5; ++i)
+            
+            var entities = new NativeArray<Entity>(5, Allocator.Temp);
+            Manager.CreateEntity(_drone, entities);
+            foreach (var drone in entities)
             {
-                var drone = _manager.CreateEntity(_drone);
-                _manager.SetComponentData(drone, new Position {Value = Random.insideUnitSphere * 5} );
-                _manager.SetComponentData(drone, new DroneUID {uid = _droneUid++} );
-                _manager.SetComponentData(drone, new DroneStatus {Value = Status.New} );
-                _manager.AddSharedComponentData(drone, _droneMesh);
+                Manager.SetComponentData(drone, new Translation {Value = Random.insideUnitSphere * 5});
+                Manager.SetComponentData(drone, new DroneUID {uid = _droneUid++} );
+                Manager.SetComponentData(drone, new DroneStatus {Value = Status.New} );
+                Manager.AddSharedComponentData(drone, _droneMesh);
             }
-
-            _destructionQuery = GetComponentGroup(new EntityArchetypeQuery
-            {
-                All = new []{ComponentType.Create<DestructionTag>()}
-            });
 
         }
 
         public static void AddDrone()
         {
-            _buildCommands = _instance._barrier.CreateCommandBuffer();
-            for (var i = 0; i < 5; ++i)
+            _buildCommands = _barrier.CreateCommandBuffer();
+            for (var i = 0; i < 500; ++i)
             {
                 var drone = _buildCommands.CreateEntity(_drone);
-                _buildCommands.SetComponent(drone, new Position {Value = Random.insideUnitSphere * 5});
+                _buildCommands.SetComponent(drone, new Translation {Value = Random.insideUnitSphere * 5});
                 _buildCommands.SetComponent(drone, new DroneUID {uid = _droneUid++} );
                 _buildCommands.SetComponent(drone, new DroneStatus {Value = Status.New} );
                 _buildCommands.AddSharedComponent(drone, _droneMesh);
