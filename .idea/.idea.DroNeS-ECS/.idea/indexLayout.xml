@@ -24,6 +24,7 @@
       <Path>Library/PackageCache/nuget.mono-cecil@0.1.6-preview</Path>
       <Path>Packages</Path>
       <Path>ProjectSettings</Path>
+      <Path>../../../Library/Unity/cache/packages/packages.unity.com/com.unity.test-framework.performance@1.0.9-preview</Path>
     </explicitIncludes>
     <explicitExcludes>
       <Path>.git</Path>

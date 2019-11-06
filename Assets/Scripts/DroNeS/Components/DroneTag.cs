@@ -5,6 +5,5 @@ namespace DroNeS.Components
 {
     public struct DroneTag : IComponentData
     {
-
     }
 }
