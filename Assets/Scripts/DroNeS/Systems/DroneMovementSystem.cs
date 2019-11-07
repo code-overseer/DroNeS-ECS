@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using DroNeS.Components;
-using Unity.Collections;
+﻿using DroNeS.Components;
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -11,7 +10,6 @@ namespace DroNeS.Systems
 {
     public class DroneMovementSystem : JobComponentSystem
     {
-
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var job = new DroneMovementJob
@@ -21,13 +19,25 @@ namespace DroNeS.Systems
             return job.Schedule(this, inputDeps);
         }
         
+        [BurstCompile]
         private struct DroneMovementJob : IJobForEach<DroneStatus, Translation, Waypoint>
         {
             public float Delta;
             private const float Speed = 10;
             public void Execute(ref DroneStatus status, ref Translation pos, ref Waypoint point)
             {
-                if (status.Value == Status.RequestingWaypoints) return;
+                switch (status.Value)
+                {
+                    case Status.New:
+                        status = Status.RequestingWaypoints;
+                        return;
+                    case Status.Ready:
+                        status = Status.Waiting;
+                        return;
+                    case Status.RequestingWaypoints:
+                        return;
+                }
+
                 if (math.lengthsq(pos.Value - point.waypoint) < 1e-3f)
                 {
                     status = (point.index >= point.length - 1) ? Status.RequestingWaypoints : Status.Waiting;

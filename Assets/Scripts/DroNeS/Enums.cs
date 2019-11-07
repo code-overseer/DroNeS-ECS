@@ -4,6 +4,7 @@
     {
         New,
         Waiting,
+        Ready,
         RequestingWaypoints,
         Delivering,
         Returning,
