@@ -7,20 +7,14 @@ namespace DroNeS.Components
     public struct Waypoint : IComponentData
     {
         public float3 waypoint;
-
-        public Waypoint(float3 point)
+        public int index;
+        public int length;
+        
+        public Waypoint(float3 point, int  index, int length)
         {
             waypoint = point;
-        }
-
-        public static implicit operator Waypoint(float3 val)
-        {
-            return new Waypoint(val);
-        }
-        
-        public static implicit operator float3(Waypoint val)
-        {
-            return new float3(val.waypoint);
+            this.index = index;
+            this.length = length;
         }
     }
 }

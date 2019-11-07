@@ -4,6 +4,7 @@
     {
         New,
         Waiting,
+        RequestingWaypoints,
         Delivering,
         Returning,
         EnRoute,

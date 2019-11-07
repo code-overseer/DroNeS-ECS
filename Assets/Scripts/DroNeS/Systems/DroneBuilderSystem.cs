@@ -2,16 +2,18 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace DroNeS.Systems
 {
     public class DroneBuilderBarrierSystem : EntityCommandBufferSystem
     {
- 
     }
+
     public class DroneBuilderSystem : ComponentSystem
     {
         private static DroneBuilderBarrierSystem _barrier;
@@ -44,28 +46,28 @@ namespace DroNeS.Systems
             {
                 Manager.SetComponentData(drone, new Translation {Value = Random.insideUnitSphere * 5});
                 Manager.SetComponentData(drone, new DroneUID {uid = _droneUid++} );
-                Manager.SetComponentData(drone, new DroneStatus {Value = Status.New} );
+                Manager.SetComponentData(drone, new DroneStatus {Value = Status.RequestingWaypoints} );
+                Manager.SetComponentData(drone, new Waypoint(float3.zero, -1,0));
                 Manager.AddSharedComponentData(drone, _droneMesh);
             }
-
         }
 
         public static void AddDrone()
         {
             _buildCommands = _barrier.CreateCommandBuffer();
-            for (var i = 0; i < 500; ++i)
+            for (var i = 0; i < 20; ++i)
             {
                 var drone = _buildCommands.CreateEntity(_drone);
                 _buildCommands.SetComponent(drone, new Translation {Value = Random.insideUnitSphere * 5});
                 _buildCommands.SetComponent(drone, new DroneUID {uid = _droneUid++} );
-                _buildCommands.SetComponent(drone, new DroneStatus {Value = Status.New} );
+                _buildCommands.SetComponent(drone, new DroneStatus {Value = Status.RequestingWaypoints} );
+                _buildCommands.SetComponent(drone, new Waypoint(float3.zero, -1,0));
                 _buildCommands.AddSharedComponent(drone, _droneMesh);
             }
         }
 
         protected override void OnUpdate()
         {
-            
         }
     }
 }

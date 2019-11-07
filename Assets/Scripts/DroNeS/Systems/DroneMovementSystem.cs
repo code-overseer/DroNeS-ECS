@@ -24,16 +24,15 @@ namespace DroNeS.Systems
         private struct DroneMovementJob : IJobForEach<DroneStatus, Translation, Waypoint>
         {
             public float Delta;
-            private const float Speed = 5;
+            private const float Speed = 10;
             public void Execute(ref DroneStatus status, ref Translation pos, ref Waypoint point)
             {
-                if (status.Value == Status.New) return;
+                if (status.Value == Status.New || point.index < 0) return;
                 if (math.lengthsq(pos.Value - point.waypoint) < 1e-3f)
                 {
-                    status = Status.Waiting;
+                    status = (point.index >= point.length - 1) ? Status.RequestingWaypoints : Status.Waiting;
                     return;
                 }
-
                 status = Status.EnRoute;
                 pos.Value = MoveTowards(pos.Value, point.waypoint, Speed * Delta);
 
