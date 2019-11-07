@@ -13,12 +13,12 @@ namespace DroNeS.Systems
        // private readonly Dictionary<int, Queue<float3>> _wp = new Dictionary<int, Queue<float3>>();
         private static EntityCommandBuffer _commandBuffer;
         private static NativeMultiHashMap<int, Waypoint> _queues;
-        private static NativeQueue<int> _queueBuffer;
+        private static NativeQueue<int> _queuesToClear;
 
         /*
          * TODO
-         * Change to NativeMultiHashMap
-         * Change waypoint to contain queue index and queue length
+         * Change to NativeMultiHashMap *
+         * Change waypoint to contain queue index and queue length *
          * Scan through using IJobChunk for 'Requesting' drones to generate new 'queue'
         */
         private EntityQuery _droneQuery;
@@ -36,26 +36,26 @@ namespace DroNeS.Systems
             });
             _droneQuery.SetFilterChanged(typeof(DroneStatus));
             _queues = new NativeMultiHashMap<int, Waypoint>(400, Allocator.Persistent);
-            _queueBuffer = new NativeQueue<int>(Allocator.Persistent);
+            _queuesToClear = new NativeQueue<int>(Allocator.Persistent);
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
             _queues.Dispose();
-            _queueBuffer.Dispose();
+            _queuesToClear.Dispose();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var job0 = new QueueCompletionCheck
             {
-                Completed = _queueBuffer.AsParallelWriter()
+                Completed = _queuesToClear.AsParallelWriter()
             };
             var job1 = new QueueRemovalJob
             {
                 AllQueues = _queues,
-                Completed = _queueBuffer
+                Completed = _queuesToClear
             };
             var job2 = new QueueGenerationJob
             {
@@ -80,7 +80,6 @@ namespace DroNeS.Systems
                 if (stats.Value != Status.RequestingWaypoints) return;
                 Completed.Enqueue(id.uid);
                 point.index = -1;
-                point.length = 0;
             }
         }
         
@@ -91,22 +90,25 @@ namespace DroNeS.Systems
 
             public void Execute()
             {
+                var space = Completed.Count * 20; // 20 is approximate queue length
                 while (Completed.Count > 0)
                 {
                     var idx = Completed.Dequeue();
                     if (AllQueues.TryGetFirstValue(idx, out _, out _)) AllQueues.Remove(idx);
                 }
+
+                while (AllQueues.Capacity - AllQueues.Length < space) AllQueues.Capacity *= 2;
             }
         }
         
-        private struct QueueGenerationJob : IJobForEach<DroneTag, DroneUID, DroneStatus, Waypoint>
+        private struct QueueGenerationJob : IJobForEach<DroneTag, DroneUID, DroneStatus>
         {
             public NativeMultiHashMap<int, Waypoint>.ParallelWriter AllQueues;
-            public void Execute([ReadOnly] ref DroneTag tag, [ReadOnly] ref DroneUID id, ref DroneStatus stats, ref Waypoint point)
+            public void Execute([ReadOnly] ref DroneTag tag, [ReadOnly] ref DroneUID id, ref DroneStatus stats)
             {
                 if (stats.Value != Status.RequestingWaypoints) return;
                 var rand = new Random((uint)id.uid | 1);
-                for (var i = 0; i < 15 && point.length == 0; ++i)
+                for (var i = 0; i < 15; ++i)
                 {
                     var p = new float3(rand.NextFloat(), rand.NextFloat(), rand.NextFloat()) * 25 - 12.5f;
                     AllQueues.Add(id.uid, new Waypoint(p, i, 15));
@@ -118,7 +120,7 @@ namespace DroNeS.Systems
         private struct WaypointUpdateJob : IJobForEach<DroneTag, DroneUID, DroneStatus, Waypoint>
         {
             [ReadOnly] public NativeMultiHashMap<int, Waypoint> AllQueues;
-            public void Execute([ReadOnly] ref DroneTag tag, ref DroneUID id, ref DroneStatus stats, ref Waypoint point)
+            public void Execute([ReadOnly] ref DroneTag tag, [ReadOnly] ref DroneUID id, [ReadOnly] ref DroneStatus stats, ref Waypoint point)
             {
                 if (stats.Value != Status.Waiting) return;
                 AllQueues.TryGetFirstValue(id.uid, out var p, out var it);

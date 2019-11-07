@@ -55,7 +55,7 @@ namespace DroNeS.Systems
         public static void AddDrone()
         {
             _buildCommands = _barrier.CreateCommandBuffer();
-            for (var i = 0; i < 20; ++i)
+            for (var i = 0; i < 500; ++i)
             {
                 var drone = _buildCommands.CreateEntity(_drone);
                 _buildCommands.SetComponent(drone, new Translation {Value = Random.insideUnitSphere * 5});

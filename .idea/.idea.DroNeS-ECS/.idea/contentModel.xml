@@ -23,7 +23,6 @@
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="WaypointUpdateSystem.cs" t="Include" />
             </e>
-            <e p="WaypointQueueElement.cs" t="Include" />
           </e>
           <e p="Editor" t="Include">
             <e p="MeshSaverEditor.cs" t="Include" />

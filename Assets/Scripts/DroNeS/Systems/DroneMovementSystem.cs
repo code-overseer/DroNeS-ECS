@@ -27,7 +27,7 @@ namespace DroNeS.Systems
             private const float Speed = 10;
             public void Execute(ref DroneStatus status, ref Translation pos, ref Waypoint point)
             {
-                if (status.Value == Status.New || point.index < 0) return;
+                if (status.Value == Status.RequestingWaypoints) return;
                 if (math.lengthsq(pos.Value - point.waypoint) < 1e-3f)
                 {
                     status = (point.index >= point.length - 1) ? Status.RequestingWaypoints : Status.Waiting;
