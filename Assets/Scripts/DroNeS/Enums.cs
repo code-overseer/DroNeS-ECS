@@ -2,14 +2,14 @@
 {
     public enum Status
     {
-        New,
-        Waiting,
-        Ready,
-        RequestingWaypoints,
+        New, // Newly created drone entity
+        Waiting, // After reaching a particular waypoint
+        Ready, // Ready to move, before moving to first waypoint in  queue"
+        RequestingWaypoints, // Finished waypoints queue
         Delivering,
         Returning,
         EnRoute,
         Dead,
-        Destroy
+        Destroy, // Flag for destruction TODO
     }
 }

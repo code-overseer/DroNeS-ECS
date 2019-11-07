@@ -3,9 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="65bcd551-ed8a-4fb4-b5f4-4d844e6715d5" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Enums.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,10 +12,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="528">
+              <caret line="33" column="35" selection-start-line="33" selection-start-column="35" selection-end-line="33" selection-end-column="35" />
               <folding>
                 <marker date="1573144682979" expanded="true" signature="6:151" ph="..." />
                 <marker date="1573144682979" expanded="true" signature="177:2021" ph="{...}" />
@@ -35,11 +33,32 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Editor/ScriptablePaletteEditor.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="48">
+              <caret line="6" column="41" selection-start-line="6" selection-start-column="41" selection-end-line="6" selection-end-column="41" />
+              <folding>
+                <marker date="1570826658000" expanded="false" signature="6:97" ph="..." />
+                <marker date="1570826658000" expanded="true" signature="188:4642" ph="{...}" />
+                <marker date="1570826658000" expanded="true" signature="1019:4640" ph="{...}" />
+                <marker date="1570826658000" expanded="true" signature="2784:2838" ph="{...}" />
+                <marker date="1570826658000" expanded="true" signature="2928:3041" ph="{...}" />
+                <marker date="1570826658000" expanded="true" signature="3054:3321" ph="{...}" />
+                <marker date="1570826658000" expanded="true" signature="3121:3311" ph="{...}" />
+                <marker date="1570826658000" expanded="true" signature="3916:4042" ph="{...}" />
+                <marker date="1570826658000" expanded="true" signature="4202:4338" ph="{...}" />
+                <marker date="1570826658000" expanded="true" signature="4498:4634" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-350">
-              <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+            <state relative-caret-position="345">
+              <caret line="50" selection-start-line="50" selection-end-line="50" />
               <folding>
                 <marker date="1573136852833" expanded="true" signature="6:230" ph="..." />
                 <marker date="1573136852833" expanded="true" signature="256:7230" ph="{...}" />
@@ -76,7 +95,7 @@
         <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="343">
-              <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
+              <caret line="42" selection-start-line="42" selection-end-line="42" />
               <folding>
                 <marker date="1573144682976" expanded="false" signature="6:215" ph="..." />
                 <marker date="1573144682976" expanded="true" signature="241:2104" ph="{...}" />
@@ -96,10 +115,10 @@
         <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Enums.cs">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="112">
-              <caret line="7" column="17" lean-forward="true" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+              <caret line="7" column="56" selection-start-line="7" selection-start-column="56" selection-end-line="7" selection-end-column="56" />
               <folding>
-                <marker date="1573132690930" expanded="true" signature="16:215" ph="{...}" />
-                <marker date="1573132690930" expanded="true" signature="41:213" ph="{...}" />
+                <marker date="1573144913780" expanded="true" signature="16:404" ph="{...}" />
+                <marker date="1573144913780" expanded="true" signature="41:402" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -141,6 +160,7 @@
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/IJobForEach.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Editor/MeshSaverEditor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Editor/ScriptablePaletteEditor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collections@0.1.1-preview/Unity.Collections/NativeHashMap.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.rider@1.0.8/Rider/Editor/RiderInitializer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Utils/Bool.cs" root0="FORCE_HIGHLIGHTING" />
@@ -178,10 +198,11 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/WaypointQueueElement.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/DroneMaker.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/Waypoint.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Enums.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Enums.cs" />
+        <option value="$PROJECT_DIR$/Assets/Mapbox/Unity/Editor/ScriptablePaletteEditor.cs" />
       </list>
     </option>
   </component>
@@ -264,12 +285,12 @@
       <workItem from="1572989189331" duration="8140000" />
       <workItem from="1573052409900" duration="3765000" />
       <workItem from="1573078947786" duration="9348000" />
-      <workItem from="1573120355886" duration="8191000" />
+      <workItem from="1573120355886" duration="8601000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="53031000" />
+    <option name="totallyTimeSpent" value="53441000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -525,21 +546,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Enums.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="7" column="17" lean-forward="true" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
-          <folding>
-            <marker date="1573132690930" expanded="true" signature="16:215" ph="{...}" />
-            <marker date="1573132690930" expanded="true" signature="41:213" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="343">
-          <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
+          <caret line="42" selection-start-line="42" selection-end-line="42" />
           <folding>
             <marker date="1573144682976" expanded="false" signature="6:215" ph="..." />
             <marker date="1573144682976" expanded="true" signature="241:2104" ph="{...}" />
@@ -556,8 +566,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-350">
-          <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+        <state relative-caret-position="345">
+          <caret line="50" selection-start-line="50" selection-end-line="50" />
           <folding>
             <marker date="1573136852833" expanded="true" signature="6:230" ph="..." />
             <marker date="1573136852833" expanded="true" signature="256:7230" ph="{...}" />
@@ -589,9 +599,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Enums.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="7" column="56" selection-start-line="7" selection-start-column="56" selection-end-line="7" selection-end-column="56" />
+          <folding>
+            <marker date="1573144913780" expanded="true" signature="16:404" ph="{...}" />
+            <marker date="1573144913780" expanded="true" signature="41:402" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="528">
+          <caret line="33" column="35" selection-start-line="33" selection-start-column="35" selection-end-line="33" selection-end-column="35" />
           <folding>
             <marker date="1573144682979" expanded="true" signature="6:151" ph="..." />
             <marker date="1573144682979" expanded="true" signature="177:2021" ph="{...}" />
@@ -603,6 +625,25 @@
             <marker date="1573144682979" expanded="true" signature="848:1219" ph="{...}" />
             <marker date="1573144682979" expanded="true" signature="1291:1465" ph="{...}" />
             <marker date="1573144682979" expanded="true" signature="1698:2003" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Editor/ScriptablePaletteEditor.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="6" column="41" selection-start-line="6" selection-start-column="41" selection-end-line="6" selection-end-column="41" />
+          <folding>
+            <marker date="1570826658000" expanded="false" signature="6:97" ph="..." />
+            <marker date="1570826658000" expanded="true" signature="188:4642" ph="{...}" />
+            <marker date="1570826658000" expanded="true" signature="1019:4640" ph="{...}" />
+            <marker date="1570826658000" expanded="true" signature="2784:2838" ph="{...}" />
+            <marker date="1570826658000" expanded="true" signature="2928:3041" ph="{...}" />
+            <marker date="1570826658000" expanded="true" signature="3054:3321" ph="{...}" />
+            <marker date="1570826658000" expanded="true" signature="3121:3311" ph="{...}" />
+            <marker date="1570826658000" expanded="true" signature="3916:4042" ph="{...}" />
+            <marker date="1570826658000" expanded="true" signature="4202:4338" ph="{...}" />
+            <marker date="1570826658000" expanded="true" signature="4498:4634" ph="{...}" />
           </folding>
         </state>
       </provider>
