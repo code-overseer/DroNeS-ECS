@@ -48,26 +48,17 @@ namespace Mapbox.Map
 		/// <value> The canonical tile identifier. </value>
 		public CanonicalTileId Id
 		{
-			get { return _id; }
-			set { _id = value; }
+			get => _id;
+			set => _id = value;
 		}
 
 
 		/// <summary>Flag to indicate if the request was successful</summary>
-		public bool HasError
-		{
-			get
-			{
-				return _exceptions == null ? false : _exceptions.Count > 0;
-			}
-		}
+		public bool HasError => _exceptions != null && _exceptions.Count > 0;
 
 
 		/// <summary> Exceptions that might have occured during creation of the tile. </summary>
-		public ReadOnlyCollection<Exception> Exceptions
-		{
-			get { return null == _exceptions ? null : _exceptions.AsReadOnly(); }
-		}
+		public ReadOnlyCollection<Exception> Exceptions => _exceptions?.AsReadOnly();
 
 
 		/// <summary> Messages of exceptions otherwise empty string. </summary>
@@ -98,25 +89,13 @@ namespace Mapbox.Map
 		///     is accusing any error.
 		/// </summary>
 		/// <value> The tile state. </value>
-		public State CurrentState
-		{
-			get
-			{
-				return _state;
-			}
-		}
+		public State CurrentState => _state;
 
 
-		public HttpRequestType RequestType { get { return _request.RequestType; } }
+		public HttpRequestType RequestType => _request.RequestType;
 
 
-		public bool IsCompleted
-		{
-			get
-			{
-				return _state == State.Loaded;
-			}
-		}
+		public bool IsCompleted => _state == State.Loaded;
 
 		/// <summary>
 		///     Initializes the <see cref="T:Mapbox.Map.Tile"/> object. It will
@@ -232,14 +211,7 @@ namespace Mapbox.Map
 			// Cancelled is not the same as loaded!
 			if (_state != State.Canceled)
 			{
-				if (response.IsUpdate)
-				{
-					_state = State.Updated;
-				}
-				else
-				{
-					_state = State.Loaded;
-				}
+				_state = response.IsUpdate ? State.Updated : State.Loaded;
 			}
 			_callback();
 		}

@@ -71,37 +71,34 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		public T FindMeshModifier<T>() where T : MeshModifier
 		{
-			MeshModifier mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			var mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
 			return (T)mod;
 		}
 
 		public T FindGameObjectModifier<T>() where T : GameObjectModifier
 		{
-			GameObjectModifier mod = _defaultStack.GoModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			var mod = _defaultStack.GoModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
 			return (T)mod;
 		}
 
 		public T AddOrCreateMeshModifier<T>() where T : MeshModifier
 		{
-			MeshModifier mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
-			if (mod == null)
-			{
-				mod = (MeshModifier)CreateInstance(typeof(T));
-				_coreModifiers.Add(mod);
-				_defaultStack.MeshModifiers.Add(mod);
-			}
+			var mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			if (mod != null) return (T) mod;
+			
+			mod = (MeshModifier)CreateInstance(typeof(T));
+			_coreModifiers.Add(mod);
+			_defaultStack.MeshModifiers.Add(mod);
 			return (T)mod;
 		}
 
 		public T AddOrCreateGameObjectModifier<T>() where T : GameObjectModifier
 		{
-			GameObjectModifier mod = _defaultStack.GoModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
-			if (mod == null)
-			{
-				mod = (GameObjectModifier)CreateInstance(typeof(T));
-				_coreModifiers.Add(mod);
-				_defaultStack.GoModifiers.Add(mod);
-			}
+			var mod = _defaultStack.GoModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			if (mod != null) return (T) mod;
+			mod = (GameObjectModifier)CreateInstance(typeof(T));
+			_coreModifiers.Add(mod);
+			_defaultStack.GoModifiers.Add(mod);
 			return (T)mod;
 		}
 
@@ -223,7 +220,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				case VectorPrimitiveType.Custom:
 					{
 						// Let the user add anything that they want
-						if (_layerProperties.coreOptions.snapToTerrain == true)
+						if (_layerProperties.coreOptions.snapToTerrain)
 						{
 							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
@@ -232,7 +229,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					}
 				case VectorPrimitiveType.Line:
 					{
-						if (_layerProperties.coreOptions.snapToTerrain == true)
+						if (_layerProperties.coreOptions.snapToTerrain)
 						{
 							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
@@ -265,7 +262,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					}
 				case VectorPrimitiveType.Polygon:
 					{
-						if (_layerProperties.coreOptions.snapToTerrain == true)
+						if (_layerProperties.coreOptions.snapToTerrain)
 						{
 							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
@@ -281,7 +278,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 						{
 							//replace materialOptions with styleOptions
-							bool useTextureSideWallModifier =
+							var useTextureSideWallModifier =
 							(_layerProperties.materialOptions.style == StyleTypes.Custom) ?
 								(_layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.AtlasWithColorPalette)
 								: (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette);
@@ -289,7 +286,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							if (useTextureSideWallModifier)
 							{
 								var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
-								GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
+								var atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
 								atlasMod.SetProperties(atlasOptions);
 								_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
 							}
@@ -315,7 +312,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						styleMod.ModifierHasChanged += UpdateVector;
 
 
-						bool isCustomStyle = (_layerProperties.materialOptions.style == StyleTypes.Custom);
+						var isCustomStyle = (_layerProperties.materialOptions.style == StyleTypes.Custom);
 						if ((isCustomStyle) ? (_layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.AtlasWithColorPalette)
 							: (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette))
 						{
@@ -388,19 +385,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// <param name="feature">Feature.</param>
 		private bool IsFeatureEligibleAfterFiltering(VectorFeatureUnity feature, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
 		{
-			if (layerProperties.layerFeatureFilters.Count() == 0)
-			{
-				return true;
-			}
-			else
-			{
-				// build features only if the filter returns true.
-				if (layerProperties.layerFeatureFilterCombiner.Try(feature))
-				{
-					return true;
-				}
-			}
-			return false;
+			return !layerProperties.layerFeatureFilters.Any() || layerProperties.layerFeatureFilterCombiner.Try(feature);
+
+			// build features only if the filter returns true.
 		}
 
 		/// <summary>
@@ -424,28 +411,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// <param name="featureId">Feature identifier.</param>
 		private bool ShouldSkipProcessingFeatureWithId(ulong featureId, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
 		{
-			return (layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId));
+			return layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId);
 		}
 
 		/// <summary>
 		/// Gets a value indicating whether this entity per coroutine bucket is full.
 		/// </summary>
 		/// <value><c>true</c> if coroutine bucket is full; otherwise, <c>false</c>.</value>
-		private bool IsCoroutineBucketFull
-		{
-			get
-			{
-				return (_performanceOptions != null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine);
-			}
-		}
+		private bool IsCoroutineBucketFull => (_performanceOptions != null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine);
 
-		public override bool Active
-		{
-			get
-			{
-				return _layerProperties.coreOptions.isActive;
-			}
-		}
+		public override bool Active => _layerProperties.coreOptions.isActive;
 
 		#endregion
 		public override void Initialize()
@@ -470,8 +445,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				_defaultStack.Initialize();
 			}
 		}
-
-
+		
 		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
 			if (!_activeCoroutines.ContainsKey(tile))
@@ -481,30 +455,30 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
 		{
-			if (tile == null)
-			{
-				yield break;
-			}
+			if (tile == null) yield break;
 
-			VectorLayerVisualizerProperties tempLayerProperties = new VectorLayerVisualizerProperties();
-			tempLayerProperties.vectorTileLayer = layer;
-			tempLayerProperties.featureProcessingStage = FeatureProcessingStage.PreProcess;
+			var tempLayerProperties = new VectorLayerVisualizerProperties
+			{
+				vectorTileLayer = layer,
+				featureProcessingStage = FeatureProcessingStage.PreProcess,
+				layerFeatureFilters =
+					_layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray(),
+				layerFeatureFilterCombiner = new LayerFilterComparer()
+			};
 
 			//Get all filters in the array.
-			tempLayerProperties.layerFeatureFilters = _layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
 
 			// Pass them to the combiner
-			tempLayerProperties.layerFeatureFilterCombiner = new Filters.LayerFilterComparer();
 			switch (_layerProperties.filterOptions.combinerType)
 			{
-				case Filters.LayerFilterCombinerOperationType.Any:
-					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AnyOf(tempLayerProperties.layerFeatureFilters);
+				case LayerFilterCombinerOperationType.Any:
+					tempLayerProperties.layerFeatureFilterCombiner = LayerFilterComparer.AnyOf(tempLayerProperties.layerFeatureFilters);
 					break;
-				case Filters.LayerFilterCombinerOperationType.All:
-					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AllOf(tempLayerProperties.layerFeatureFilters);
+				case LayerFilterCombinerOperationType.All:
+					tempLayerProperties.layerFeatureFilterCombiner = LayerFilterComparer.AllOf(tempLayerProperties.layerFeatureFilters);
 					break;
-				case Filters.LayerFilterCombinerOperationType.None:
-					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.NoneOf(tempLayerProperties.layerFeatureFilters);
+				case LayerFilterCombinerOperationType.None:
+					tempLayerProperties.layerFeatureFilterCombiner = LayerFilterComparer.NoneOf(tempLayerProperties.layerFeatureFilters);
 					break;
 				default:
 					break;
@@ -523,30 +497,30 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			#region PreProcess & Process.
 
-			var featureCount = (tempLayerProperties.vectorTileLayer == null) ? 0 : tempLayerProperties.vectorTileLayer.FeatureCount();
+			var featureCount = tempLayerProperties.vectorTileLayer?.FeatureCount() ?? 0;
 			do
 			{
-				for (int i = 0; i < featureCount; i++)
+				for (var i = 0; i < featureCount; i++)
 				{
 					//checking if tile is recycled and changed
-					if (tile.UnwrappedTileId != tileId || !_activeCoroutines.ContainsKey(tile) || tile.TileState == Enums.TilePropertyState.Unregistered)
+					if (tile.UnwrappedTileId != tileId 
+					    || !_activeCoroutines.ContainsKey(tile) 
+					    || tile.TileState == Enums.TilePropertyState.Unregistered)
 					{
 						yield break;
 					}
 
 					ProcessFeature(i, tile, tempLayerProperties, layer.Extent);
 
-					if (IsCoroutineBucketFull && !(Application.isEditor && !Application.isPlaying))
-					{
-						//Reset bucket..
-						_entityInCurrentCoroutine = 0;
-						yield return null;
-					}
+					if (!IsCoroutineBucketFull || Application.isEditor && !Application.isPlaying) continue;
+					//Reset bucket..
+					_entityInCurrentCoroutine = 0;
+					yield return null;
 				}
 				// move processing to next stage.
 				tempLayerProperties.featureProcessingStage++;
-			} while (tempLayerProperties.featureProcessingStage == FeatureProcessingStage.PreProcess
-			|| tempLayerProperties.featureProcessingStage == FeatureProcessingStage.Process);
+			} while (tempLayerProperties.featureProcessingStage == FeatureProcessingStage.PreProcess 
+			         || tempLayerProperties.featureProcessingStage == FeatureProcessingStage.Process);
 
 			#endregion
 
@@ -559,15 +533,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 			#endregion
 
-			if (callback != null)
-				callback(tile, this);
+			callback?.Invoke(tile, this);
 		}
 
 		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties, float layerExtent)
 		{
 			var fe = layerProperties.vectorTileLayer.GetFeature(index);
 			List<List<Point2d<float>>> geom;
-			if (layerProperties.buildingsWithUniqueIds == true) //ids from building dataset is big ulongs
+			if (layerProperties.buildingsWithUniqueIds) //ids from building dataset is big ulongs
 			{
 				geom = fe.Geometry<float>(); //and we're not clipping by passing no parameters
 
@@ -581,41 +554,40 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				geom = fe.Geometry<float>(0); //passing zero means clip at tile edge
 			}
 
-			var feature = new VectorFeatureUnity(layerProperties.vectorTileLayer.GetFeature(index),
+			var feature = new VectorFeatureUnity(
+				layerProperties.vectorTileLayer.GetFeature(index),
 				geom,
 				tile,
 				layerProperties.vectorTileLayer.Extent,
 				layerProperties.buildingsWithUniqueIds);
 
 
-			if (IsFeatureEligibleAfterFiltering(feature, tile, layerProperties))
+			if (!IsFeatureEligibleAfterFiltering(feature, tile, layerProperties)) return true;
+			if (tile == null || tile.gameObject == null ||
+			    tile.VectorDataState == Enums.TilePropertyState.Cancelled) return true;
+			
+			switch (layerProperties.featureProcessingStage)
 			{
-				if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
-				{
-					switch (layerProperties.featureProcessingStage)
+				case FeatureProcessingStage.PreProcess:
+					//pre process features.
+					PreProcessFeatures(feature, tile, tile.gameObject);
+					break;
+				case FeatureProcessingStage.Process:
+					//skip existing features, only works on tilesets with unique ids
+					if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile, layerProperties))
 					{
-						case FeatureProcessingStage.PreProcess:
-							//pre process features.
-							PreProcessFeatures(feature, tile, tile.gameObject);
-							break;
-						case FeatureProcessingStage.Process:
-							//skip existing features, only works on tilesets with unique ids
-							if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile, layerProperties))
-							{
-								return false;
-							}
-							//feature not skipped. Add to pool only if features are in preprocess stage.
-							AddFeatureToTileObjectPool(feature, tile);
-							Build(feature, tile, tile.gameObject);
-							break;
-						case FeatureProcessingStage.PostProcess:
-							break;
-						default:
-							break;
+						return false;
 					}
-					_entityInCurrentCoroutine++;
-				}
+					//feature not skipped. Add to pool only if features are in preprocess stage.
+					AddFeatureToTileObjectPool(feature, tile);
+					Build(feature, tile, tile.gameObject);
+					break;
+				case FeatureProcessingStage.PostProcess:
+					break;
+				default:
+					break;
 			}
+			_entityInCurrentCoroutine++;
 			return true;
 		}
 
@@ -665,12 +637,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			//and finally, running the modifier stack on the feature
 			var processed = false;
 
-			if (!processed)
+			if (_defaultStack != null)
 			{
-				if (_defaultStack != null)
-				{
-					_defaultStack.Execute(tile, feature, meshData, parent, styleSelectorKey);
-				}
+				_defaultStack.Execute(tile, feature, meshData, parent, styleSelectorKey);
 			}
 		}
 
@@ -696,14 +665,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			//removing ids from activeIds list so they'll be recreated next time tile loads (necessary when you're unloading/loading tiles)
-			if (_idPool.ContainsKey(tile))
+			if (!_idPool.ContainsKey(tile)) return;
+			foreach (var item in _idPool[tile])
 			{
-				foreach (var item in _idPool[tile])
-				{
-					_activeIds.Remove(item);
-				}
-				_idPool[tile].Clear();
+				_activeIds.Remove(item);
 			}
+			_idPool[tile].Clear();
 		}
 
 		public override void Clear()

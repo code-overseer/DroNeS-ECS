@@ -26,73 +26,51 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		ImageryLayerProperties _properties;
 		protected ImageDataFetcher DataFetcher;
 
-		public ImageryLayerProperties Properties
-		{
-			get
-			{
-				return _properties;
-			}
-		}
+		public ImageryLayerProperties Properties => _properties;
 
 		public string TilesetId
 		{
-			get
-			{
-				return _properties.sourceOptions.Id;
-			}
+			get => _properties.sourceOptions.Id;
 
-			set
-			{
-				_properties.sourceOptions.Id = value;
-			}
+			set => _properties.sourceOptions.Id = value;
 		}
 
 		#region UnityMethods
 		protected virtual void OnDestroy()
 		{
 			//unregister events
-			if (DataFetcher != null)
-			{
-				DataFetcher.DataRecieved -= OnImageRecieved;
-				DataFetcher.FetchingError -= OnDataError;
-			}
+			if (DataFetcher == null) return;
+			DataFetcher.DataRecieved -= OnImageRecieved;
+			DataFetcher.FetchingError -= OnDataError;
 		}
 		#endregion
 
 		#region DataFetcherEvents
 		private void OnImageRecieved(UnityTile tile, RasterTile rasterTile)
 		{
-			if (tile != null)
-			{
-				_tilesWaitingResponse.Remove(tile);
+			if (tile == null) return;
+			_tilesWaitingResponse.Remove(tile);
 
-				if (tile.RasterDataState != TilePropertyState.Unregistered)
-				{
-					tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
-				}
+			if (tile.RasterDataState != TilePropertyState.Unregistered)
+			{
+				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
 			}
 		}
 
 		//merge this with OnErrorOccurred?
 		protected virtual void OnDataError(UnityTile tile, RasterTile rasterTile, TileErrorEventArgs e)
 		{
-			if (tile != null)
-			{
-				if (tile.RasterDataState != TilePropertyState.Unregistered)
-				{
-					tile.RasterDataState = TilePropertyState.Error;
-					_tilesWaitingResponse.Remove(tile);
-					OnErrorOccurred(e);
-				}
-
-			}
+			if (tile == null || tile.RasterDataState == TilePropertyState.Unregistered) return;
+			tile.RasterDataState = TilePropertyState.Error;
+			_tilesWaitingResponse.Remove(tile);
+			OnErrorOccurred(e);
 		}
 		#endregion
 
 		#region AbstractFactoryOverrides
 		protected override void OnInitialized()
 		{
-			DataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
+			DataFetcher = CreateInstance<ImageDataFetcher>();
 			DataFetcher.DataRecieved += OnImageRecieved;
 			DataFetcher.FetchingError += OnDataError;
 		}
@@ -110,22 +88,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.RasterDataState = TilePropertyState.None;
 				return;
 			}
-			else
+
+			tile.RasterDataState = TilePropertyState.Loading;
+			if (_properties.sourceType != ImagerySourceType.Custom)
 			{
-				tile.RasterDataState = TilePropertyState.Loading;
-				if (_properties.sourceType != ImagerySourceType.Custom)
-				{
-					_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
-				}
-				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
-				{
-					canonicalTileId = tile.CanonicalTileId,
-					tile = tile,
-					tilesetId = TilesetId,
-					useRetina = _properties.rasterOptions.useRetina
-				};
-				DataFetcher.FetchData(parameters);
+				_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
 			}
+			var parameters = new ImageDataFetcherParameters()
+			{
+				canonicalTileId = tile.CanonicalTileId,
+				tile = tile,
+				tilesetId = TilesetId,
+				useRetina = _properties.rasterOptions.useRetina
+			};
+			DataFetcher.FetchData(parameters);
 		}
 
 		/// <summary>

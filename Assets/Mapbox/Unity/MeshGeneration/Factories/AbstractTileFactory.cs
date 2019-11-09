@@ -60,7 +60,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public virtual void Initialize(IFileSource fileSource)
 		{
-			_fileSource = fileSource;
+			//_fileSource = fileSource;
 			_tilesWaitingResponse = new HashSet<UnityTile>();
 			_tilesWaitingProcessing = new HashSet<UnityTile>();
 			OnInitialized();

@@ -45,13 +45,7 @@ namespace Mapbox.Map
 		/// _sampleMaterial.mainTexture = texture;
 		/// </code>
 		/// </example>
-		public byte[] Data
-		{
-			get
-			{
-				return this.data;
-			}
-		}
+		public byte[] Data => this.data;
 
 		internal override TileResource MakeTileResource(string tilesetId)
 		{

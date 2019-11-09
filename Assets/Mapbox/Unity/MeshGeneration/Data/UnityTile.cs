@@ -35,13 +35,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			get
 			{
+				if (_meshRenderer != null) return _meshRenderer;
+				_meshRenderer = GetComponent<MeshRenderer>();
 				if (_meshRenderer == null)
 				{
-					_meshRenderer = GetComponent<MeshRenderer>();
-					if (_meshRenderer == null)
-					{
-						_meshRenderer = gameObject.AddComponent<MeshRenderer>();
-					}
+					_meshRenderer = gameObject.AddComponent<MeshRenderer>();
 				}
 				return _meshRenderer;
 			}
@@ -52,16 +50,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			get
 			{
-				if (_meshFilter == null)
-				{
-					_meshFilter = GetComponent<MeshFilter>();
-					if (_meshFilter == null)
-					{
-						_meshFilter = gameObject.AddComponent<MeshFilter>();
-						_meshFilter.sharedMesh = new Mesh();
-						ElevationType = TileTerrainType.None;
-					}
-				}
+				if (_meshFilter != null) return _meshFilter;
+				
+				_meshFilter = GetComponent<MeshFilter>();
+				if (_meshFilter != null) return _meshFilter;
+				
+				_meshFilter = gameObject.AddComponent<MeshFilter>();
+				_meshFilter.sharedMesh = new Mesh();
+				ElevationType = TileTerrainType.None;
 				return _meshFilter;
 			}
 		}
@@ -101,17 +97,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private TilePropertyState _rasterDataState;
 		public TilePropertyState RasterDataState
 		{
-			get
-			{
-				return _rasterDataState;
-			}
+			get => _rasterDataState;
 			internal set
 			{
-				if (_rasterDataState != value)
-				{
-					_rasterDataState = value;
-					OnRasterDataChanged(this);
-				}
+				if (_rasterDataState == value) return;
+				_rasterDataState = value;
+				OnRasterDataChanged(this);
 			}
 		}
 		[SerializeField]
@@ -135,26 +126,19 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private TilePropertyState _vectorDataState;
 		public TilePropertyState VectorDataState
 		{
-			get
-			{
-				return _vectorDataState;
-			}
+			get => _vectorDataState;
 			internal set
 			{
-				if (_vectorDataState != value)
-				{
-					_vectorDataState = value;
-					OnVectorDataChanged(this);
-				}
+				if (_vectorDataState == value) return;
+				_vectorDataState = value;
+				OnVectorDataChanged(this);
 			}
 		}
+		
 		private TilePropertyState _tileState = TilePropertyState.None;
 		public TilePropertyState TileState
 		{
-			get
-			{
-				return _tileState;
-			}
+			get => _tileState;
 			set
 			{
 				if (_tileState != value)
@@ -183,7 +167,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			CanonicalTileId = tileId.Canonical;
 			_loadingTexture = loadingTexture;
 
-			float scaleFactor = 1.0f;
+			var scaleFactor = 1.0f;
 			if (_isInitialized == false)
 			{
 				_isInitialized = true;
@@ -228,92 +212,94 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
 		{
-			if (HeightDataState != TilePropertyState.Unregistered)
+			Debug.Log("This function is not needed for flat terrain");
+			if (HeightDataState == TilePropertyState.Unregistered)
 			{
-				//reset height data
-				if(data == null)
-				{
-					HeightData = new float[256 * 256];
-					HeightDataState = TilePropertyState.None;
-					return;
-				}
-
-				// HACK: compute height values for terrain. We could probably do this without a texture2d.
-				if (_heightTexture == null)
-				{
-					_heightTexture = new Texture2D(0, 0);
-				}
-
-				_heightTexture.LoadImage(data);
-				byte[] rgbData = _heightTexture.GetRawTextureData();
-
-				// Get rid of this temporary texture. We don't need to bloat memory.
-				_heightTexture.LoadImage(null);
-
-				if (HeightData == null)
-				{
-					HeightData = new float[256 * 256];
-				}
-
-				var relativeScale = useRelative ? _relativeScale : 1f;
-				for (int xx = 0; xx < 256; ++xx)
-				{
-					for (int yy = 0; yy < 256; ++yy)
-					{
-						float r = rgbData[(xx * 256 + yy) * 4 + 1];
-						float g = rgbData[(xx * 256 + yy) * 4 + 2];
-						float b = rgbData[(xx * 256 + yy) * 4 + 3];
-						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-						HeightData[xx * 256 + yy] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
-					}
-				}
-
-				if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
-				{
-					gameObject.AddComponent<MeshCollider>();
-				}
-
-				HeightDataState = TilePropertyState.Loaded;
+				return;
 			}
+			//reset height data
+			if(data == null)
+			{
+				HeightData = new float[256 * 256];
+				HeightDataState = TilePropertyState.None;
+				return;
+			}
+
+			// HACK: compute height values for terrain. We could probably do this without a texture2d.
+			if (_heightTexture == null)
+			{
+				_heightTexture = new Texture2D(0, 0);
+			}
+
+			_heightTexture.LoadImage(data);
+			var rgbData = _heightTexture.GetRawTextureData();
+
+			// Get rid of this temporary texture. We don't need to bloat memory.
+			_heightTexture.LoadImage(null);
+
+			if (HeightData == null)
+			{
+				HeightData = new float[256 * 256];
+			}
+
+			var relativeScale = useRelative ? _relativeScale : 1f;
+			for (var xx = 0; xx < 256; ++xx)
+			{
+				for (var yy = 0; yy < 256; ++yy)
+				{
+					float r = rgbData[(xx * 256 + yy) * 4 + 1];
+					float g = rgbData[(xx * 256 + yy) * 4 + 2];
+					float b = rgbData[(xx * 256 + yy) * 4 + 3];
+					//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+					HeightData[xx * 256 + yy] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+				}
+			}
+
+			if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
+			{
+				gameObject.AddComponent<MeshCollider>();
+			}
+
+			HeightDataState = TilePropertyState.Loaded;
 		}
 
 		public void SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = false)
 		{
 			// Don't leak the texture, just reuse it.
-			if (RasterDataState != TilePropertyState.Unregistered)
+			if (RasterDataState == TilePropertyState.Unregistered)
 			{
-				//reset image on null data
-				if (data == null)
-				{
-					MeshRenderer.material.mainTexture = null;
-					return;
-				}
-
-				if (_rasterData == null)
-				{
-					_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
-					_rasterData.wrapMode = TextureWrapMode.Clamp;
-				}
-
-				_rasterData.LoadImage(data);
-				if (useCompression)
-				{
-					// High quality = true seems to decrease image quality?
-					_rasterData.Compress(false);
-				}
-
-				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
-
-				RasterDataState = TilePropertyState.Loaded;
+				return;
 			}
+			
+			//reset image on null data
+			if (data == null)
+			{
+				MeshRenderer.material.mainTexture = null;
+				return;
+			}
+
+			if (_rasterData == null)
+			{
+				_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
+				_rasterData.wrapMode = TextureWrapMode.Clamp;
+			}
+
+			_rasterData.LoadImage(data);
+			if (useCompression)
+			{
+				// High quality = true seems to decrease image quality?
+				_rasterData.Compress(false);
+			}
+
+			MeshRenderer.sharedMaterial.mainTexture = _rasterData;
+
+			RasterDataState = TilePropertyState.Loaded;
 		}
 
 		public void SetVectorData(VectorTile vectorTile)
 		{
-			if (VectorDataState != TilePropertyState.Unregistered)
-			{
-				VectorData = vectorTile;
-			}
+			if (VectorDataState == TilePropertyState.Unregistered) return;
+			VectorData = vectorTile;
 		}
 
 		/// <summary>
@@ -369,13 +355,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void ClearAssets()
 		{
-			if (Application.isEditor && !Application.isPlaying)
-			{
-				DestroyImmediate(_heightTexture, true);
-				DestroyImmediate(_rasterData, true);
-				DestroyImmediate(_meshFilter.sharedMesh);
-				DestroyImmediate(_meshRenderer.sharedMaterial);
-			}
+			if (!Application.isEditor || Application.isPlaying) return;
+			DestroyImmediate(_heightTexture, true);
+			DestroyImmediate(_rasterData, true);
+			DestroyImmediate(_meshFilter.sharedMesh);
+			DestroyImmediate(_meshRenderer.sharedMaterial);
 		}
 
 		public void Cancel()

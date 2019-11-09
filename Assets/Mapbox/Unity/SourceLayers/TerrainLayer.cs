@@ -16,67 +16,26 @@ namespace Mapbox.Unity.Map
 		[NodeEditorElement("Terrain Layer")]
 		ElevationLayerProperties _layerProperty = new ElevationLayerProperties();
 		[NodeEditorElement("Terrain Layer")]
-		public ElevationLayerProperties LayerProperty
-		{
-			get
-			{
-				return _layerProperty;
-			}
-		}
+		public ElevationLayerProperties LayerProperty => _layerProperty;
 
-		public MapLayerType LayerType
-		{
-			get
-			{
-				return MapLayerType.Elevation;
-			}
-		}
-
-		public bool IsLayerActive
-		{
-			get
-			{
-				return (_layerProperty.sourceType != ElevationSourceType.None);
-			}
-		}
-
-		public string LayerSourceId
-		{
-			get
-			{
-				return _layerProperty.sourceOptions.Id;
-			}
-		}
-
-		public ElevationSourceType LayerSource
-		{
-			get
-			{
-				return _layerProperty.sourceType;
-			}
-		}
+		public MapLayerType LayerType => MapLayerType.Elevation;
+		public bool IsLayerActive => (_layerProperty.sourceType != ElevationSourceType.None);
+		public string LayerSourceId => _layerProperty.sourceOptions.Id;
+		public ElevationSourceType LayerSource => _layerProperty.sourceType;
 
 		public ElevationLayerType ElevationType
 		{
-			get
-			{
-				return _layerProperty.elevationLayerType;
-			}
+			get => _layerProperty.elevationLayerType;
 			set
 			{
-				if (_layerProperty.elevationLayerType != value)
-				{
-					_layerProperty.elevationLayerType = value;
-					_layerProperty.HasChanged = true;
-				}
+				if (_layerProperty.elevationLayerType == value) return;
+				_layerProperty.elevationLayerType = value;
+				_layerProperty.HasChanged = true;
 			}
 		}
 		public float ExaggerationFactor
 		{
-			get
-			{
-				return _layerProperty.requiredOptions.exaggerationFactor;
-			}
+			get => _layerProperty.requiredOptions.exaggerationFactor;
 			set
 			{
 				_layerProperty.requiredOptions.exaggerationFactor = value;
@@ -86,25 +45,12 @@ namespace Mapbox.Unity.Map
 
 		public float EarthRadius
 		{
-			get
-			{
-				return _layerProperty.modificationOptions.earthRadius;
-			}
+			get => _layerProperty.modificationOptions.earthRadius;
 
-			set
-			{
-				_layerProperty.modificationOptions.earthRadius = value;
-			}
+			set => _layerProperty.modificationOptions.earthRadius = value;
 		}
 		private TerrainFactoryBase _elevationFactory;
-		public AbstractTileFactory Factory
-		{
-			get
-			{
-				return _elevationFactory;
-			}
-		}
-
+		public AbstractTileFactory Factory => _elevationFactory;
 
 
 		public TerrainLayer()
@@ -195,8 +141,6 @@ namespace Mapbox.Unity.Map
 				sourceType = ElevationSourceType.None
 			};
 		}
-
-
 
 		public void Update(LayerProperties properties)
 		{
@@ -365,7 +309,6 @@ namespace Mapbox.Unity.Map
 				_layerProperty.unityLayerOptions.HasChanged = true;
 			}
 		}
-
 
 		#endregion
 	}

@@ -20,11 +20,11 @@ namespace DroNeS.Systems
         }
         
         [BurstCompile]
-        private struct DroneMovementJob : IJobForEach<DroneStatus, Translation, Waypoint>
+        private struct DroneMovementJob : IJobForEach<DroneTag, DroneStatus, Translation, Waypoint>
         {
             public float Delta;
             private const float Speed = 10;
-            public void Execute(ref DroneStatus status, ref Translation pos, ref Waypoint point)
+            public void Execute(ref DroneTag tag, ref DroneStatus status, ref Translation pos, ref Waypoint point)
             {
                 switch (status.Value)
                 {
@@ -45,7 +45,6 @@ namespace DroNeS.Systems
                 }
                 status = Status.EnRoute;
                 pos.Value = MoveTowards(pos.Value, point.waypoint, Speed * Delta);
-
             }
 
             private static float3 MoveTowards(float3 current, float3 target, float maxDelta)

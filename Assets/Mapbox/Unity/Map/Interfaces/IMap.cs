@@ -35,7 +35,7 @@ namespace Mapbox.Unity.Map.Interfaces
 		HashSet<UnwrappedTileId> CurrentExtent { get; }
 		event Action OnInitialized;
 		event Action OnUpdated;
-		Vector2d WorldToGeoPosition(Vector3 realworldPoint);
+		Vector2d WorldToGeoPosition(Vector3 point);
 		Vector3 GeoToWorldPosition(Vector2d latitudeLongitude, bool queryHeight = true);
 	}
 

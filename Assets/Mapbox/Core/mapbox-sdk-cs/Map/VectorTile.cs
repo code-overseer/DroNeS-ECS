@@ -46,7 +46,7 @@ namespace Mapbox.Map
 		// with his class. Something has to be renamed here.
 		private Mapbox.VectorTile.VectorTile data;
 
-		bool _isStyleOptimized = false;
+		bool _isStyleOptimized;
 
 		string _optimizedStyleId;
 
@@ -56,13 +56,7 @@ namespace Mapbox.Map
 
 		/// <summary> Gets the vector decoded using Mapbox.VectorTile library. </summary>
 		/// <value> The GeoJson data. </value>
-		public Mapbox.VectorTile.VectorTile Data
-		{
-			get
-			{
-				return this.data;
-			}
-		}
+		public Mapbox.VectorTile.VectorTile Data => this.data;
 
 		public VectorTile()
 		{
@@ -102,17 +96,9 @@ namespace Mapbox.Map
 		//protected override void Dispose(bool disposeManagedResources)
 		public void Dispose(bool disposeManagedResources)
 		{
-			if (!isDisposed)
-			{
-				if (disposeManagedResources)
-				{
-					//TODO implement IDisposable with Mapbox.VectorTile.VectorTile
-					if (null != data)
-					{
-						data = null;
-					}
-				}
-			}
+			if (isDisposed || !disposeManagedResources) return;
+			//TODO implement IDisposable with Mapbox.VectorTile.VectorTile
+			data = null;
 		}
 
 
@@ -130,13 +116,7 @@ namespace Mapbox.Map
 		/// Console.Write("GeoJson: " + json);
 		/// </code>
 		/// </example>
-		public string GeoJson
-		{
-			get
-			{
-				return this.data.ToGeoJson((ulong)Id.Z, (ulong)Id.X, (ulong)Id.Y, 0);
-			}
-		}
+		public string GeoJson => this.data.ToGeoJson((ulong)Id.Z, (ulong)Id.X, (ulong)Id.Y, 0);
 
 
 		/// <summary>

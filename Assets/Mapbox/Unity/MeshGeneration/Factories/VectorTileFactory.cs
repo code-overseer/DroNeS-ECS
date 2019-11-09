@@ -36,24 +36,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region Properties
 		public string TilesetId
 		{
-			get
-			{
-				return _properties.sourceOptions.Id;
-			}
+			get => _properties.sourceOptions.Id;
 
-			set
-			{
-				_properties.sourceOptions.Id = value;
-			}
+			set => _properties.sourceOptions.Id = value;
 		}
 
-		public VectorLayerProperties Properties
-		{
-			get
-			{
-				return _properties;
-			}
-		}
+		public VectorLayerProperties Properties => _properties;
+
 		#endregion
 
 		#region Public Methods
@@ -92,8 +81,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			// Set honorBuildingSettings - need to set here in addition to the UI.
 			// Not setting it here can lead to wrong filtering.
 
-			bool isPrimitiveTypeValidForBuidingIds = (subLayer.coreOptions.geometryType == VectorPrimitiveType.Polygon) || (subLayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
-			bool isSourceValidForBuildingIds = _properties.sourceType != VectorSourceType.MapboxStreets;
+			var isPrimitiveTypeValidForBuidingIds = (subLayer.coreOptions.geometryType == VectorPrimitiveType.Polygon) || (subLayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
+			var isSourceValidForBuildingIds = _properties.sourceType != VectorSourceType.MapboxStreets;
 
 			subLayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
 			// Setup visualizer.
@@ -144,31 +133,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public virtual LayerVisualizerBase FindVectorLayerVisualizer(VectorSubLayerProperties subLayer)
 		{
-			if (_layerBuilder.ContainsKey(subLayer.Key))
-			{
-				var visualizer = _layerBuilder[subLayer.Key].Find((obj) => obj.SubLayerProperties == subLayer);
-				return visualizer;
-			}
-			return null;
+			if (!_layerBuilder.ContainsKey(subLayer.Key)) return null;
+			var visualizer = _layerBuilder[subLayer.Key].Find((obj) => obj.SubLayerProperties == subLayer);
+			return visualizer;
 		}
 
 		public virtual void RemoveVectorLayerVisualizer(LayerVisualizerBase subLayer)
 		{
 			subLayer.Clear();
-			if (_layerBuilder.ContainsKey(subLayer.Key))
+			if (!_layerBuilder.ContainsKey(subLayer.Key)) return;
+			if (Properties.vectorSubLayers.Contains(subLayer.SubLayerProperties))
 			{
-				if (Properties.vectorSubLayers.Contains(subLayer.SubLayerProperties))
-				{
-					Properties.vectorSubLayers.Remove(subLayer.SubLayerProperties);
-				}
-				else if (subLayer.SubLayerProperties is PrefabItemOptions && Properties.locationPrefabList.Contains(subLayer.SubLayerProperties as PrefabItemOptions))
-				{
-					Properties.locationPrefabList.Remove(subLayer.SubLayerProperties as PrefabItemOptions);
-				}
-				subLayer.LayerVisualizerHasChanged -= UpdateTileFactory;
-				subLayer.UnbindSubLayerEvents();
-				_layerBuilder[subLayer.Key].Remove(subLayer);
+				Properties.vectorSubLayers.Remove(subLayer.SubLayerProperties);
 			}
+			else if (subLayer.SubLayerProperties is PrefabItemOptions && Properties.locationPrefabList.Contains(subLayer.SubLayerProperties as PrefabItemOptions))
+			{
+				Properties.locationPrefabList.Remove(subLayer.SubLayerProperties as PrefabItemOptions);
+			}
+			subLayer.LayerVisualizerHasChanged -= UpdateTileFactory;
+			subLayer.UnbindSubLayerEvents();
+			_layerBuilder[subLayer.Key].Remove(subLayer);
 		}
 		#endregion
 
@@ -199,7 +183,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 			tile.VectorDataState = TilePropertyState.Loading;
 			_tilesWaitingResponse.Add(tile);
-			VectorDataFetcherParameters parameters = new VectorDataFetcherParameters()
+			var parameters = new VectorDataFetcherParameters()
 			{
 				canonicalTileId = tile.CanonicalTileId,
 				tilesetId = TilesetId,
@@ -221,14 +205,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_tilesWaitingProcessing.Remove(tile);
 			}
 
-			if (_layerBuilder != null)
+			if (_layerBuilder == null) return;
+			foreach (var layer in _layerBuilder.Values)
 			{
-				foreach (var layer in _layerBuilder.Values)
+				foreach (var visualizer in layer)
 				{
-					foreach (var visualizer in layer)
-					{
-						visualizer.UnregisterTile(tile);
-					}
+					visualizer.UnregisterTile(tile);
 				}
 			}
 		}
@@ -236,34 +218,30 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public override void Clear()
 		{
 			DestroyImmediate(DataFetcher);
-			if (_layerBuilder != null)
+			if (_layerBuilder == null) return;
+			foreach (var layerList in _layerBuilder.Values)
 			{
-				foreach (var layerList in _layerBuilder.Values)
+				foreach (var layerVisualizerBase in layerList)
 				{
-					foreach (var layerVisualizerBase in layerList)
-					{
-						layerVisualizerBase.Clear();
-						DestroyImmediate(layerVisualizerBase);
-					}
+					layerVisualizerBase.Clear();
+					DestroyImmediate(layerVisualizerBase);
 				}
-
-				_layerProgress.Clear();
-				_tilesWaitingResponse.Clear();
-				_tilesWaitingProcessing.Clear();
 			}
+
+			_layerProgress.Clear();
+			_tilesWaitingResponse.Clear();
+			_tilesWaitingProcessing.Clear();
 		}
 
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (VectorLayerProperties)options;
-			if (_layerBuilder != null)
-			{
-				RemoveAllLayerVisualiers();
+			if (_layerBuilder == null) return;
+			RemoveAllLayerVisualiers();
 
-				CreatePOILayerVisualizers();
+			CreatePOILayerVisualizers();
 
-				CreateLayerVisualizers();
-			}
+			CreateLayerVisualizers();
 		}
 
 		public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
@@ -279,7 +257,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void UpdateTileFactory(object sender, EventArgs args)
 		{
-			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
+			var layerUpdateArgs = args as VectorLayerUpdateArgs;
 			layerUpdateArgs.factory = this;
 			base.UpdateTileFactory(sender, layerUpdateArgs);
 		}
@@ -305,15 +283,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnUnbindEvents()
 		{
-			if (_layerBuilder != null)
+			if (_layerBuilder == null) return;
+			foreach (var layer in _layerBuilder.Values)
 			{
-				foreach (var layer in _layerBuilder.Values)
+				foreach (var visualizer in layer)
 				{
-					foreach (var visualizer in layer)
-					{
-						visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
-						visualizer.UnbindSubLayerEvents();
-					}
+					visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
+					visualizer.UnbindSubLayerEvents();
 				}
 			}
 		}
@@ -322,25 +298,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region DataFetcherEvents
 		private void OnVectorDataRecieved(UnityTile tile, Mapbox.Map.VectorTile vectorTile)
 		{
-			if (tile != null)
-			{
-				_tilesWaitingResponse.Remove(tile);
-				if (tile.VectorDataState != TilePropertyState.Unregistered)
-				{
-					tile.SetVectorData(vectorTile);
+			if (tile == null) return;
+			_tilesWaitingResponse.Remove(tile);
+			if (tile.VectorDataState == TilePropertyState.Unregistered) return;
+			tile.SetVectorData(vectorTile);
 
-					// FIXME: we can make the request BEFORE getting a response from these!
-					if (tile.HeightDataState == TilePropertyState.Loading ||
-							tile.RasterDataState == TilePropertyState.Loading)
-					{
-						tile.OnHeightDataChanged += DataChangedHandler;
-						tile.OnRasterDataChanged += DataChangedHandler;
-					}
-					else
-					{
-						CreateMeshes(tile);
-					}
-				}
+			// FIXME: we can make the request BEFORE getting a response from these!
+			if (tile.HeightDataState == TilePropertyState.Loading ||
+			    tile.RasterDataState == TilePropertyState.Loading)
+			{
+				tile.OnHeightDataChanged += DataChangedHandler;
+				tile.OnRasterDataChanged += DataChangedHandler;
+			}
+			else
+			{
+				CreateMeshes(tile);
 			}
 		}
 
@@ -356,16 +328,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void OnDataError(UnityTile tile, Mapbox.Map.VectorTile vectorTile, TileErrorEventArgs e)
 		{
-			if (tile != null)
-			{
-				_tilesWaitingResponse.Remove(tile);
-				if (tile.VectorDataState != TilePropertyState.Unregistered)
-				{
-					tile.SetVectorData(null);
-					tile.VectorDataState = TilePropertyState.Error;
-					OnErrorOccurred(e);
-				}
-			}
+			if (tile == null) return;
+			_tilesWaitingResponse.Remove(tile);
+			if (tile.VectorDataState == TilePropertyState.Unregistered) return;
+			tile.SetVectorData(null);
+			tile.VectorDataState = TilePropertyState.Error;
+			OnErrorOccurred(e);
 
 		}
 		#endregion
@@ -378,25 +346,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			foreach (var layerName in tile.VectorData.Data.LayerNames())
 			{
-				if (_layerBuilder.ContainsKey(layerName))
+				if (!_layerBuilder.ContainsKey(layerName)) continue;
+				//two loops; first one to add it to waiting/tracking list, second to start it
+				foreach (var builder in _layerBuilder[layerName])
 				{
-					//two loops; first one to add it to waiting/tracking list, second to start it
-					foreach (var builder in _layerBuilder[layerName])
-					{
-						nameList.Add(layerName);
-						builderList.Add(builder);
-						TrackFeatureWithBuilder(tile, layerName, builder);
-					}
+					nameList.Add(layerName);
+					builderList.Add(builder);
+					TrackFeatureWithBuilder(tile, layerName, builder);
 				}
 			}
-			for (int i = 0; i < nameList.Count; i++)
+			
+			for (var i = 0; i < nameList.Count; i++)
 			{
 				CreateFeatureWithBuilder(tile, nameList[i], builderList[i]);
 			}
 
 			builderList.Clear();
+			
+			Debug.Log("Everything with emptyLayer is bullshit");
 			//emptylayer for visualizers that don't depend on outside data sources
-			string emptyLayer = "";
+			var emptyLayer = "";
 			if (_layerBuilder.ContainsKey(emptyLayer))
 			{
 				//two loops; first one to add it to waiting/tracking list, second to start it
@@ -406,9 +375,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					TrackFeatureWithBuilder(tile, emptyLayer, builder);
 				}
 			}
-			for (int i = 0; i < builderList.Count; i++)
+			foreach (var builderI in builderList)
 			{
-				CreateFeatureWithBuilder(tile, emptyLayer, builderList[i]);
+				CreateFeatureWithBuilder(tile, emptyLayer, builderI);
 			}
 
 			if (!_layerProgress.ContainsKey(tile))
@@ -419,67 +388,57 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void TrackFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
 		{
-			if (builder.Active)
+			if (!builder.Active) return;
+			if (_layerProgress.ContainsKey(tile))
 			{
-				if (_layerProgress.ContainsKey(tile))
+				_layerProgress[tile].Add(builder);
+			}
+			else
+			{
+				_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> {builder});
+				if (!_tilesWaitingProcessing.Contains(tile))
 				{
-					_layerProgress[tile].Add(builder);
-				}
-				else
-				{
-					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> {builder});
-					if (!_tilesWaitingProcessing.Contains(tile))
-					{
-						_tilesWaitingProcessing.Add(tile);
-					}
+					_tilesWaitingProcessing.Add(tile);
 				}
 			}
 		}
 
 		private void CreateFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
 		{
-			if (builder.Active)
+			if (!builder.Active) return;
+			if (_layerProgress.ContainsKey(tile))
 			{
-				if (_layerProgress.ContainsKey(tile))
+				_layerProgress[tile].Add(builder);
+			}
+			else
+			{
+				_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
+				if (!_tilesWaitingProcessing.Contains(tile))
 				{
-					_layerProgress[tile].Add(builder);
-				}
-				else
-				{
-					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
-					if (!_tilesWaitingProcessing.Contains(tile))
-					{
-						_tilesWaitingProcessing.Add(tile);
-					}
-				}
-				if (layerName != "")
-				{
-					builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
-				}
-				else
-				{
-					//just pass the first available layer - we should create a static null layer for this
-					builder.Create(tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile, DecreaseProgressCounter);
+					_tilesWaitingProcessing.Add(tile);
 				}
 			}
+
+			builder.Create(
+				layerName != ""
+					? tile.VectorData.Data.GetLayer(layerName)
+					: tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile,
+				DecreaseProgressCounter);
 		}
 
 		private void DecreaseProgressCounter(UnityTile tile, LayerVisualizerBase builder)
 		{
-			if (_layerProgress.ContainsKey(tile))
+			if (!_layerProgress.ContainsKey(tile)) return;
+			if (_layerProgress[tile].Contains(builder))
 			{
-				if (_layerProgress[tile].Contains(builder))
-				{
-					_layerProgress[tile].Remove(builder);
+				_layerProgress[tile].Remove(builder);
 
-				}
-				if (_layerProgress[tile].Count == 0)
-				{
-					_layerProgress.Remove(tile);
-					_tilesWaitingProcessing.Remove(tile);
-					tile.VectorDataState = TilePropertyState.Loaded;
-				}
 			}
+
+			if (_layerProgress[tile].Count != 0) return;
+			_layerProgress.Remove(tile);
+			_tilesWaitingProcessing.Remove(tile);
+			tile.VectorDataState = TilePropertyState.Loaded;
 		}
 
 		private void CreatePOILayerVisualizers()

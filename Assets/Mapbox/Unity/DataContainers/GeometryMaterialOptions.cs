@@ -241,34 +241,32 @@
 
 		private void AssignAssets(StyleAssetPathBundle styleAssetPathBundle)
 		{
-			Material topMaterial = Resources.Load(styleAssetPathBundle.topMaterialPath, typeof(Material)) as Material;
-			Material sideMaterial = Resources.Load(styleAssetPathBundle.sideMaterialPath, typeof(Material)) as Material;
+			var topMaterial = Resources.Load(styleAssetPathBundle.topMaterialPath, typeof(Material)) as Material;
+			var sideMaterial = Resources.Load(styleAssetPathBundle.sideMaterialPath, typeof(Material)) as Material;
 
-			AtlasInfo atlas = Resources.Load(styleAssetPathBundle.atlasPath, typeof(AtlasInfo)) as AtlasInfo;
-			ScriptablePalette palette = Resources.Load(styleAssetPathBundle.palettePath, typeof(ScriptablePalette)) as ScriptablePalette;
+			var atlas = Resources.Load(styleAssetPathBundle.atlasPath, typeof(AtlasInfo)) as AtlasInfo;
+			var palette = Resources.Load(styleAssetPathBundle.palettePath, typeof(ScriptablePalette)) as ScriptablePalette;
 
-			Material[] tempMaterials = new Material[2];
-
-
-			for (int i = 0; i < materials.Length; i++)
-			{
-				if (materials[i].Materials[0] != null)
-				{
-					tempMaterials[i] = materials[i].Materials[0];
-					materials[i].Materials[0] = null;
-				}
-			}
+//			Material[] tempMaterials = new Material[2];
+//
+//
+//			for (int i = 0; i < materials.Length; i++)
+//			{
+//				if (materials[i].Materials[0] == null) continue;
+//				tempMaterials[i] = materials[i].Materials[0];
+//				materials[i].Materials[0] = null;
+//			}
 
 			materials[0].Materials[0] = new Material(topMaterial);
 			materials[1].Materials[0] = new Material(sideMaterial);
 
-			for (int i = 0; i < materials.Length; i++)
-			{
-				if (tempMaterials[i] != null)
-				{
-					tempMaterials[i].Destroy();
-				}
-			}
+//			for (int i = 0; i < materials.Length; i++)
+//			{
+//				if (tempMaterials[i] != null)
+//				{
+//					tempMaterials[i].Destroy();
+//				}
+//			}
 
 			Resources.UnloadUnusedAssets();
 

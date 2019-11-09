@@ -12,8 +12,7 @@ public class ImageDataFetcher : DataFetcher
 	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
 	public override void FetchData(DataFetcherParameters parameters)
 	{
-		var imageDataParameters = parameters as ImageDataFetcherParameters;
-		if(imageDataParameters == null)
+		if(!(parameters is ImageDataFetcherParameters imageDataParameters))
 		{
 			return;
 		}

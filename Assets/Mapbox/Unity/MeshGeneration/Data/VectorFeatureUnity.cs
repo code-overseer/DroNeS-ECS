@@ -34,24 +34,17 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Tile = tile;
 
 			//this is a temp hack until we figure out how streets ids works
-			if (buildingsWithUniqueIds == true) //ids from building dataset is big ulongs 
-			{
-				_geom = feature.Geometry<float>(); //and we're not clipping by passing no parameters
-			}
-			else //streets ids, will require clipping
-			{
-				_geom = feature.Geometry<float>(0); //passing zero means clip at tile edge
-			}
+			_geom = buildingsWithUniqueIds ? feature.Geometry<float>() : feature.Geometry<float>(0);
 
 			_rectSizex = tile.Rect.Size.x;
 			_rectSizey = tile.Rect.Size.y;
 
 			_geomCount = _geom.Count;
-			for (int i = 0; i < _geomCount; i++)
+			for (var i = 0; i < _geomCount; i++)
 			{
 				_pointCount = _geom[i].Count;
 				_newPoints = new List<Vector3>(_pointCount);
-				for (int j = 0; j < _pointCount; j++)
+				for (var j = 0; j < _pointCount; j++)
 				{
 					var point = _geom[i][j];
 					_newPoints.Add(new Vector3((float)(point.X / layerExtent * _rectSizex - (_rectSizex / 2)) * tile.TileScale, 0, (float)((layerExtent - point.Y) / layerExtent * _rectSizey - (_rectSizey / 2)) * tile.TileScale));
@@ -72,11 +65,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_rectSizey = tile.Rect.Size.y;
 
 			_geomCount = _geom.Count;
-			for (int i = 0; i < _geomCount; i++)
+			for (var i = 0; i < _geomCount; i++)
 			{
 				_pointCount = _geom[i].Count;
 				_newPoints = new List<Vector3>(_pointCount);
-				for (int j = 0; j < _pointCount; j++)
+				for (var j = 0; j < _pointCount; j++)
 				{
 					var point = _geom[i][j];
 					_newPoints.Add(new Vector3((float)(point.X / layerExtent * _rectSizex - (_rectSizex / 2)) * tile.TileScale, 0, (float)((layerExtent - point.Y) / layerExtent * _rectSizey - (_rectSizey / 2)) * tile.TileScale));

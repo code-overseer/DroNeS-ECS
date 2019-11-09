@@ -32,15 +32,14 @@ namespace Mapbox.Utils
 				return buffer;
 			}
 
-			using (GZipStream stream = new GZipStream(new MemoryStream(buffer), CompressionMode.Decompress))
+			using (var stream = new GZipStream(new MemoryStream(buffer), CompressionMode.Decompress))
 			{
 				const int Size = 4096; // Pagesize.
-				byte[] buf = new byte[Size];
+				var buf = new byte[Size];
 
-				using (MemoryStream memory = new MemoryStream())
+				using (var memory = new MemoryStream())
 				{
-					int count = 0;
-
+					var count = 0;
 					do
 					{
 						try

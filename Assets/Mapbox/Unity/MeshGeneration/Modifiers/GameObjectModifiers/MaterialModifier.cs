@@ -37,47 +37,67 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var min = Math.Min(_options.materials.Length, ve.MeshFilter.sharedMesh.subMeshCount);
 			var mats = new Material[min];
 
-			if (_options.style == StyleTypes.Custom)
+			switch (_options.style)
 			{
-				for (int i = 0; i < min; i++)
+				case StyleTypes.Custom:
 				{
-					mats[i] = _options.customStyleOptions.materials[i].Materials[UnityEngine.Random.Range(0, _options.customStyleOptions.materials[i].Materials.Length)];
-				}
-			}
-			else if (_options.style == StyleTypes.Satellite)
-			{
-				for (int i = 0; i < min; i++)
-				{
-					mats[i] = Instantiate(_options.materials[i].Materials[UnityEngine.Random.Range(0, _options.materials[i].Materials.Length)]);
+					for (var i = 0; i < min; i++)
+					{
+						mats[i] = _options.customStyleOptions.materials[i].Materials[UnityEngine.Random.Range(0, _options.customStyleOptions.materials[i].Materials.Length)];
+					}
+
+					break;
 				}
 
-				mats[0].mainTexture = tile.GetRasterData();
-				mats[0].mainTextureScale = new Vector2(1f, 1f);
-			}
-			else
-			{
-				float renderMode = 0.0f;
-				switch (_options.style)
+				case StyleTypes.Satellite:
 				{
-					case StyleTypes.Light:
-						renderMode = GetRenderMode(_options.lightStyleOpacity);
-						break;
-					case StyleTypes.Dark:
-						renderMode = GetRenderMode(_options.darkStyleOpacity);
-						break;
-					case StyleTypes.Color:
-						renderMode = GetRenderMode(_options.colorStyleColor.a);
-						break;
-					default:
-						break;
+					for (var i = 0; i < min; i++)
+					{
+						mats[i] = Instantiate(_options.materials[i].Materials[UnityEngine.Random.Range(0, _options.materials[i].Materials.Length)]);
+					}
+
+					mats[0].mainTexture = tile.GetRasterData();
+					mats[0].mainTextureScale = new Vector2(1f, 1f);
+					break;
 				}
-				for (int i = 0; i < min; i++)
+
+				default:
 				{
-					mats[i] = _options.materials[i].Materials[UnityEngine.Random.Range(0, _options.materials[i].Materials.Length)];
-					mats[i].SetFloat("_Mode", renderMode);
+					var renderMode = 0.0f;
+					switch (_options.style)
+					{
+						case StyleTypes.Light:
+							renderMode = GetRenderMode(_options.lightStyleOpacity);
+							break;
+						case StyleTypes.Dark:
+							renderMode = GetRenderMode(_options.darkStyleOpacity);
+							break;
+						case StyleTypes.Color:
+							renderMode = GetRenderMode(_options.colorStyleColor.a);
+							break;
+						case StyleTypes.Custom:
+							break;
+						case StyleTypes.Simple:
+							break;
+						case StyleTypes.Realistic:
+							break;
+						case StyleTypes.Fantasy:
+							break;
+						case StyleTypes.Satellite:
+							break;
+						default:
+							break;
+					}
+					for (var i = 0; i < min; i++)
+					{
+						mats[i] = _options.materials[i].Materials[UnityEngine.Random.Range(0, _options.materials[i].Materials.Length)];
+						mats[i].SetFloat("_Mode", renderMode);
+					}
+
+					break;
 				}
 			}
-			ve.MeshRenderer.materials = mats;
+			ve.MeshRenderer.materials = mats; // material set here
 		}
 
 		public override void OnPoolItem(VectorEntity vectorEntity)

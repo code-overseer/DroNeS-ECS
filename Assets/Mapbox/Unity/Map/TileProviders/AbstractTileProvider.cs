@@ -20,13 +20,7 @@ namespace Mapbox.Unity.Map.TileProviders
 		protected ExtentArgs _currentExtent = new ExtentArgs();
 
 		protected ITileProviderOptions _options;
-		public ITileProviderOptions Options
-		{
-			get
-			{
-				return _options;
-			}
-		}
+		public ITileProviderOptions Options => _options;
 
 		public virtual void Initialize(IMap map)
 		{
@@ -36,10 +30,7 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		public virtual void OnExtentChanged()
 		{
-			if (ExtentChanged != null)
-			{
-				ExtentChanged(this, _currentExtent);
-			}
+			ExtentChanged?.Invoke(this, _currentExtent);
 		}
 
 		public abstract void OnInitialized();

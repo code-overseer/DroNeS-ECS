@@ -11,8 +11,7 @@ public class VectorDataFetcher : DataFetcher
 	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
 	public override void FetchData(DataFetcherParameters parameters)
 	{
-		var vectorDaraParameters = parameters as VectorDataFetcherParameters;
-		if(vectorDaraParameters == null)
+		if(!(parameters is VectorDataFetcherParameters vectorDaraParameters))
 		{
 			return;
 		}

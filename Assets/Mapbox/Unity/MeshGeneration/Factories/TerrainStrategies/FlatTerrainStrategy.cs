@@ -41,19 +41,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			if ((int)tile.ElevationType != (int)ElevationLayerType.FlatTerrain)
-			{
-				tile.MeshFilter.sharedMesh.Clear();
-				// HACK: This is here in to make the system trigger a finished state.
-				GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
-				tile.ElevationType = TileTerrainType.Flat;
-			}
+			if ((int) tile.ElevationType == (int) ElevationLayerType.FlatTerrain) return;
+			tile.MeshFilter.sharedMesh.Clear();
+			// HACK: This is here in to make the system trigger a finished state.
+			GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
+			Debug.Log("Flat Terrain complete");
+			tile.ElevationType = TileTerrainType.Flat;
 		}
 
 		private void GetQuad(UnityTile tile, bool buildSide)
 		{
 			if (_cachedQuad != null)
 			{
+				Debug.Log("Flat terrain mesh built here");
 				var mesh = tile.MeshFilter.sharedMesh;
 				mesh.vertices = _cachedQuad.Vertices;
 				mesh.normals = _cachedQuad.Normals;
@@ -82,10 +82,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			verts[1] = tile.TileScale * (new Vector3((float)(tile.Rect.Max.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Min.y - tile.Rect.Center.y)));
 			verts[2] = tile.TileScale * ((tile.Rect.Max - tile.Rect.Center).ToVector3xz());
 			verts[3] = tile.TileScale * (new Vector3((float)(tile.Rect.Min.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Max.y - tile.Rect.Center.y)));
-			norms[0] = Mapbox.Unity.Constants.Math.Vector3Up;
-			norms[1] = Mapbox.Unity.Constants.Math.Vector3Up;
-			norms[2] = Mapbox.Unity.Constants.Math.Vector3Up;
-			norms[3] = Mapbox.Unity.Constants.Math.Vector3Up;
+			norms[0] = Constants.Math.Vector3Up;
+			norms[1] = Constants.Math.Vector3Up;
+			norms[2] = Constants.Math.Vector3Up;
+			norms[3] = Constants.Math.Vector3Up;
 
 			unityMesh.vertices = verts;
 			unityMesh.normals = norms;

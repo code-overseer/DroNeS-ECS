@@ -28,7 +28,6 @@ namespace Mapbox.Unity.Map
 		[NodeEditorElementAttribute("Factories")]
 		[FormerlySerializedAs("_factories")]
 		public List<AbstractTileFactory> Factories;
-
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
 		protected Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
@@ -43,16 +42,14 @@ namespace Mapbox.Unity.Map
 			}
 			internal set
 			{
-				if (_state != value)
-				{
-					_state = value;
-					OnMapVisualizerStateChanged(_state);
-				}
+				if (_state == value) return;
+				_state = value;
+				OnMapVisualizerStateChanged(_state);
 			}
 		}
 
-		public IMapReadable Map { get { return _map; } }
-		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles { get { return _activeTiles; } }
+		public IMapReadable Map => _map;
+		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles => _activeTiles;
 		public Dictionary<UnwrappedTileId, int> _tileProgress;
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
@@ -116,7 +113,7 @@ namespace Mapbox.Unity.Map
 			if (Factories != null)
 			{
 				_counter = Factories.Count;
-				for (int i = 0; i < _counter; i++)
+				for (var i = 0; i < _counter; i++)
 				{
 					if (Factories[i] != null)
 					{
@@ -170,50 +167,40 @@ namespace Mapbox.Unity.Map
 
 		public virtual void TileStateChanged(UnityTile tile)
 		{
-			bool rasterDone = (tile.RasterDataState == TilePropertyState.None ||
+			var rasterDone = (tile.RasterDataState == TilePropertyState.None ||
 								tile.RasterDataState == TilePropertyState.Loaded ||
 								tile.RasterDataState == TilePropertyState.Error ||
 								tile.RasterDataState == TilePropertyState.Cancelled);
 
-			bool terrainDone = (tile.HeightDataState == TilePropertyState.None ||
+			var terrainDone = (tile.HeightDataState == TilePropertyState.None ||
 								tile.HeightDataState == TilePropertyState.Loaded ||
 								 tile.HeightDataState == TilePropertyState.Error ||
 								 tile.HeightDataState == TilePropertyState.Cancelled);
-			bool vectorDone = (tile.VectorDataState == TilePropertyState.None ||
+			var vectorDone = (tile.VectorDataState == TilePropertyState.None ||
 								tile.VectorDataState == TilePropertyState.Loaded ||
 								tile.VectorDataState == TilePropertyState.Error ||
 								tile.VectorDataState == TilePropertyState.Cancelled);
 
-			if (rasterDone && terrainDone && vectorDone)
+			if (!rasterDone || !terrainDone || !vectorDone) return;
+			
+			tile.TileState = TilePropertyState.Loaded;
+			OnTileFinished(tile);
+
+			// Check if all tiles in extent are active tiles
+			if (_map.CurrentExtent.Count == _activeTiles.Count)
 			{
-				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
-				OnTileFinished(tile);
-
-				// Check if all tiles in extent are active tiles
-				if (_map.CurrentExtent.Count == _activeTiles.Count)
+				var allDone = true;
+				// Check if all tiles are loaded.
+				foreach (var currentTile in _map.CurrentExtent)
 				{
-					bool allDone = true;
-					// Check if all tiles are loaded.
-					foreach (var currentTile in _map.CurrentExtent)
-					{
-						allDone = allDone && (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
-					}
-
-					if (allDone)
-					{
-						State = ModuleState.Finished;
-					}
-					else
-					{
-						State = ModuleState.Working;
-					}
-				}
-				else
-				{
-					State = ModuleState.Working;
+					allDone = allDone && (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
 				}
 
-
+				State = allDone ? ModuleState.Finished : ModuleState.Working;
+			}
+			else
+			{
+				State = ModuleState.Working;
 			}
 		}
 		#endregion
@@ -243,7 +230,6 @@ namespace Mapbox.Unity.Map
 					Debug.Log("Tile Material not set. Using default material");
 					unityTile.MeshRenderer.sharedMaterial = Instantiate(new Material(Shader.Find("Diffuse")));
 				}
-
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
@@ -258,7 +244,7 @@ namespace Mapbox.Unity.Map
 			unityTile.OnRasterDataChanged += TileRasterStateChanged;
 			unityTile.OnVectorDataChanged += TileVectorStateChanged;
 
-			unityTile.TileState = MeshGeneration.Enums.TilePropertyState.Loading;
+			unityTile.TileState = TilePropertyState.Loading;
 			ActiveTiles.Add(tileId, unityTile);
 
 			foreach (var factory in Factories)
@@ -305,11 +291,9 @@ namespace Mapbox.Unity.Map
 			{
 				foreach (var tileFactory in Factories)
 				{
-					if (tileFactory != null)
-					{
-						tileFactory.Clear();
-						DestroyImmediate(tileFactory);
-					}
+					if (tileFactory == null) continue;
+					tileFactory.Clear();
+					DestroyImmediate(tileFactory);
 				}
 			}
 			foreach (var tileId in _activeTiles.Keys.ToList())
@@ -360,7 +344,7 @@ namespace Mapbox.Unity.Map
 
 		public void UnregisterAndRedrawTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
 		{
-			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			foreach (var tileBundle in _activeTiles)
 			{
 				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
 			}
@@ -368,7 +352,7 @@ namespace Mapbox.Unity.Map
 			layerVisualizer.UnbindSubLayerEvents();
 			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
 			layerVisualizer.InitializeStack();
-			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			foreach (var tileBundle in _activeTiles)
 			{
 				factory.RedrawSubLayer(tileBundle.Value, layerVisualizer);
 			}
@@ -376,7 +360,7 @@ namespace Mapbox.Unity.Map
 
 		public void RemoveTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
 		{
-			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			foreach (var tileBundle in _activeTiles)
 			{
 				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
 			}
@@ -385,7 +369,7 @@ namespace Mapbox.Unity.Map
 
 		public void ReregisterTilesTo(VectorTileFactory factory)
 		{
-			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			foreach (var tileBundle in _activeTiles)
 			{
 				factory.Register(tileBundle.Value);
 			}
@@ -393,7 +377,7 @@ namespace Mapbox.Unity.Map
 
 		public void UpdateTileForProperty(AbstractTileFactory factory, LayerUpdateArgs updateArgs)
 		{
-			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			foreach (var tileBundle in _activeTiles)
 			{
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
 			}
@@ -408,11 +392,8 @@ namespace Mapbox.Unity.Map
 		public event EventHandler<TileErrorEventArgs> OnTileError;
 		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
 		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if (handler != null)
-			{
-				handler(this, e);
-			}
+			var handler = OnTileError;
+			handler?.Invoke(this, e);
 		}
 
 		/// <summary>

@@ -57,23 +57,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			// if collider exists. remove it.
 			RemoveColliderFrom(ve);
-			if (_colliderStrategy != null)
-			{
-				_colliderStrategy.AddColliderTo(ve);
-			}
+			_colliderStrategy?.AddColliderTo(ve);
 		}
 
 		public void RemoveColliderFrom(VectorEntity ve)
 		{
 			var existingCollider = ve.GameObject.GetComponent<Collider>();
-			if (existingCollider != null)
-			{
-				DestroyImmediate(existingCollider);
-				if (_colliderStrategy != null)
-				{
-					_colliderStrategy.Reset();
-				}
-			}
+			if (existingCollider == null) return;
+			DestroyImmediate(existingCollider);
+			_colliderStrategy?.Reset();
 		}
 
 		public class BoxColliderStrategy : IColliderStrategy

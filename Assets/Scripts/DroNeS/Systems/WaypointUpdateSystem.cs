@@ -17,14 +17,6 @@ namespace DroNeS.Systems
         private static NativeQueue<int> _queuesToClear;
         private static EntityQuery _droneQuery;
 
-        /*
-         * TODO
-         * Change to NativeMultiHashMap *
-         * Change waypoint to contain queue index and queue length *
-         * Scan through using IJobChunk for 'Requesting' drones to generate new 'queue'
-        */
-        
-
         protected override void OnCreate()
         {
             _droneQuery = GetEntityQuery(new EntityQueryDesc

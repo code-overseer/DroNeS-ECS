@@ -48,10 +48,8 @@ namespace Mapbox.Unity.Map.TileProviders
 				// 2. 'Unable to write data' is another exception associated
 				//    with aborted requests: request finshed successfully but
 				//    was aborted during filling of local buffer, also show as warning
-				if (
-					e.Exceptions[0].Message.Contains("Request aborted")
-					|| e.Exceptions[0].Message.Equals("Unable to write data")
-				)
+				if (e.Exceptions[0].Message.Contains("Request aborted")
+					|| e.Exceptions[0].Message.Equals("Unable to write data"))
 				{
 					Debug.LogWarning(printMessage(e.Exceptions, e));
 				}
@@ -61,10 +59,7 @@ namespace Mapbox.Unity.Map.TileProviders
 				}
 			}
 
-			if (OnTileError != null)
-			{
-				OnTileError.Invoke(e);
-			}
+			OnTileError?.Invoke(e);
 		}
 
 

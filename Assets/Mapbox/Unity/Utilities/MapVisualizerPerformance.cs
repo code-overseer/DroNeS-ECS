@@ -27,35 +27,39 @@
 
 			_mapVisualizer.OnMapVisualizerStateChanged += (s) =>
 			{
-				if (s == ModuleState.Working)
+				switch (s)
 				{
-					_sw.Reset();
-					_sw.Start();
-				}
-				else if (s == ModuleState.Finished)
-				{
-					_sw.Stop();
-					if (_currentTest > 1)
+					case ModuleState.Working:
+						_sw.Reset();
+						_sw.Start();
+						break;
+					case ModuleState.Finished:
 					{
-						TotalTime += _sw.ElapsedMilliseconds;
-						UnityEngine.Debug.Log("Test " + _currentTest + ": " + _sw.ElapsedMilliseconds);
-					}
-					else
-					{
-						_firstRun = _sw.ElapsedMilliseconds;
-					}
-
-					if (TestCount > _currentTest)
-					{
-						_currentTest++;
-						Invoke("Run", 1f);
-					}
-					else
-					{
+						_sw.Stop();
 						if (_currentTest > 1)
 						{
-							UnityEngine.Debug.Log("First Run:        " + _firstRun + " \r\nRest Average: " + TotalTime / (_currentTest - 1));
+							TotalTime += _sw.ElapsedMilliseconds;
+							UnityEngine.Debug.Log("Test " + _currentTest + ": " + _sw.ElapsedMilliseconds);
 						}
+						else
+						{
+							_firstRun = _sw.ElapsedMilliseconds;
+						}
+
+						if (TestCount > _currentTest)
+						{
+							_currentTest++;
+							Invoke("Run", 1f);
+						}
+						else
+						{
+							if (_currentTest > 1)
+							{
+								UnityEngine.Debug.Log("First Run:        " + _firstRun + " \r\nRest Average: " + TotalTime / (_currentTest - 1));
+							}
+						}
+
+						break;
 					}
 				}
 			};

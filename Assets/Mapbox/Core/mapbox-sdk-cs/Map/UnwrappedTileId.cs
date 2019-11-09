@@ -80,68 +80,20 @@ namespace Mapbox.Map
 			return !(a == b);
 		}
 
-		public UnwrappedTileId North
-		{
-			get
-			{
-				return new UnwrappedTileId(Z, X, Y - 1);
-			}
-		}
+		public UnwrappedTileId North => new UnwrappedTileId(Z, X, Y - 1);
 
-		public UnwrappedTileId East
-		{
-			get
-			{
-				return new UnwrappedTileId(Z, X + 1, Y);
-			}
-		}
+		public UnwrappedTileId East => new UnwrappedTileId(Z, X + 1, Y);
 
-		public UnwrappedTileId South
-		{
-			get
-			{
-				return new UnwrappedTileId(Z, X, Y + 1);
-			}
-		}
+		public UnwrappedTileId South => new UnwrappedTileId(Z, X, Y + 1);
 
-		public UnwrappedTileId West
-		{
-			get
-			{
-				return new UnwrappedTileId(Z, X - 1, Y);
-			}
-		}
+		public UnwrappedTileId West => new UnwrappedTileId(Z, X - 1, Y);
 
-		public UnwrappedTileId NorthEast
-		{
-			get
-			{
-				return new UnwrappedTileId(Z, X + 1, Y - 1);
-			}
-		}
+		public UnwrappedTileId NorthEast => new UnwrappedTileId(Z, X + 1, Y - 1);
 
-		public UnwrappedTileId SouthEast
-		{
-			get
-			{
-				return new UnwrappedTileId(Z, X + 1, Y + 1);
-			}
-		}
+		public UnwrappedTileId SouthEast => new UnwrappedTileId(Z, X + 1, Y + 1);
 
-		public UnwrappedTileId NorthWest
-		{
-			get
-			{
-				return new UnwrappedTileId(Z, X - 1, Y - 1);
-			}
-		}
+		public UnwrappedTileId NorthWest => new UnwrappedTileId(Z, X - 1, Y - 1);
 
-		public UnwrappedTileId SouthWest
-		{
-			get
-			{
-				return new UnwrappedTileId(Z, X - 1, Y + 1);
-			}
-		}
+		public UnwrappedTileId SouthWest => new UnwrappedTileId(Z, X - 1, Y + 1);
 	}
 }
