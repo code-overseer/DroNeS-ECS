@@ -12,27 +12,28 @@ namespace DroNeS.Mapbox
 //        public CanonicalTileId canonicalTileId;
 //        public string tilesetId;
 //        public UnityTile tile;
-        
+        public CustomTile cTile;
         public bool useOptimizedStyle = false;
         public Style style = null;
     }
     
     public class BuildingMeshFetcher : DataFetcher
     {
-        public Action<UnityTile, VectorTile> dataReceived = (t, s) => { };
-        public Action<UnityTile, VectorTile, TileErrorEventArgs> fetchingError = (t, r, s) => { };
+        public Action<CustomTile, VectorTile> dataReceived = (t, s) => { };
+//        public Action<UnityTile, VectorTile, TileErrorEventArgs> fetchingError = (t, r, s) => { };
 
         //tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
         public override void FetchData(DataFetcherParameters parameters)
         {
-            if(!(parameters is VectorDataFetcherParameters vectorDaraParameters)) return;
+            if(!(parameters is BuildingMeshFetcherParameters fetcherParameters)) return;
             
-            var vectorTile = vectorDaraParameters.useOptimizedStyle ? new VectorTile(vectorDaraParameters.style.Id, vectorDaraParameters.style.Modified) : new VectorTile();
-            vectorDaraParameters.tile.AddTile(vectorTile); //This needs to be here for cancellation 
+            var vectorTile = new VectorTile();
             
-            vectorTile.Initialize(_fileSource, vectorDaraParameters.canonicalTileId, vectorDaraParameters.tilesetId, () =>
+            fetcherParameters.cTile.AddTile(vectorTile); //This needs to be here for cancellation 
+            
+            vectorTile.Initialize(_fileSource, fetcherParameters.canonicalTileId, fetcherParameters.tilesetId, () =>
             {
-                if (vectorDaraParameters.canonicalTileId != vectorTile.Id) return;
+                if (fetcherParameters.canonicalTileId != vectorTile.Id) return;
                 
                 if (vectorTile.HasError)
                 {
@@ -40,7 +41,7 @@ namespace DroNeS.Mapbox
                 }
                 else
                 {
-                    dataReceived(vectorDaraParameters.tile, vectorTile);
+                    dataReceived(fetcherParameters.cTile, vectorTile);
                 }
             });
         }

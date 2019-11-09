@@ -36,10 +36,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected LayerProperties _options;
 
-		public LayerProperties Options
-		{
-			get { return _options; }
-		}
+		public LayerProperties Options => _options;
 
 		protected HashSet<UnityTile> _tilesWaitingResponse;
 		protected HashSet<UnityTile> _tilesWaitingProcessing;
@@ -51,7 +48,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected virtual void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
 		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			var handler = OnTileError;
 			if (handler != null)
 			{
 				handler(this, e);

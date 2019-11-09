@@ -16,54 +16,25 @@ namespace Mapbox.Unity.Map
 		[NodeEditorElement("Image Layer")]
 		public ImageryLayerProperties LayerProperty
 		{
-			get
-			{
-				return _layerProperty;
-			}
-			set
-			{
-				_layerProperty = value;
-			}
+			get => _layerProperty;
+			set => _layerProperty = value;
 		}
-		public MapLayerType LayerType
-		{
-			get
-			{
-				return MapLayerType.Imagery;
-			}
-		}
+		public MapLayerType LayerType => MapLayerType.Imagery;
 
-		public bool IsLayerActive
-		{
-			get
-			{
-				return (_layerProperty.sourceType != ImagerySourceType.None);
-			}
-		}
+		public bool IsLayerActive => _layerProperty.sourceType != ImagerySourceType.None;
 
 		public string LayerSourceId
 		{
-			get
-			{
-				return _layerProperty.sourceOptions.Id;
-			}
+			get => _layerProperty.sourceOptions.Id;
 			internal set
 			{
-				if (value != _layerProperty.sourceOptions.Id)
-				{
-					_layerProperty.sourceOptions.Id = value;
-					_layerProperty.HasChanged = true;
-				}
+				if (value == _layerProperty.sourceOptions.Id) return;
+				_layerProperty.sourceOptions.Id = value;
+				_layerProperty.HasChanged = true;
 			}
 		}
 
-		public ImagerySourceType LayerSource
-		{
-			get
-			{
-				return _layerProperty.sourceType;
-			}
-		}
+		public ImagerySourceType LayerSource => _layerProperty.sourceType;
 
 		public ImageryLayer()
 		{
@@ -138,13 +109,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		private MapImageFactory _imageFactory;
-		public MapImageFactory Factory
-		{
-			get
-			{
-				return _imageFactory;
-			}
-		}
+		public MapImageFactory Factory => _imageFactory;
 
 		#region API Methods
 
@@ -185,11 +150,9 @@ namespace Mapbox.Unity.Map
 		/// <param name="useCompression"></param>
 		public virtual void UseCompression(bool useCompression)
 		{
-			if (_layerProperty.rasterOptions.useCompression != useCompression)
-			{
-				_layerProperty.rasterOptions.useCompression = useCompression;
-				_layerProperty.rasterOptions.HasChanged = true;
-			}
+			if (_layerProperty.rasterOptions.useCompression == useCompression) return;
+			_layerProperty.rasterOptions.useCompression = useCompression;
+			_layerProperty.rasterOptions.HasChanged = true;
 		}
 
 		/// <summary>

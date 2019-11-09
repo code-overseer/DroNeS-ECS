@@ -15,10 +15,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Polygon Mesh Modifier")]
 	public class PolygonMeshModifier : MeshGenerationBase
 	{
-		public override ModifierType Type
-		{
-			get { return ModifierType.Preprocess; }
-		}
+		public override ModifierType Type => ModifierType.Preprocess;
 
 		private UVModifierOptions _options;
 		private Vector3 _v1, _v2;
@@ -62,25 +59,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 				}
 			}
-
-			var _counter = feature.Points.Count;
-			var subset = new List<List<Vector3>>(_counter);
+			
+			var counter = feature.Points.Count;
+			var subset = new List<List<Vector3>>(counter);
 			Data flatData = null;
 			List<int> result = null;
 			var currentIndex = 0;
-			int vertCount = 0, polygonVertexCount = 0;
+			var polygonVertexCount = 0;
 			List<int> triList = null;
-			List<Vector3> sub = null;
 
-
-
-			for (int i = 0; i < _counter; i++)
+			for (var i = 0; i < counter; i++)
 			{
-				sub = feature.Points[i];
-				//earcut is built to handle one polygon with multiple holes
+				var sub = feature.Points[i];
+				// ear cut is built to handle one polygon with multiple holes
 				//point data can contain multiple polygons though, so we're handling them separately here
 
-				vertCount = md.Vertices.Count;
+				var vertCount = md.Vertices.Count;
 				if (IsClockwise(sub) && vertCount > 0)
 				{
 					flatData = EarcutLibrary.Flatten(subset);
@@ -112,7 +106,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				md.Edges.Capacity = md.Edges.Count + polygonVertexCount * 2;
 				var _size = md.TileRect.Size;
 
-				for (int j = 0; j < polygonVertexCount; j++)
+				for (var j = 0; j < polygonVertexCount; j++)
 				{
 					md.Edges.Add(vertCount + ((j + 1) % polygonVertexCount));
 					md.Edges.Add(vertCount + j);
@@ -148,10 +142,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				maxy = float.MinValue;
 
 				_textureUvCoordinates = new Vector2[md.Vertices.Count];
-				_textureDirection = Quaternion.FromToRotation((md.Vertices[0] - md.Vertices[1]), Mapbox.Unity.Constants.Math.Vector3Right);
+				_textureDirection = Quaternion.FromToRotation((md.Vertices[0] - md.Vertices[1]), Constants.Math.Vector3Right);
 				_textureUvCoordinates[0] = new Vector2(0, 0);
 				_firstVert = md.Vertices[0];
-				for (int i = 1; i < md.Vertices.Count; i++)
+				for (var i = 1; i < md.Vertices.Count; i++)
 				{
 					_vert = md.Vertices[i];
 					_vertexRelativePos = _vert - _firstVert;
@@ -170,7 +164,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				var width = maxx - minx;
 				var height = maxy - miny;
 
-				for (int i = 0; i < md.Vertices.Count; i++)
+				for (var i = 0; i < md.Vertices.Count; i++)
 				{
 					md.UV[0].Add(new Vector2(
 						(((_textureUvCoordinates[i].x - minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
@@ -187,7 +181,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				triList.Capacity = triList.Count + polygonVertexCount;
 			}
 
-			for (int i = 0; i < polygonVertexCount; i++)
+			for (var i = 0; i < polygonVertexCount; i++)
 			{
 				triList.Add(result[i] + currentIndex);
 			}

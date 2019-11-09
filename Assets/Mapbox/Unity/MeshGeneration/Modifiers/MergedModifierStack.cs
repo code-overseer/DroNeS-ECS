@@ -132,7 +132,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
 				{
-//					Debug.Log(MeshModifiers[i].GetType());
 					MeshModifiers[i].Run(feature, meshData, tile);
 				}
 			}

@@ -1,5 +1,6 @@
 ﻿using DroNeS.Components;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -24,7 +25,7 @@ namespace DroNeS.Systems
         {
             public float Delta;
             private const float Speed = 10;
-            public void Execute(ref DroneTag tag, ref DroneStatus status, ref Translation pos, ref Waypoint point)
+            public void Execute([ReadOnly] ref DroneTag tag, ref DroneStatus status, ref Translation pos, ref Waypoint point)
             {
                 switch (status.Value)
                 {

@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: NewMeshRendererModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _Materials: []
+  materials:
+  - {fileID: 2100000, guid: 28da7a4fc66ea43979c8695d764b6af7, type: 2}

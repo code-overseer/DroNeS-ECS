@@ -23,41 +23,15 @@ namespace Mapbox.Unity.Map
 
 		//Properties
 		[NodeEditorElement(" Vector Layer ")]
-		public VectorLayerProperties LayerProperty
-		{
-			get
-			{
-				return _layerProperty;
-			}
-		}
-		public MapLayerType LayerType
-		{
-			get
-			{
-				return MapLayerType.Vector;
-			}
-		}
-		public bool IsLayerActive
-		{
-			get
-			{
-				return (_layerProperty.sourceType != VectorSourceType.None);
-			}
-		}
-		public string LayerSourceId
-		{
-			get
-			{
-				return _layerProperty.sourceOptions.Id;
-			}
-		}
-		public VectorTileFactory Factory
-		{
-			get
-			{
-				return _vectorTileFactory;
-			}
-		}
+		public VectorLayerProperties LayerProperty => _layerProperty;
+
+		public MapLayerType LayerType => MapLayerType.Vector;
+
+		public bool IsLayerActive => (_layerProperty.sourceType != VectorSourceType.None);
+
+		public string LayerSourceId => _layerProperty.sourceOptions.Id;
+
+		public VectorTileFactory Factory => _vectorTileFactory;
 
 		//Public Methods
 		public void Initialize(LayerProperties properties)

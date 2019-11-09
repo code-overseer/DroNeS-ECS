@@ -7,7 +7,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	using Mapbox.Unity.Map;
 
 	/// <summary>
-	/// Layer visualizers contains sytling logic and processes features
+	/// Layer visualizers contains styling logic and processes features
 	/// </summary>
 	public abstract class LayerVisualizerBase : ScriptableObject
 	{
@@ -53,11 +53,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		}
 		protected virtual void OnUpdateLayerVisualizer(System.EventArgs e)
 		{
-			System.EventHandler handler = LayerVisualizerHasChanged;
-			if (handler != null)
-			{
-				handler(this, e);
-			}
+			var handler = LayerVisualizerHasChanged;
+			handler?.Invoke(this, e);
 		}
 	}
 }

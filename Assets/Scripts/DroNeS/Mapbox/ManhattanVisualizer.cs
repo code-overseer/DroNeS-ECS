@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Platform;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.Map.Interfaces;
-using Mapbox.Unity.MeshGeneration.Data;
-using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Factories;
+using Unity.Mathematics;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace DroNeS.Mapbox
 {
     public static class ManhattanVisualizer
     {
-        public static List<AbstractTileFactory> factories;
+        public static BuildingMeshFactory MeshFactory;
+        public static TerrainImageFactory ImageFactory;
         private static IMapReadable _map;
-        private static Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
-        private static Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
+        private static Dictionary<UnwrappedTileId, CustomTile> _activeTiles = new Dictionary<UnwrappedTileId, CustomTile>();
         private static int _counter;
         private static ModuleState _state;
     
@@ -26,68 +22,32 @@ namespace DroNeS.Mapbox
         {
             _map = map;
             _state = ModuleState.Initialized;
+            MeshFactory = new BuildingMeshFactory();
+            ImageFactory = new TerrainImageFactory();
+        }
 
-            foreach (var factory in factories)
-            {
-                factory.Initialize(fileSource);
-                UnregisterEvents(factory);
-                RegisterEvents(factory);
-            }
-        }
-        private static void RegisterEvents(AbstractTileFactory factory)
-        {
-            factory.OnTileError += Factory_OnTileError;
-        }
-        private static void UnregisterEvents(AbstractTileFactory factory)
-        {
-            factory.OnTileError -= Factory_OnTileError;
-        }
-        private static void Factory_OnTileError(object sender, TileErrorEventArgs e)
-        {
-            Debug.LogError(e.Exceptions.Count > 0 ? e.Exceptions[0].Message : "Unknown Error Occured");
-        }
-        
-        private static void PlaceTile(UnityTile tile)
+        private static float3 GeneratePosition(in CustomTile tile)
         {
             var rect = tile.Rect;
             var scale = tile.TileScale;
-            var scaleFactor = Mathf.Pow(2, (_map.InitialZoom - _map.AbsoluteZoom));
-            var position = new Vector3(
+            var scaleFactor = math.pow(2, _map.InitialZoom - _map.AbsoluteZoom);
+            return new float3(
                 (float)(rect.Center.x - _map.CenterMercator.x) * scale * scaleFactor,
                 0,
                 (float)(rect.Center.y - _map.CenterMercator.y) * scale * scaleFactor);
-            tile.transform.localPosition = position;
             // Create entity component position here
         }
         
-        public static UnityTile LoadTile(UnwrappedTileId tileId)
+        public static CustomTile LoadTile(UnwrappedTileId tileId)
         {
-            UnityTile unityTile = null;
+            var tile = new CustomTile(in _map, in tileId, _map.AbsoluteZoom);
+            GeneratePosition(tile); // do something
+            _activeTiles.Add(tileId, tile); // to keep track
 
-            if (_inactiveTiles.Count > 0)
-            {
-                unityTile = _inactiveTiles.Dequeue(); // might not need since no gameobject
-            }
+            MeshFactory.Register(tile);
+            ImageFactory.Register(tile);
 
-            if (unityTile == null)
-            {
-                unityTile = new GameObject().AddComponent<UnityTile>();
-                unityTile.MeshRenderer.sharedMaterial = Object.Instantiate(_map.TileMaterial);
-                unityTile.transform.SetParent(_map.Root, false);
-            }
-
-            unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _map.LoadingTexture);
-            PlaceTile(unityTile);
-
-            unityTile.TileState = TilePropertyState.Loading;
-            _activeTiles.Add(tileId, unityTile); // to keep track
-
-            foreach (var factory in factories)
-            {
-                factory.Register(unityTile);
-            }
-
-            return unityTile;
+            return tile;
         }
         
     

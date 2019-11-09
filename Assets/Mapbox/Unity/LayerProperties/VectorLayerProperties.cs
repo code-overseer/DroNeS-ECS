@@ -36,13 +36,10 @@
 		/// </summary>
 		public TileJsonData tileJsonData = new TileJsonData();
 		[SerializeField]
-		protected VectorSourceType _sourceType = VectorSourceType.MapboxStreets;
+		protected VectorSourceType _sourceType = VectorSourceType.MapboxStreetsV8WithBuildingIds;
 		public VectorSourceType sourceType
 		{
-			get
-			{
-				return _sourceType;
-			}
+			get => _sourceType;
 			set
 			{
 				if (value != VectorSourceType.Custom)
@@ -50,26 +47,19 @@
 					sourceOptions.Id = MapboxDefaultVector.GetParameters(value).Id;
 				}
 
-				if (value == VectorSourceType.None)
-				{
-					sourceOptions.isActive = false;
-				}
-				else
-				{
-					sourceOptions.isActive = true;
-				}
+				sourceOptions.isActive = value != VectorSourceType.None;
 
 				_sourceType = value;
 			}
 		}
 
-		public LayerSourceOptions sourceOptions = new LayerSourceOptions()
+		public LayerSourceOptions sourceOptions = new LayerSourceOptions
 		{
 			isActive = true,
-			layerSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets)
+			layerSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreetsV8WithBuildingIds)
 		};
 		[Tooltip("Use Mapbox style-optimized tilesets, remove any layers or features in the tile that are not represented by a Mapbox style. Style-optimized vector tiles are smaller, served over-the-wire, and a great way to reduce the size of offline caches.")]
-		public bool useOptimizedStyle = false;
+		public bool useOptimizedStyle;
 		[StyleSearch]
 		public Style optimizedStyle;
 		public LayerPerformanceOptions performanceOptions;
@@ -79,9 +69,6 @@
 		public List<PrefabItemOptions> locationPrefabList = new List<PrefabItemOptions>();
 
 
-		public override bool NeedsForceUpdate()
-		{
-			return true;
-		}
+		public override bool NeedsForceUpdate() => true;
 	}
 }
