@@ -10,6 +10,7 @@ using Mapbox.Unity.Map.TileProviders;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DroNeS
 {
@@ -17,15 +18,14 @@ namespace DroNeS
     public class DronesMap : IMap
     {
         #region Private Fields
-        [SerializeField] private MapOptions _options = new MapOptions();
-        private MapboxAccess _fileSource;
+        [SerializeField] private MapOptions options = new MapOptions();
         #endregion
         
         #region IMap Properties
         public Vector2d CenterMercator { get; private set; }
         public float WorldRelativeScale { get; private set; }
         public Vector2d CenterLatitudeLongitude { get; private set; }
-        public float Zoom => _options.locationOptions.zoom;
+        public float Zoom => options.locationOptions.zoom;
         public int InitialZoom => 16;
 
         public int AbsoluteZoom => (int) Math.Floor(Zoom);
@@ -43,7 +43,7 @@ namespace DroNeS
         }
         private DronesMap()
         {
-            _options.locationOptions.zoom = 16;
+            options.locationOptions.zoom = 16;
             MapOnStartRoutine();
         }
         
@@ -65,7 +65,7 @@ namespace DroNeS
 
         public void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude)
         {
-            _options.locationOptions.latitudeLongitude = $"{centerLatitudeLongitude.x}, {centerLatitudeLongitude.y}";
+            options.locationOptions.latitudeLongitude = $"{centerLatitudeLongitude.x}, {centerLatitudeLongitude.y}";
             CenterLatitudeLongitude = centerLatitudeLongitude;
         }
 
@@ -91,15 +91,14 @@ namespace DroNeS
         
         private void SetUpMap()
         {
-            _options.scalingOptions.scalingStrategy = new MapScalingAtWorldScaleStrategy();
-            _options.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
+            options.scalingOptions.scalingStrategy = new MapScalingAtWorldScaleStrategy();
+            options.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
             
-            InitializeMap(_options);
+            InitializeMap(options);
         }
 
         private void InitializeMap(MapOptions options)
         {
-            _fileSource = MapboxAccess.Instance;
             CenterLatitudeLongitude = Conversions.StringToLatLon("40.764170691358686, -73.97670925665614");
             SetWorldRelativeScale(Mathf.Pow(2, AbsoluteZoom - InitialZoom) * Mathf.Cos(Mathf.Deg2Rad * (float)CenterLatitudeLongitude.x));
             SetCenterMercator(Conversions.TileBounds(TileCover.CoordinateToTileId(CenterLatitudeLongitude, AbsoluteZoom)).Center);

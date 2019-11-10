@@ -29,11 +29,12 @@ namespace DroNeS.Systems
                 ComponentType.ReadOnly<BuildingTag>(), 
                 ComponentType.ReadOnly<Translation>(),
                 typeof(LocalToWorld));
-            DronesMap.Build();
+//            DronesMap.Build();
         }
 
         protected override void OnUpdate()
         {
+            
         }
 
         public static void MakeBuilding(in float3 position, in RenderMesh renderMesh)
@@ -41,7 +42,7 @@ namespace DroNeS.Systems
             var commands = _barrier.CreateCommandBuffer();
 			var entity = commands.CreateEntity(_building);
 			commands.SetComponent(entity, new Translation { Value = position });
-			commands.AddSharedComponent(entity, renderMesh);
+            commands.AddSharedComponent(entity, renderMesh);
         }
         public static void MakeTerrain(in float3 position, in RenderMesh renderMesh)
         {

@@ -27,8 +27,8 @@ namespace DroNeS.Systems
             _barrier = World.Active.GetOrCreateSystem<DroneBuilderBarrierSystem>();
             _drone = Manager.CreateArchetype(
                 ComponentType.ReadOnly<DroneTag>(),
+                ComponentType.ReadOnly<DroneUID>(),
                 typeof(Translation),
-                typeof(DroneUID),
                 typeof(DroneStatus),
                 typeof(Waypoint),
                 typeof(LocalToWorld));
@@ -43,7 +43,7 @@ namespace DroNeS.Systems
         public static void AddDrone()
         {
             var buildCommands = _barrier.CreateCommandBuffer();
-            for (var i = 0; i < 5; ++i)
+            for (var i = 0; i < 500; ++i)
             {
                 var drone = buildCommands.CreateEntity(_drone);
                 buildCommands.SetComponent(drone, new Translation {Value = Random.insideUnitSphere * 5});

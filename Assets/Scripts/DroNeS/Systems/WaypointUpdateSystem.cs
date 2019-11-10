@@ -136,7 +136,7 @@ namespace DroNeS.Systems
                     var rand = new Random((uint)droneIds[i].uid | 1);
                     for (var j = 0; j < 15; ++j)
                     {
-                        var p = new float3(rand.NextFloat(), rand.NextFloat(), rand.NextFloat()) * 25 - 12.5f;
+                        var p = new float3(rand.NextFloat(), rand.NextFloat(), rand.NextFloat()) * 400;
                         AllQueues.Add(droneIds[i].uid, new Waypoint(p, j, 15));
                     }
                     stats[i] = new DroneStatus(Status.Ready);
