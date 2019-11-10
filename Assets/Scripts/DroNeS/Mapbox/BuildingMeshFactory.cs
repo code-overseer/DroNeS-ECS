@@ -19,7 +19,6 @@ namespace DroNeS.Mapbox
 		#endregion
 
 		#region Properties
-
 		public BuildingMeshFactory()
 		{
 			_layerProgress = new Dictionary<CustomTile, HashSet<BuildingMeshBuilder>>();
@@ -35,7 +34,6 @@ namespace DroNeS.Mapbox
 		private string TilesetId => Properties.sourceOptions.Id;
 
 		private VectorLayerProperties Properties { get; }
-
 		#endregion
 
 		#region Public Layer
@@ -46,7 +44,7 @@ namespace DroNeS.Mapbox
 
 			subLayer.coreOptions.geometryType = VectorPrimitiveType.Polygon;
 			subLayer.honorBuildingIdSetting = true;
-			
+
 			// Setup visualizer.
 			visualizer.SetProperties(subLayer);
 			visualizer.Initialize();
@@ -73,12 +71,13 @@ namespace DroNeS.Mapbox
 
 		protected override void OnRegistered(CustomTile tile)
 		{
-			if (string.IsNullOrEmpty(TilesetId) || !Properties.sourceOptions.isActive || 
+			if (!Properties.sourceOptions.isActive || 
 			    Properties.vectorSubLayers.Count + Properties.locationPrefabList.Count == 0)
 			{
 				tile.VectorDataState = TilePropertyState.None;
 				return;
 			}
+			
 			tile.VectorDataState = TilePropertyState.Loading;
 			TilesWaitingResponse.Add(tile);
 			
@@ -122,7 +121,6 @@ namespace DroNeS.Mapbox
 			foreach (var layerName in tile.VectorData.Data.LayerNames())
 			{
 				if (!_layerBuilder.ContainsKey(layerName)) continue;
-				//two loops; first one to add it to waiting/tracking list, second to start it
 				foreach (var builder in _layerBuilder[layerName])
 				{
 					nameList.Add(layerName);
@@ -136,10 +134,8 @@ namespace DroNeS.Mapbox
 				CreateFeatureWithBuilder(tile, nameList[i], builderList[i]);
 			}
 
-			if (!_layerProgress.ContainsKey(tile))
-			{
-				tile.VectorDataState = TilePropertyState.Loaded;
-			}
+			if (!_layerProgress.ContainsKey(tile)) tile.VectorDataState = TilePropertyState.Loaded;
+			
 		}
 
 		private void TrackFeatureWithBuilder(CustomTile tile, string layerName, BuildingMeshBuilder builder)
@@ -181,6 +177,7 @@ namespace DroNeS.Mapbox
 			_layerProgress.Remove(tile);
 			TilesWaitingProcessing.Remove(tile);
 			tile.VectorDataState = TilePropertyState.Loaded;
+			// Create building entity here
 		}
 
 		private void CreateLayerVisualizers()

@@ -546,6 +546,7 @@
               <e p="MeshMerger.cs" t="Include" />
               <e p="MeshRendererModifier.cs" t="Include" />
               <e p="TerrainImageFactory.cs" t="Include" />
+              <e p="TerrainImageFetcher.cs" t="Include" />
             </e>
             <e p="MonoBehaviours" t="Include">
               <e p="DroneMaker.cs" t="Include" />

@@ -58,20 +58,13 @@ namespace DroNeS.Mapbox
 			SubLayerProperties = properties;
 			PerformanceOptions = properties.performanceOptions;
 			_defaultStack = ScriptableObject.CreateInstance<MeshMerger>();
-			
 			if (_defaultStack.MeshModifiers == null)
 			{
 				_defaultStack.MeshModifiers = new List<MeshModifier>();
 			}
-			if (_defaultStack.GoModifiers == null)
-			{
-				_defaultStack.GoModifiers = new List<GameObjectModifier>();
-			}
-			
+
 			SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
-			AddOrCreateMeshModifier<SnapTerrainModifier>();
 			var poly = AddOrCreateMeshModifier<PolygonMeshModifier>();
-			
 			//This may cause problems
 			var uvModOptions = new UVModifierOptions
 			{
@@ -81,17 +74,17 @@ namespace DroNeS.Mapbox
 			};
 			poly.SetProperties(uvModOptions);
 
-			var heightMod = AddOrCreateMeshModifier<HeightModifier>();
-			heightMod.SetProperties(SubLayerProperties.extrusionOptions);
+			var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
+			SubLayerProperties.extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
+			SubLayerProperties.extrusionOptions.extrusionScaleFactor = 1.3203f;
+			SubLayerProperties.extrusionOptions.propertyName = "height";
+			SubLayerProperties.extrusionOptions.extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
+			var atlasOptions = new GeometryExtrusionWithAtlasOptions(SubLayerProperties.extrusionOptions, uvModOptions);
+			atlasMod.SetProperties(atlasOptions);
+			
 			SubLayerProperties.filterOptions.RegisterFilters();
-			if (SubLayerProperties.MeshModifiers != null)
-			{
-				_defaultStack.MeshModifiers.AddRange(SubLayerProperties.MeshModifiers);
-			}
-			if (SubLayerProperties.GoModifiers != null)
-			{
-				_defaultStack.GoModifiers.AddRange(SubLayerProperties.GoModifiers);
-			}
+			_defaultStack.MeshModifiers.AddRange(SubLayerProperties.MeshModifiers);
+
 		}
 		
 		private void SetReplacementCriteria(IReplacementCriteria criteria)

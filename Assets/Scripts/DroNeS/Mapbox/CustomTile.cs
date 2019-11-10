@@ -14,11 +14,11 @@ namespace DroNeS.Mapbox
 	{
 		private readonly int _initialZoom;
 		public TilePropertyState VectorDataState;
-		public TileTerrainType ElevationType { get; private set; }
-		public Texture2D RasterData { get; private set; }
+		private TileTerrainType ElevationType { get; }
+		private Texture2D RasterData { get; set; }
 		public VectorTile VectorData { get; private set; }
-		private Material _material;
-		public float RelativeScale { get; private set; }
+		private readonly Material _material;
+		private float RelativeScale { get; set; }
 		public RectD Rect { get; private set; }
 		public float TileScale { get; private set; }
 		public UnwrappedTileId UnwrappedTileId { get; }

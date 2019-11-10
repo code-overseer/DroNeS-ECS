@@ -35,7 +35,6 @@ namespace DroNeS.Mapbox
                 (float)(rect.Center.x - _map.CenterMercator.x) * scale * scaleFactor,
                 0,
                 (float)(rect.Center.y - _map.CenterMercator.y) * scale * scaleFactor);
-            // Create entity component position here
         }
         
         public static CustomTile LoadTile(UnwrappedTileId tileId)
@@ -44,8 +43,8 @@ namespace DroNeS.Mapbox
             GeneratePosition(tile); // do something
             _activeTiles.Add(tileId, tile); // to keep track
 
-            MeshFactory.Register(tile);
             ImageFactory.Register(tile);
+            MeshFactory.Register(tile);
 
             return tile;
         }

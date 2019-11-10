@@ -269,10 +269,17 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 						var poly = AddOrCreateMeshModifier<PolygonMeshModifier>();
 
-						UVModifierOptions uvModOptions = new UVModifierOptions();
-						uvModOptions.texturingType = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.texturingType : _layerProperties.materialOptions.texturingType;
-						uvModOptions.atlasInfo = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.atlasInfo : _layerProperties.materialOptions.atlasInfo;
-						uvModOptions.style = _layerProperties.materialOptions.style;
+						var uvModOptions = new UVModifierOptions
+						{
+							texturingType = (_layerProperties.materialOptions.style == StyleTypes.Custom)
+								? _layerProperties.materialOptions.customStyleOptions.texturingType
+								: _layerProperties.materialOptions.texturingType,
+							atlasInfo = (_layerProperties.materialOptions.style == StyleTypes.Custom)
+								? _layerProperties.materialOptions.customStyleOptions.atlasInfo
+								: _layerProperties.materialOptions.atlasInfo,
+							style = _layerProperties.materialOptions.style
+						};
+						
 						poly.SetProperties(uvModOptions);
 
 						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)

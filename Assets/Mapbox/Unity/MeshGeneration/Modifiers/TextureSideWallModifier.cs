@@ -53,7 +53,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		GeometryExtrusionWithAtlasOptions _options;
 		private int _counter = 0;
 		private float height = 0.0f;
-		private float _scale = 1f;
+		private float _scale = 0.7571877f;
 		private float _minWallLength;
 		private float _singleFloorHeight;
 		private float _currentMidHeight;
@@ -102,8 +102,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
 				return;
 
-			if (tile != null)
-				_scale = tile.TileScale;
+			if (tile != null) _scale = tile.TileScale;
 
 			//facade texture to decorate this building
 			_currentFacade =
@@ -112,10 +111,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_currentTextureRect = _currentFacade.TextureRect;
 
 			//this can be moved to initialize or in an if clause if you're sure all your tiles will be same level/scale
-			_singleFloorHeight = (tile.TileScale * _currentFacade.FloorHeight) / _currentFacade.MidFloorCount;
-			_scaledFirstFloorHeight = tile.TileScale * _currentFacade.FirstFloorHeight;
-			_scaledTopFloorHeight = tile.TileScale * _currentFacade.TopFloorHeight;
-			_scaledPreferredWallLength = tile.TileScale * _currentFacade.PreferredEdgeSectionLength;
+			_singleFloorHeight = (_scale * _currentFacade.FloorHeight) / _currentFacade.MidFloorCount;
+			_scaledFirstFloorHeight = _scale * _currentFacade.FirstFloorHeight;
+			_scaledTopFloorHeight = _scale * _currentFacade.TopFloorHeight;
+			_scaledPreferredWallLength = _scale * _currentFacade.PreferredEdgeSectionLength;
 			_scaledFloorHeight = _scaledPreferredWallLength * _currentFacade.WallToFloorRatio;
 			_singleColumnLength = _scaledPreferredWallLength / _currentFacade.ColumnCount;
 
@@ -129,7 +128,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			minHeight = minHeight * _options.extrusionScaleFactor * _scale;
 			height = (maxHeight - minHeight);
 
-			//we cann GenerateRoofMesh even if extrusion type is sidewall-only
+			//we can GenerateRoofMesh even if extrusion type is sidewall-only
 			//it pushes the vertices to building height, then we clear top polygon triangles
 			//to remove roof.
 			GenerateRoofMesh(md, minHeight, maxHeight);
@@ -138,91 +137,87 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				md.Triangles[0].Clear();
 			}
 
-			if (_options.extrusionGeometryType != ExtrusionGeometryType.RoofOnly)
+			if (_options.extrusionGeometryType == ExtrusionGeometryType.RoofOnly) return;
+			//limiting section heights, first floor gets priority, then we draw top floor, then mid if we still have space
+			finalFirstHeight = Mathf.Min(height, _scaledFirstFloorHeight);
+			finalTopHeight = (height - finalFirstHeight) < _scaledTopFloorHeight ? 0 : _scaledTopFloorHeight;
+			finalMidHeight = Mathf.Max(0, height - (finalFirstHeight + finalTopHeight));
+			wallTriangles = new List<int>();
+
+			//cuts long edges into smaller ones using PreferredEdgeSectionLength
+			currentWallLength = 0;
+			start = Constants.Math.Vector3Zero;
+			wallSegmentDirection = Constants.Math.Vector3Zero;
+
+			finalLeftOverRowHeight = 0f;
+			if (finalMidHeight > 0)
 			{
-				//limiting section heights, first floor gets priority, then we draw top floor, then mid if we still have space
-				finalFirstHeight = Mathf.Min(height, _scaledFirstFloorHeight);
-				finalTopHeight = (height - finalFirstHeight) < _scaledTopFloorHeight ? 0 : _scaledTopFloorHeight;
-				finalMidHeight = Mathf.Max(0, height - (finalFirstHeight + finalTopHeight));
-				wallTriangles = new List<int>();
+				finalLeftOverRowHeight = finalMidHeight;
+				finalLeftOverRowHeight = finalLeftOverRowHeight % _singleFloorHeight;
+				finalMidHeight -= finalLeftOverRowHeight;
+			}
+			else
+			{
+				finalLeftOverRowHeight = finalTopHeight;
+			}
 
-				//cuts long edges into smaller ones using PreferredEdgeSectionLength
-				currentWallLength = 0;
-				start = Constants.Math.Vector3Zero;
-				wallSegmentDirection = Constants.Math.Vector3Zero;
+			for (int i = 0; i < md.Edges.Count; i += 2)
+			{
+				var v1 = md.Vertices[md.Edges[i]];
+				var v2 = md.Vertices[md.Edges[i + 1]];
 
-				finalLeftOverRowHeight = 0f;
-				if (finalMidHeight > 0)
+				wallDirection = v2 - v1;
+
+				currentWallLength = Vector3.Distance(v1, v2);
+				_leftOverColumnLength = currentWallLength % _singleColumnLength;
+				start = v1;
+				wallSegmentDirection = (v2 - v1).normalized;
+
+				//half of leftover column (if _centerSegments ofc) at the begining
+				if (_centerSegments && currentWallLength > _singleColumnLength)
 				{
-					finalLeftOverRowHeight = finalMidHeight;
-					finalLeftOverRowHeight = finalLeftOverRowHeight % _singleFloorHeight;
-					finalMidHeight -= finalLeftOverRowHeight;
-				}
-				else
-				{
-					finalLeftOverRowHeight = finalTopHeight;
-				}
+					//save left,right vertices and wall length
+					wallSegmentFirstVertex = start;
+					wallSegmentLength = (_leftOverColumnLength / 2);
+					start += wallSegmentDirection * wallSegmentLength;
+					wallSegmentSecondVertex = start;
 
-				for (int i = 0; i < md.Edges.Count; i += 2)
-				{
-					var v1 = md.Vertices[md.Edges[i]];
-					var v2 = md.Vertices[md.Edges[i + 1]];
-
-					wallDirection = v2 - v1;
-
-					currentWallLength = Vector3.Distance(v1, v2);
-					_leftOverColumnLength = currentWallLength % _singleColumnLength;
-					start = v1;
-					wallSegmentDirection = (v2 - v1).normalized;
-
-					//half of leftover column (if _centerSegments ofc) at the begining
-					if (_centerSegments && currentWallLength > _singleColumnLength)
-					{
-						//save left,right vertices and wall length
-						wallSegmentFirstVertex = start;
-						wallSegmentLength = (_leftOverColumnLength / 2);
-						start += wallSegmentDirection * wallSegmentLength;
-						wallSegmentSecondVertex = start;
-
-						_leftOverColumnLength = _leftOverColumnLength / 2;
-						CreateWall(md);
-					}
-
-					while (currentWallLength > _singleColumnLength)
-					{
-						wallSegmentFirstVertex = start;
-						//columns fitting wall / max column we have in texture
-						var stepRatio =
-							(float)Math.Min(_currentFacade.ColumnCount,
-								Math.Floor(currentWallLength / _singleColumnLength)) / _currentFacade.ColumnCount;
-						wallSegmentLength = stepRatio * _scaledPreferredWallLength;
-						start += wallSegmentDirection * wallSegmentLength;
-						wallSegmentSecondVertex = start;
-
-						currentWallLength -= (stepRatio * _scaledPreferredWallLength);
-						CreateWall(md);
-					}
-
-					//left over column at the end
-					if (_leftOverColumnLength > 0)
-					{
-						wallSegmentFirstVertex = start;
-						wallSegmentSecondVertex = v2;
-						wallSegmentLength = _leftOverColumnLength;
-						CreateWall(md);
-					}
+					_leftOverColumnLength /= 2;
+					CreateWall(md);
 				}
 
-				//this first loop is for columns
-				if (_separateSubmesh)
+				while (currentWallLength > _singleColumnLength)
 				{
-					md.Triangles.Add(wallTriangles);
+					wallSegmentFirstVertex = start;
+					//columns fitting wall / max column we have in texture
+					var stepRatio =
+						(float)Math.Min(_currentFacade.ColumnCount,
+							Math.Floor(currentWallLength / _singleColumnLength)) / _currentFacade.ColumnCount;
+					wallSegmentLength = stepRatio * _scaledPreferredWallLength;
+					start += wallSegmentDirection * wallSegmentLength;
+					wallSegmentSecondVertex = start;
+
+					currentWallLength -= (stepRatio * _scaledPreferredWallLength);
+					CreateWall(md);
 				}
-				else
-				{
-					md.Triangles.Capacity = md.Triangles.Count + wallTriangles.Count;
-					md.Triangles[0].AddRange(wallTriangles);
-				}
+
+				//left over column at the end
+				if (!(_leftOverColumnLength > 0)) continue;
+				wallSegmentFirstVertex = start;
+				wallSegmentSecondVertex = v2;
+				wallSegmentLength = _leftOverColumnLength;
+				CreateWall(md);
+			}
+
+			//this first loop is for columns
+			if (_separateSubmesh)
+			{
+				md.Triangles.Add(wallTriangles);
+			}
+			else
+			{
+				md.Triangles.Capacity = md.Triangles.Count + wallTriangles.Count;
+				md.Triangles[0].AddRange(wallTriangles);
 			}
 		}
 

@@ -9,9 +9,6 @@ namespace DroNeS.Mapbox
 {
     public class BuildingMeshFetcherParameters : DataFetcherParameters
     {
-//        public CanonicalTileId canonicalTileId;
-//        public string tilesetId;
-//        public UnityTile tile;
         public CustomTile cTile;
         public bool useOptimizedStyle = false;
         public Style style = null;

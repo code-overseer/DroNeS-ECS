@@ -6,7 +6,7 @@
 	{
 		public static Style GetParameters(VectorSourceType defaultElevation)
 		{
-			Style defaultStyle = new Style();
+			var defaultStyle = new Style();
 			switch (defaultElevation)
 			{
 				case VectorSourceType.MapboxStreets:

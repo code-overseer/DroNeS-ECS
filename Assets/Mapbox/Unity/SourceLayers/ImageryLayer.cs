@@ -137,11 +137,9 @@ namespace Mapbox.Unity.Map
 		/// <param name="useRetina"></param>
 		public virtual void UseRetina(bool useRetina)
 		{
-			if (_layerProperty.rasterOptions.useRetina != useRetina)
-			{
-				_layerProperty.rasterOptions.useRetina = useRetina;
-				_layerProperty.rasterOptions.HasChanged = true;
-			}
+			if (_layerProperty.rasterOptions.useRetina == useRetina) return;
+			_layerProperty.rasterOptions.useRetina = useRetina;
+			_layerProperty.rasterOptions.HasChanged = true;
 		}
 
 		/// <summary>
