@@ -1,3 +1,5 @@
+using DroNeS.Mapbox;
+
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using Mapbox.Unity.MeshGeneration.Data;
@@ -32,7 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	/// </summary>
 	public class MeshModifier : ModifierBase
 	{
-		public virtual ModifierType Type { get { return ModifierType.Preprocess; } }
+		public virtual ModifierType Type => ModifierType.Preprocess;
 
 		public virtual void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{

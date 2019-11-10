@@ -98,7 +98,7 @@ namespace DroNeS.Mapbox
         }
 
         public static bool Cleanup(UnwrappedTileId tile) {
-            return (!Tiles.activeTiles.Contains(tile));
+            return !Tiles.activeTiles.Contains(tile);
         }
 
     }

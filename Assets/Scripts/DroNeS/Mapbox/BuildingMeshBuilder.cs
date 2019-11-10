@@ -58,10 +58,7 @@ namespace DroNeS.Mapbox
 			SubLayerProperties = properties;
 			PerformanceOptions = properties.performanceOptions;
 			_defaultStack = ScriptableObject.CreateInstance<MeshMerger>();
-			if (_defaultStack.MeshModifiers == null)
-			{
-				_defaultStack.MeshModifiers = new List<MeshModifier>();
-			}
+			_defaultStack.MeshModifiers = new List<MeshModifier>();
 
 			SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
 			var poly = AddOrCreateMeshModifier<PolygonMeshModifier>();
@@ -69,11 +66,11 @@ namespace DroNeS.Mapbox
 			var uvModOptions = new UVModifierOptions
 			{
 				texturingType = UvMapType.Atlas,
-				atlasInfo = SubLayerProperties.materialOptions.atlasInfo,
+				atlasInfo = Resources.Load("Atlases/BuildingAtlas") as AtlasInfo,
 				style = StyleTypes.Custom
 			};
 			poly.SetProperties(uvModOptions);
-
+			
 			var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
 			SubLayerProperties.extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
 			SubLayerProperties.extrusionOptions.extrusionScaleFactor = 1.3203f;
@@ -83,8 +80,6 @@ namespace DroNeS.Mapbox
 			atlasMod.SetProperties(atlasOptions);
 			
 			SubLayerProperties.filterOptions.RegisterFilters();
-			_defaultStack.MeshModifiers.AddRange(SubLayerProperties.MeshModifiers);
-
 		}
 		
 		private void SetReplacementCriteria(IReplacementCriteria criteria)
@@ -99,13 +94,13 @@ namespace DroNeS.Mapbox
 		}
 
 		#region Private Helper Methods
-		private void AddFeatureToTileObjectPool(VectorFeatureUnity feature)
+		private void AddFeatureToTileObjectPool(CustomFeatureUnity feature)
 		{
 			_activeIds.Add(feature.Data.Id);
 		}
-		private static bool IsFeatureEligibleAfterFiltering(VectorFeatureUnity feature, BuildingMeshBuilderProperties layerProperties)
+		private static bool IsFeatureEligibleAfterFiltering(CustomFeatureUnity feature, BuildingMeshBuilderProperties layerProperties)
 		{
-			return !layerProperties.layerFeatureFilters.Any() || layerProperties.layerFeatureFilterCombiner.Try(feature);
+			return !layerProperties.layerFeatureFilters.Any() || layerProperties.layerFeatureFilterCombiner.Try((VectorFeatureUnity)feature);
 		}
 		private bool ShouldSkipProcessingFeatureWithId(ulong featureId, BuildingMeshBuilderProperties layerProperties)
 		{
@@ -225,10 +220,10 @@ namespace DroNeS.Mapbox
 				geom = fe.Geometry<float>(0); //passing zero means clip at tile edge
 			}
 
-			var feature = new VectorFeatureUnity(
+			var feature = new CustomFeatureUnity(
 				layerProperties.vectorTileLayer.GetFeature(index),
 				geom,
-				null,
+				tile,
 				layerProperties.vectorTileLayer.Extent,
 				layerProperties.buildingsWithUniqueIds);
 
@@ -248,14 +243,14 @@ namespace DroNeS.Mapbox
 			return true;
 		}
 		
-		private bool IsFeatureValid(VectorFeatureUnity feature)
+		private bool IsFeatureValid(CustomFeatureUnity feature)
 		{
 			if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
 				return false;
 
 			return feature.Points.Count >= 1;
 		}
-		private void Build(VectorFeatureUnity feature, CustomTile tile)
+		private void Build(CustomFeatureUnity feature, CustomTile tile)
 		{
 			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))
 				return;

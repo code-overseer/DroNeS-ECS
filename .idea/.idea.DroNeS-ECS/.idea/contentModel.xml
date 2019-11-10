@@ -527,10 +527,12 @@
         <e p="Scripts" t="Include">
           <e p="DroNeS" t="Include">
             <e p="Components" t="Include">
+              <e p="BuildingTag.cs" t="Include" />
               <e p="DestructionTag.cs" t="Include" />
               <e p="DroneStatus.cs" t="Include" />
               <e p="DroneTag.cs" t="Include" />
               <e p="DroneUID.cs" t="Include" />
+              <e p="TerrainTag.cs" t="Include" />
               <e p="Waypoint.cs" t="Include" />
             </e>
             <e p="Enums.cs" t="Include" />
@@ -538,6 +540,7 @@
               <e p="BuildingMeshBuilder.cs" t="Include" />
               <e p="BuildingMeshFactory.cs" t="Include" />
               <e p="BuildingMeshFetcher.cs" t="Include" />
+              <e p="CustomFeatureUnity.cs" t="Include" />
               <e p="CustomTile.cs" t="Include" />
               <e p="CustomTileFactory.cs" t="Include" />
               <e p="DronesMap.cs" t="Include" />
@@ -552,6 +555,7 @@
               <e p="DroneMaker.cs" t="Include" />
             </e>
             <e p="Systems" t="Include">
+              <e p="CityBuilderSystem.cs" t="Include" />
               <e p="DroneBuilderSystem.cs" t="Include" />
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="WaypointUpdateSystem.cs" t="Include" />

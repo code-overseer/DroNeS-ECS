@@ -130,7 +130,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_counter = MeshModifiers.Count;
 			for (var i = 0; i < _counter; i++)
 			{
-				Debug.Log(MeshModifiers[i].GetType());
 				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
 				{
 					MeshModifiers[i].Run(feature, meshData, tile);
@@ -139,16 +138,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			GameObject go = null;
 			//65000 is the vertex limit for meshes, keep stashing it until that
-//			_counter = meshData.Vertices.Count;
-//			if (_cacheVertexCount[tile] + _counter < 65000)
-//			{
-//				_cacheVertexCount[tile] += _counter;
-//				_cached[tile].Add(meshData);
-//			}
-//			else
-//			{
-//				go = End(tile, parent, type);
-//			}
+			_counter = meshData.Vertices.Count;
+			if (_cacheVertexCount[tile] + _counter < 65000)
+			{
+				_cacheVertexCount[tile] += _counter;
+				_cached[tile].Add(meshData);
+			}
+			else
+			{
+				go = End(tile, parent, type);
+			}
 
 			return go;
 		}

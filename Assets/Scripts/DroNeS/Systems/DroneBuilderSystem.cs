@@ -20,18 +20,17 @@ namespace DroNeS.Systems
         private static EntityArchetype _drone;
         private static RenderMesh _droneMesh;
         private static EntityManager Manager => World.Active.EntityManager;
-        private static EntityCommandBuffer _buildCommands;
         private static int _droneUid;
 
         protected override void OnCreate()
         {
             _barrier = World.Active.GetOrCreateSystem<DroneBuilderBarrierSystem>();
             _drone = Manager.CreateArchetype(
+                ComponentType.ReadOnly<DroneTag>(),
                 typeof(Translation),
                 typeof(DroneUID),
                 typeof(DroneStatus),
                 typeof(Waypoint),
-                typeof(DroneTag),
                 typeof(LocalToWorld));
             
             _droneMesh = new RenderMesh
@@ -43,15 +42,15 @@ namespace DroNeS.Systems
 
         public static void AddDrone()
         {
-            _buildCommands = _barrier.CreateCommandBuffer();
+            var buildCommands = _barrier.CreateCommandBuffer();
             for (var i = 0; i < 5; ++i)
             {
-                var drone = _buildCommands.CreateEntity(_drone);
-                _buildCommands.SetComponent(drone, new Translation {Value = Random.insideUnitSphere * 5});
-                _buildCommands.SetComponent(drone, new DroneUID {uid = _droneUid++} );
-                _buildCommands.SetComponent(drone, new DroneStatus {Value = Status.New} );
-                _buildCommands.SetComponent(drone, new Waypoint(float3.zero, -1,0));
-                _buildCommands.AddSharedComponent(drone, _droneMesh);
+                var drone = buildCommands.CreateEntity(_drone);
+                buildCommands.SetComponent(drone, new Translation {Value = Random.insideUnitSphere * 5});
+                buildCommands.SetComponent(drone, new DroneUID {uid = _droneUid++} );
+                buildCommands.SetComponent(drone, new DroneStatus {Value = Status.New} );
+                buildCommands.SetComponent(drone, new Waypoint(float3.zero, -1,0));
+                buildCommands.AddSharedComponent(drone, _droneMesh);
             }
         }
 

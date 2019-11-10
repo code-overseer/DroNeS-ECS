@@ -6,13 +6,13 @@ using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using Unity.Mathematics;
+using Unity.Rendering;
 using UnityEngine;
 
 namespace DroNeS.Mapbox
 {
 	public class CustomTile
 	{
-		private readonly int _initialZoom;
 		public TilePropertyState VectorDataState;
 		private TileTerrainType ElevationType { get; }
 		private Texture2D RasterData { get; set; }
@@ -20,45 +20,75 @@ namespace DroNeS.Mapbox
 		private readonly Material _material;
 		private float RelativeScale { get; set; }
 		public RectD Rect { get; private set; }
+		public float3 Position { get; }
+		private Mesh  QuadMesh { get; set; }
 		public float TileScale { get; private set; }
+
+		public readonly int CurrentZoom;
 		public UnwrappedTileId UnwrappedTileId { get; }
 		public CanonicalTileId CanonicalTileId => UnwrappedTileId.Canonical;
 		private static Texture2D _loadingTexture;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
-		private List<Tile> _tiles = new List<Tile>();
+		private readonly List<Tile> _tiles = new List<Tile>();
     
 
-		public CustomTile(in IMapReadable map, in UnwrappedTileId tileId, int initialZoom)
+		public CustomTile(in IMapReadable map, in UnwrappedTileId tileId)
 		{
-			_initialZoom = initialZoom;
+			CurrentZoom = map.AbsoluteZoom;
 			if (_loadingTexture == null) _loadingTexture = map.LoadingTexture;
 			ElevationType = TileTerrainType.None;
 			TileScale = map.WorldRelativeScale;
 			RelativeScale = math.rcp(math.cos(math.radians((float)map.CenterLatitudeLongitude.x)));
 			Rect = Conversions.TileBounds(tileId);
 			UnwrappedTileId = tileId;
-			_material = new Material(map.TileMaterial);
+			_material = new Material(Shader.Find("Diffuse"));
 			var scaleFactor = math.pow(2, map.InitialZoom - map.AbsoluteZoom);
-		}
-    
-		public void MakeFlatTerrain()
-		{
-			// make quad mesh and assign
-		
+			Position = new float3(
+				(float)(Rect.Center.x - map.CenterMercator.x) * TileScale * scaleFactor,
+				0,
+				(float)(Rect.Center.y - map.CenterMercator.y) * TileScale * scaleFactor);
+			MakeFlatTerrain();
 		}
 
-		public void SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = false)
+		private void MakeFlatTerrain()
 		{
-			if (RasterData == null) // make this static
+			var verts = new Vector3[4];
+			verts[0] = TileScale * (Rect.Min - Rect.Center).ToVector3xz();
+			verts[1] = TileScale * new Vector3((float)(Rect.Max.x - Rect.Center.x), 0, (float)(Rect.Min.y - Rect.Center.y));
+			verts[2] = TileScale * (Rect.Max - Rect.Center).ToVector3xz();
+			verts[3] = TileScale * new Vector3((float)(Rect.Min.x - Rect.Center.x), 0, (float)(Rect.Max.y - Rect.Center.y));
+			var norms = new [] {Vector3.up, Vector3.up, Vector3.up, Vector3.up};
+
+			QuadMesh = new Mesh
 			{
-				RasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
-				RasterData.wrapMode = TextureWrapMode.Clamp;
+				vertices = verts,
+				normals = norms,
+				triangles = new[] {0, 1, 2, 0, 2, 3},
+				uv = new[]
+				{
+					new Vector2(0, 1),
+					new Vector2(1, 1),
+					new Vector2(1, 0),
+					new Vector2(0, 0)
+				}
+			};
+		}
+
+		public RenderMesh SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = false)
+		{
+			if (RasterData == null)
+			{
+				RasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap) {wrapMode = TextureWrapMode.Clamp};
 			}
-
 			RasterData.LoadImage(data);
-			RasterData.Compress(false);
-
+			RasterData.Compress(useCompression);
 			_material.mainTexture = RasterData;
+
+			return new RenderMesh
+			{
+				mesh = QuadMesh,
+				material = _material
+			};
 		}
 		
 		public void SetVectorData(VectorTile vectorTile)

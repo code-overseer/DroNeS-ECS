@@ -2,8 +2,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using System.Collections.Generic;
 	using UnityEngine;
-	using Mapbox.Unity.MeshGeneration.Data;
-	using Mapbox.Unity.Map;
+	using Data;
+	using Map;
 	using System;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Textured Side Wall Modifier")]
@@ -50,7 +50,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float _narrowWallWidthDelta = 0.01f;
 		private float _shortRowHeightDelta = 0.015f;
 
-		GeometryExtrusionWithAtlasOptions _options;
+		private GeometryExtrusionWithAtlasOptions _options;
 		private int _counter = 0;
 		private float height = 0.0f;
 		private float _scale = 0.7571877f;
@@ -63,17 +63,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void SetProperties(ModifierProperties properties)
 		{
-			if (properties is GeometryExtrusionWithAtlasOptions)
+			if (properties is GeometryExtrusionWithAtlasOptions options)
 			{
-				_options = (GeometryExtrusionWithAtlasOptions)properties;
+				_options = options;
 			}
-			else if (properties is GeometryExtrusionOptions)
+			else if (properties is GeometryExtrusionOptions extrusionOptions)
 			{
-				_options = ((GeometryExtrusionOptions)properties).ToGeometryExtrusionWithAtlasOptions();
+				_options = extrusionOptions.ToGeometryExtrusionWithAtlasOptions();
 			}
-			else if (properties is UVModifierOptions)
+			else if (properties is UVModifierOptions modifierOptions)
 			{
-				_options = ((UVModifierOptions)properties).ToGeometryExtrusionWithAtlasOptions();
+				_options = modifierOptions.ToGeometryExtrusionWithAtlasOptions();
 			}
 		}
 
@@ -91,10 +91,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		public override void UpdateModifier(object sender, System.EventArgs layerArgs)
+		public override void UpdateModifier(object sender, EventArgs layerArgs)
 		{
 			SetProperties((ModifierProperties)sender);
-			NotifyUpdateModifier(new VectorLayerUpdateArgs { property = sender as MapboxDataProperty, modifier = this });
+			NotifyUpdateModifier(new VectorLayerUpdateArgs { property = (MapboxDataProperty) sender, modifier = this });
 		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)

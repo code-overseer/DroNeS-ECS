@@ -9,7 +9,8 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 	public class TypeFilter : FilterBase
 	{
-		public override string Key { get { return "type"; } }
+		public override string Key => "type";
+
 		[SerializeField]
 		private string[] _types;
 		[SerializeField]
@@ -18,9 +19,9 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 		public override bool Try(VectorFeatureUnity feature)
 		{
 			var check = false;
-			for (int i = 0; i < _types.Length; i++)
+			foreach (var t in _types)
 			{
-				if (_types[i].ToLowerInvariant() == feature.Properties["type"].ToString().ToLowerInvariant())
+				if (string.Equals(t, feature.Properties["type"].ToString(), StringComparison.InvariantCultureIgnoreCase))
 				{
 					check = true;
 				}
@@ -170,12 +171,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		public bool Try(VectorFeatureUnity feature)
 		{
-			object property;
-			if (feature.Properties.TryGetValue(Key, out property))
-			{
-				return PropertyComparer(property);
-			}
-			return false;
+			return feature.Properties.TryGetValue(Key, out var property) && PropertyComparer(property);
 		}
 
 		protected virtual bool PropertyComparer(object property)
@@ -264,11 +260,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			}
 
 			var propertyValue = Convert.ToDouble(property);
-			if (Math.Abs(propertyValue - Min) < Mapbox.Utils.Constants.EpsilonFloatingPoint)
-			{
-				return true;
-			}
-			return false;
+			return Math.Abs(propertyValue - Min) < Mapbox.Utils.Constants.EpsilonFloatingPoint;
 		}
 	}
 

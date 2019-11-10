@@ -136,8 +136,6 @@ namespace Mapbox.Unity.Map
 
 		#region Factory event callbacks
 		//factory event callback, not relaying this up for now
-
-
 		private void TileHeightStateChanged(UnityTile tile)
 		{
 			if (tile.HeightDataState == TilePropertyState.Loaded)
@@ -165,7 +163,7 @@ namespace Mapbox.Unity.Map
 			TileStateChanged(tile);
 		}
 
-		public virtual void TileStateChanged(UnityTile tile)
+		public void TileStateChanged(UnityTile tile)
 		{
 			var rasterDone = (tile.RasterDataState == TilePropertyState.None ||
 								tile.RasterDataState == TilePropertyState.Loaded ||

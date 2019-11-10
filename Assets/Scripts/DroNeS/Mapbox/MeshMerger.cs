@@ -1,25 +1,24 @@
 ﻿using System.Collections.Generic;
+using DroNeS.Systems;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Modifiers;
+using Unity.Entities;
+using Unity.Rendering;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace DroNeS.Mapbox
 {
-	public class RenderEntity
-	{
-		public Mesh Mesh;
-		public Material Material;
-	}
 	public class MeshMerger : ModifierStackBase
     {
         private readonly Dictionary<CustomTile, int> _cacheVertexCount = new Dictionary<CustomTile, int>();
 		private readonly Dictionary<CustomTile, List<MeshData>> _cached = new Dictionary<CustomTile, List<MeshData>>();
 		private readonly Dictionary<CustomTile, int> _buildingCount = new Dictionary<CustomTile, int>();
 
-		private Dictionary<CustomTile, List<RenderEntity>> _activeObjects = new Dictionary<CustomTile, List<RenderEntity>>();
+		private Dictionary<CustomTile, List<RenderMesh>> _activeObjects = new Dictionary<CustomTile, List<RenderMesh>>();
 		private MeshData _tempMeshData;
 		private MeshData _temp2MeshData;
-		private RenderEntity _tempVectorEntity;
+		private RenderMesh _tempVectorEntity;
 		private ObjectPool<List<MeshData>> _meshDataPool;
 		private static Material _buildingMaterial;
 		private int _counter, _counter2;
@@ -41,14 +40,9 @@ namespace DroNeS.Mapbox
 			{
 				MeshModifiers[i].Initialize();
 			}
-			_counter = GoModifiers.Count;
-			for (var i = 0; i < _counter; i++)
-			{
-				GoModifiers[i].Initialize();
-			}
 		}
 
-	    public void Execute(CustomTile tile, VectorFeatureUnity feature, MeshData meshData, string type = "")
+	    public void Execute(CustomTile tile, CustomFeatureUnity feature, MeshData meshData, string type = "")
 	    {
 		    if (!_cacheVertexCount.ContainsKey(tile))
 		    {
@@ -63,7 +57,7 @@ namespace DroNeS.Mapbox
 		    {
 			    if (MeshModifiers[i] != null && MeshModifiers[i].Active)
 			    {
-				    MeshModifiers[i].Run(feature, meshData);
+				    MeshModifiers[i].Run((VectorFeatureUnity)feature, meshData);
 			    }
 		    }
 		    
@@ -134,30 +128,34 @@ namespace DroNeS.Mapbox
 			
 			_cached[tile].Clear();
 			_cacheVertexCount[tile] = 0;
-			_tempVectorEntity = new RenderEntity
+			_tempVectorEntity = new RenderMesh
 			{
-				Mesh = new Mesh(),
-				Material = _buildingMaterial
+				mesh = new Mesh(),
+				material = _buildingMaterial
 			};
-			_tempVectorEntity.Mesh.subMeshCount = _tempMeshData.Triangles.Count;
-			_tempVectorEntity.Mesh.SetVertices(_tempMeshData.Vertices);
-			_tempVectorEntity.Mesh.SetNormals(_tempMeshData.Normals);
+			_tempVectorEntity.mesh.subMeshCount = _tempMeshData.Triangles.Count;
+			_tempVectorEntity.mesh.SetVertices(_tempMeshData.Vertices);
+			_tempVectorEntity.mesh.SetNormals(_tempMeshData.Normals);
 
 			_counter = _tempMeshData.Triangles.Count;
 			for (var i = 0; i < _counter; i++)
 			{
-				_tempVectorEntity.Mesh.SetTriangles(_tempMeshData.Triangles[i], i);
+				_tempVectorEntity.mesh.SetTriangles(_tempMeshData.Triangles[i], i);
 			}
 
 			_counter = _tempMeshData.UV.Count;
 			for (var i = 0; i < _counter; i++)
 			{
-				_tempVectorEntity.Mesh.SetUVs(i, _tempMeshData.UV[i]);
+				_tempVectorEntity.mesh.SetUVs(i, _tempMeshData.UV[i]);
 			}
-			_tempVectorEntity.Mesh.SetTriangles(_tempVectorEntity.Mesh.triangles, 0);
-			_tempVectorEntity.Mesh.subMeshCount = 1;
+			_tempVectorEntity.mesh.SetTriangles(_tempVectorEntity.mesh.triangles, 0);
+			_tempVectorEntity.mesh.subMeshCount = 1;
+
+			var pos = tile.Position;
 			
-			// TODO create RenderMesh component here
+			CityBuilderSystem.MakeBuilding(in pos, in _tempVectorEntity);
+
+
 		}
     }
 }

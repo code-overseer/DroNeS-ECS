@@ -215,13 +215,7 @@ namespace Mapbox.Unity.Map
 	[Serializable]
 	public class GeometryExtrusionWithAtlasOptions : ModifierProperties
 	{
-		public override Type ModifierType
-		{
-			get
-			{
-				return typeof(TextureSideWallModifier);
-			}
-		}
+		public override Type ModifierType => typeof(TextureSideWallModifier);
 		public UvMapType texturingType = UvMapType.Tiled;
 		public AtlasInfo atlasInfo;
 		public ExtrusionType extrusionType = ExtrusionType.None;

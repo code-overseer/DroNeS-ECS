@@ -21,11 +21,11 @@ namespace DroNeS.Mapbox
             
             var rasterTile = imageDataParameters.useRetina ? new RetinaRasterTile() : new RasterTile();
 
-            imageDataParameters.tile.AddTile(rasterTile);
+            imageDataParameters.cTile.AddTile(rasterTile);
 
-            rasterTile.Initialize(_fileSource, imageDataParameters.tile.CanonicalTileId, imageDataParameters.tilesetId, () =>
+            rasterTile.Initialize(_fileSource, imageDataParameters.cTile.CanonicalTileId, imageDataParameters.tilesetId, () =>
             {
-                if (imageDataParameters.tile.CanonicalTileId != rasterTile.Id) return;
+                if (imageDataParameters.cTile.CanonicalTileId != rasterTile.Id) return;
 
                 if (rasterTile.HasError)
                 {

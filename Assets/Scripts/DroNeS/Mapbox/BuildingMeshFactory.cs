@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using DroNeS.Systems;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Factories;
 using Mapbox.Unity.MeshGeneration.Interfaces;
+using Mapbox.Unity.MeshGeneration.Modifiers;
+using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace DroNeS.Mapbox
@@ -27,8 +31,30 @@ namespace DroNeS.Mapbox
 			_dataFetcher = ScriptableObject.CreateInstance<BuildingMeshFetcher>();
 			_dataFetcher.dataReceived += OnVectorDataReceived;
 			
-			CreateLayerVisualizers();
 			Properties = new VectorLayerProperties();
+			var vslp = new VectorSubLayerProperties
+			{
+				colliderOptions = {colliderType = ColliderType.None},
+				coreOptions =
+				{
+					geometryType = VectorPrimitiveType.Polygon,
+					layerName = "building",
+					snapToTerrain = true,
+					combineMeshes = true
+				},
+				extrusionOptions =
+				{
+					extrusionType = ExtrusionType.PropertyHeight,
+					extrusionScaleFactor = 1.3203f,
+					propertyName = "height",
+					extrusionGeometryType = ExtrusionGeometryType.RoofAndSide
+				},
+				moveFeaturePositionTo = PositionTargetType.CenterOfVertices
+			};
+			vslp.coreOptions.sublayerName = "Buildings";
+            vslp.buildingsWithUniqueIds = true;
+            Properties.vectorSubLayers.Add(vslp);
+            CreateLayerVisualizers();
 		}
 
 		private string TilesetId => Properties.sourceOptions.Id;
@@ -177,7 +203,6 @@ namespace DroNeS.Mapbox
 			_layerProgress.Remove(tile);
 			TilesWaitingProcessing.Remove(tile);
 			tile.VectorDataState = TilePropertyState.Loaded;
-			// Create building entity here
 		}
 
 		private void CreateLayerVisualizers()

@@ -10,10 +10,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 	{
 		MeshDataArray _cachedQuad;
 
-		public override int RequiredVertexCount
-		{
-			get { return 4; }
-		}
+		public override int RequiredVertexCount => 4;
 
 		public override void Initialize(ElevationLayerProperties elOptions)
 		{

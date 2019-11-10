@@ -178,7 +178,7 @@
 		/// </summary>
 		public void SetDefaultMaterialOptions()
 		{
-			string styleName = style.ToString();
+			var styleName = style.ToString();
 
 			if (customStyleOptions == null)
 			{
@@ -191,11 +191,11 @@
 			}
 			else
 			{
-				string samplePaletteName = samplePalettes.ToString();
+				var samplePaletteName = samplePalettes.ToString();
 
-				string path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine(styleName, Constants.Path.MAPBOX_STYLES_ASSETS_FOLDER));
+				var path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine(styleName, Constants.Path.MAPBOX_STYLES_ASSETS_FOLDER));
 
-				StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle(styleName, path, samplePaletteName);
+				var styleAssetPathBundle = new StyleAssetPathBundle(styleName, path, samplePaletteName);
 
 				AssignAssets(styleAssetPathBundle);
 			}
@@ -203,7 +203,7 @@
 			switch (style)
 			{
 				case StyleTypes.Light:
-					Color lightColor = materials[0].Materials[0].color;
+					var lightColor = materials[0].Materials[0].color;
 					lightColor.a = lightStyleOpacity;
 					materials[0].Materials[0].color = lightColor;
 
@@ -212,7 +212,7 @@
 					materials[1].Materials[0].color = lightColor;
 					break;
 				case StyleTypes.Dark:
-					Color darkColor = materials[0].Materials[0].color;
+					var darkColor = materials[0].Materials[0].color;
 					darkColor.a = darkStyleOpacity;
 					materials[0].Materials[0].color = darkColor;
 
@@ -221,7 +221,7 @@
 					materials[1].Materials[0].color = darkColor;
 					break;
 				case StyleTypes.Color:
-					Color color = colorStyleColor;
+					var color = colorStyleColor;
 					materials[0].Materials[0].color = color;
 					materials[1].Materials[0].color = color;
 					break;

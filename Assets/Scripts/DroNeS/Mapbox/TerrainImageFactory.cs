@@ -1,5 +1,8 @@
-﻿using Mapbox.Map;
+﻿using DroNeS.Systems;
+using Mapbox.Map;
 using Mapbox.Unity.Map;
+using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace DroNeS.Mapbox
@@ -9,7 +12,7 @@ namespace DroNeS.Mapbox
 	    private readonly TerrainImageFetcher _dataFetcher;
 	    private ImageryLayerProperties Properties { get; }
 
-		private string TilesetId => Properties.sourceOptions.Id;
+	    private string TilesetId => Properties.sourceOptions.Id;
 
 		public TerrainImageFactory()
 		{
@@ -36,8 +39,9 @@ namespace DroNeS.Mapbox
 		{
 			if (tile == null) return;
 			TilesWaitingResponse.Remove(tile);
-
-			tile.SetRasterData(rasterTile.Data, Properties.rasterOptions.useMipMap, Properties.rasterOptions.useCompression);
+			var pos = tile.Position;
+			var rm = tile.SetRasterData(rasterTile.Data);
+			CityBuilderSystem.MakeTerrain(in pos, in rm);
 		}
 		#endregion
 
