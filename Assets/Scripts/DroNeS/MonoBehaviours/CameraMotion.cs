@@ -15,7 +15,7 @@ namespace DroNeS.MonoBehaviours
         {
             MoveLongitudinal(Input.GetAxis("Vertical") * SpeedScale);
             MoveLateral(Input.GetAxis("Horizontal") * SpeedScale);
-            Rotate(Input.GetAxis("Rotate"));
+            Rotate(Input.GetAxis("Rotate") * 0.05f);
 
             Zoom(Input.GetAxis("Mouse ScrollWheel") * SpeedScale);
             //FPS mouse hold click

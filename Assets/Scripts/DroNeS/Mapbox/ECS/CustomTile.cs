@@ -9,7 +9,7 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
 	public class CustomTile
 	{

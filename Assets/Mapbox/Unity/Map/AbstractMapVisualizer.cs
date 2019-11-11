@@ -26,8 +26,7 @@ namespace Mapbox.Unity.Map
 	{
 		[SerializeField]
 		[NodeEditorElementAttribute("Factories")]
-		[FormerlySerializedAs("_factories")]
-		public List<AbstractTileFactory> Factories;
+		public List<AbstractTileFactory> factories;
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
 		protected Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
@@ -83,7 +82,7 @@ namespace Mapbox.Unity.Map
 
 			State = ModuleState.Initialized;
 
-			foreach (var factory in Factories)
+			foreach (var factory in factories)
 			{
 				if (null == factory)
 				{
@@ -110,14 +109,14 @@ namespace Mapbox.Unity.Map
 
 		public virtual void Destroy()
 		{
-			if (Factories != null)
+			if (factories != null)
 			{
-				_counter = Factories.Count;
+				_counter = factories.Count;
 				for (var i = 0; i < _counter; i++)
 				{
-					if (Factories[i] != null)
+					if (factories[i] != null)
 					{
-						UnregisterEvents(Factories[i]);
+						UnregisterEvents(factories[i]);
 					}
 				}
 			}
@@ -245,7 +244,7 @@ namespace Mapbox.Unity.Map
 			unityTile.TileState = TilePropertyState.Loading;
 			ActiveTiles.Add(tileId, unityTile);
 
-			foreach (var factory in Factories)
+			foreach (var factory in factories)
 			{
 				factory.Register(unityTile);
 			}
@@ -257,7 +256,7 @@ namespace Mapbox.Unity.Map
 		{
 			var unityTile = ActiveTiles[tileId];
 
-			foreach (var factory in Factories)
+			foreach (var factory in factories)
 			{
 				factory.Unregister(unityTile);
 			}
@@ -285,9 +284,9 @@ namespace Mapbox.Unity.Map
 		public void ClearMap()
 		{
 			UnregisterAllTiles();
-			if (Factories != null)
+			if (factories != null)
 			{
-				foreach (var tileFactory in Factories)
+				foreach (var tileFactory in factories)
 				{
 					if (tileFactory == null) continue;
 					tileFactory.Clear();
@@ -314,7 +313,7 @@ namespace Mapbox.Unity.Map
 		{
 			foreach (var activeTile in _activeTiles)
 			{
-				foreach (var abstractTileFactory in Factories)
+				foreach (var abstractTileFactory in factories)
 				{
 					abstractTileFactory.Register(activeTile.Value);
 				}
@@ -325,7 +324,7 @@ namespace Mapbox.Unity.Map
 		{
 			foreach (var activeTile in _activeTiles)
 			{
-				foreach (var abstractTileFactory in Factories)
+				foreach (var abstractTileFactory in factories)
 				{
 					abstractTileFactory.Unregister(activeTile.Value);
 				}

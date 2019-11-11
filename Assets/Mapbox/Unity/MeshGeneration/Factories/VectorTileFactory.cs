@@ -363,8 +363,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			builderList.Clear();
 			
-			Debug.Log("Everything with emptyLayer is bullshit");
-			//emptylayer for visualizers that don't depend on outside data sources
 			var emptyLayer = "";
 			if (_layerBuilder.ContainsKey(emptyLayer))
 			{

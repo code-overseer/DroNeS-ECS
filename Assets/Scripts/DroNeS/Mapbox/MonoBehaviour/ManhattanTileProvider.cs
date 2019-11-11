@@ -5,9 +5,9 @@ using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.Map.TileProviders;
 using Unity.Mathematics;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.MonoBehaviour
 {
-    public class ManhattanTiles : AbstractTileProvider {
+    public class ManhattanTileProvider : AbstractTileProvider {
         private bool _initialized = false;
         private static readonly float2[] West = {
             new float2(40.83f,-73.958f),
@@ -95,7 +95,7 @@ namespace DroNeS.Mapbox
             if (!_initialized) { return; }
             _currentExtent.activeTiles.Clear();
 
-            if (_currentExtent == null) SetUpTiles(_map);
+            if (_currentExtent.activeTiles.Count <= 0) SetUpTiles(_map);
 
             OnExtentChanged();
         }

@@ -2,12 +2,10 @@
 using DroNeS.Systems;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Modifiers;
-using Unity.Entities;
 using Unity.Rendering;
-using Unity.Transforms;
 using UnityEngine;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
 	public class MeshMerger : ModifierStackBase
     {

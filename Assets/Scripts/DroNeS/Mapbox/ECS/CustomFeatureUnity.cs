@@ -6,7 +6,7 @@ using Mapbox.VectorTile;
 using Mapbox.VectorTile.Geometry;
 using UnityEngine;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
     public class CustomFeatureUnity
 	{

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using Mapbox.Map;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
     public class TerrainImageFetcherParameters : DataFetcherParameters
     {

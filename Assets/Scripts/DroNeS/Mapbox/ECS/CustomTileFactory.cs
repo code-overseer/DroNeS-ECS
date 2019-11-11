@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Mapbox.Map;
-using Mapbox.Platform;
-using Mapbox.Unity.MeshGeneration.Data;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
 	public abstract class CustomTileFactory 
 	{

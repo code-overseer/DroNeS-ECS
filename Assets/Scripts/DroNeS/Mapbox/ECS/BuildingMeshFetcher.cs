@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
-using Mapbox.Unity.MeshGeneration.Data;
-using UnityEngine.Serialization;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
     public class BuildingMeshFetcherParameters : DataFetcherParameters
     {

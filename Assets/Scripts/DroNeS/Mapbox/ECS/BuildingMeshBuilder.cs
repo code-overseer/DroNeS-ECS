@@ -13,7 +13,7 @@ using Mapbox.VectorTile;
 using Mapbox.VectorTile.Geometry;
 using UnityEngine;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
 	// ReSharper disable once ClassNeverInstantiated.Global
 	public class BuildingMeshBuilderProperties

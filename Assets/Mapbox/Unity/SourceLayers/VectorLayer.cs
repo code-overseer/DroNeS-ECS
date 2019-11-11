@@ -215,13 +215,11 @@ namespace Mapbox.Unity.Map
 		///
 		public virtual void EnableVectorFeatureProcessingWithCoroutines(int entityPerCoroutine = 20)
 		{
-			if (_layerProperty.performanceOptions.isEnabled != true ||
-				_layerProperty.performanceOptions.entityPerCoroutine != entityPerCoroutine)
-			{
-				_layerProperty.performanceOptions.isEnabled = true;
-				_layerProperty.performanceOptions.entityPerCoroutine = entityPerCoroutine;
-				_layerProperty.performanceOptions.HasChanged = true;
-			}
+			if (_layerProperty.performanceOptions.isEnabled == true &&
+			    _layerProperty.performanceOptions.entityPerCoroutine == entityPerCoroutine) return;
+			_layerProperty.performanceOptions.isEnabled = true;
+			_layerProperty.performanceOptions.entityPerCoroutine = entityPerCoroutine;
+			_layerProperty.performanceOptions.HasChanged = true;
 		}
 
 		public void DisableVectorFeatureProcessingWithCoroutines()

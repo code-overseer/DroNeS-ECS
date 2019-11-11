@@ -1,9 +1,10 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Modifiers
-{
-    using Mapbox.Unity.MeshGeneration.Data;
-    using UnityEngine;
-    using UnityEngine.Rendering;
+﻿using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.MeshGeneration.Modifiers;
+using UnityEngine;
+using UnityEngine.Rendering;
 
+namespace DroNeS.Mapbox.ECS
+{
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Mesh Renderer Modifier")]
     public class MeshRendererModifier : GameObjectModifier
     {

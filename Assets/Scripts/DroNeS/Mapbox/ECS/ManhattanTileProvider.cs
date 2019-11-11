@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Mapbox.Map;
-using Mapbox.Unity.Map;
 using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.Map.TileProviders;
 using Unity.Mathematics;
 
 // ReSharper disable HeapView.ObjectAllocation.Evident
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
     public static class ManhattanTileProvider
     {

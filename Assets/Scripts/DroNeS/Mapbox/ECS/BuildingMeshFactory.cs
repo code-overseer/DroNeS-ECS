@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using DroNeS.Systems;
+﻿using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
-using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
-using Mapbox.Unity.MeshGeneration.Factories;
-using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Unity.MeshGeneration.Modifiers;
-using Unity.Entities;
-using Unity.Transforms;
 using UnityEngine;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
 	public class BuildingMeshFactory : CustomTileFactory
 	{

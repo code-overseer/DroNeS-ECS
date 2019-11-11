@@ -42,7 +42,7 @@ namespace Mapbox.Unity.Map.Interfaces
 	public interface IMapWritable
 	{
 		void SetCenterMercator(Vector2d centerMercator);
-		void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude);
+		void SetCenterLatitudeLongitude(Vector2d latLong);
 		void SetZoom(float zoom);
 		void SetWorldRelativeScale(float scale);
 	}

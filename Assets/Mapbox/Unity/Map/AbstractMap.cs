@@ -542,7 +542,7 @@ namespace Mapbox.Unity.Map
 			}
 			_vectorData.Initialize();
 
-			_mapVisualizer.Factories = new List<AbstractTileFactory>
+			_mapVisualizer.factories = new List<AbstractTileFactory>
 			{
 				_terrain.Factory,
 				_imagery.Factory,
@@ -1033,8 +1033,7 @@ namespace Mapbox.Unity.Map
 		/// <param name="latlong">Latlong.</param>
 		public virtual float QueryElevationInUnityUnitsAt(Vector2d latlong)
 		{
-			float tileScale = 1f;
-			return QueryElevationAtInternal(latlong, out tileScale);
+			return QueryElevationAtInternal(latlong, out _);
 		}
 
 		/// <summary>
@@ -1056,10 +1055,10 @@ namespace Mapbox.Unity.Map
 			_centerMercator = centerMercator;
 		}
 
-		public virtual void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude)
+		public virtual void SetCenterLatitudeLongitude(Vector2d latLong)
 		{
-			_options.locationOptions.latitudeLongitude = string.Format("{0}, {1}", centerLatitudeLongitude.x, centerLatitudeLongitude.y);
-			_centerLatitudeLongitude = centerLatitudeLongitude;
+			_options.locationOptions.latitudeLongitude = string.Format("{0}, {1}", latLong.x, latLong.y);
+			_centerLatitudeLongitude = latLong;
 		}
 
 		public virtual void SetWorldRelativeScale(float scale)

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using DroNeS.Mapbox;
 using Mapbox.Map;
-using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.Map.Strategies;
@@ -10,9 +8,8 @@ using Mapbox.Unity.Map.TileProviders;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace DroNeS
+namespace DroNeS.Mapbox.ECS
 {
     [Serializable]
     public class DronesMap : IMap
@@ -63,10 +60,10 @@ namespace DroNeS
             CenterMercator = centerMercator;
         }
 
-        public void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude)
+        public void SetCenterLatitudeLongitude(Vector2d latLong)
         {
-            options.locationOptions.latitudeLongitude = $"{centerLatitudeLongitude.x}, {centerLatitudeLongitude.y}";
-            CenterLatitudeLongitude = centerLatitudeLongitude;
+            options.locationOptions.latitudeLongitude = $"{latLong.x}, {latLong.y}";
+            CenterLatitudeLongitude = latLong;
         }
 
         public void SetWorldRelativeScale(float scale)

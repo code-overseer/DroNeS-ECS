@@ -1,11 +1,9 @@
 ﻿using DroNeS.Systems;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
-using Unity.Entities;
-using Unity.Transforms;
 using UnityEngine;
 
-namespace DroNeS.Mapbox
+namespace DroNeS.Mapbox.ECS
 {
     public class TerrainImageFactory : CustomTileFactory
     {
