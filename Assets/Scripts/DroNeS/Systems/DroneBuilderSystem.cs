@@ -47,7 +47,7 @@ namespace DroNeS.Systems
             {
                 var drone = buildCommands.CreateEntity(_drone);
                 buildCommands.SetComponent(drone, new Translation {Value = Random.insideUnitSphere * 5});
-                buildCommands.SetComponent(drone, new DroneUID {uid = _droneUid++} );
+                buildCommands.SetComponent(drone, new DroneUID {Value = _droneUid++} );
                 buildCommands.SetComponent(drone, new DroneStatus {Value = Status.New} );
                 buildCommands.SetComponent(drone, new Waypoint(float3.zero, -1,0));
                 buildCommands.AddSharedComponent(drone, _droneMesh);

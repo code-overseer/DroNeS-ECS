@@ -3,7 +3,7 @@
 
 namespace DroNeS.Components
 {
-    public struct DroneUID : IComponentData
+    public struct JobUID : IComponentData
     {
         public int Value;
     }

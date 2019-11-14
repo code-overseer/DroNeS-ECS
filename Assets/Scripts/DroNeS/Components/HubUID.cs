@@ -1,9 +1,9 @@
 ﻿using Unity.Entities;
-// ReSharper disable InconsistentNaming
+using UnityEngine;
 
 namespace DroNeS.Components
 {
-    public struct DroneUID : IComponentData
+    public struct HubUID : IComponentData
     {
         public int Value;
     }

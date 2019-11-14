@@ -13,7 +13,6 @@ namespace DroNeS.Systems
     public class WaypointUpdateSystem : JobComponentSystem
     {
         private static EntityCommandBuffer _commandBuffer;
-        private static NativeMultiHashMap<int, Waypoint> _queues;
         private static NativeQueue<int> _queuesToClear;
         private static EntityQuery _droneQuery;
 
@@ -30,14 +29,14 @@ namespace DroNeS.Systems
                 }
             });
             _droneQuery.SetFilterChanged(typeof(DroneStatus));
-            _queues = new NativeMultiHashMap<int, Waypoint>(400, Allocator.Persistent);
+            Queue.Waypoints = new NativeMultiHashMap<int, Waypoint>(400, Allocator.Persistent);
             _queuesToClear = new NativeQueue<int>(Allocator.Persistent);
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            _queues.Dispose();
+            Queue.Waypoints.Dispose();
             _queuesToClear.Dispose();
         }
 
@@ -45,27 +44,27 @@ namespace DroNeS.Systems
         {
             var job0 = new WaypointUpdateJob
             {
-                AllQueues = _queues,
-                DroneID = GetArchetypeChunkComponentType<DroneUID>(),
+                AllQueues = Queue.Waypoints,
+                DroneId = GetArchetypeChunkComponentType<DroneUID>(),
                 Statuses = GetArchetypeChunkComponentType<DroneStatus>(),
                 CurrentPoint = GetArchetypeChunkComponentType<Waypoint>()
             };
             var job1 = new QueueCompletionCheck
             {
                 Completed = _queuesToClear.AsParallelWriter(),
-                DroneID = GetArchetypeChunkComponentType<DroneUID>(),
+                DroneId = GetArchetypeChunkComponentType<DroneUID>(),
                 Statuses = GetArchetypeChunkComponentType<DroneStatus>(),
                 CurrentPoint = GetArchetypeChunkComponentType<Waypoint>()
             };
             var job2 = new QueueRemovalJob
             {
-                AllQueues = _queues,
+                AllQueues = Queue.Waypoints,
                 Completed = _queuesToClear
             };
             var job3 = new QueueGenerationJob
             {
-                AllQueues = _queues.AsParallelWriter(),
-                DroneID = GetArchetypeChunkComponentType<DroneUID>(),
+                AllQueues = Queue.Waypoints.AsParallelWriter(),
+                DroneId = GetArchetypeChunkComponentType<DroneUID>(),
                 Statuses = GetArchetypeChunkComponentType<DroneStatus>()
             };
             
@@ -80,12 +79,12 @@ namespace DroNeS.Systems
         private struct QueueCompletionCheck : IJobChunk
         {
             public NativeQueue<int>.ParallelWriter Completed;
-            [ReadOnly] public ArchetypeChunkComponentType<DroneUID> DroneID;
+            [ReadOnly] public ArchetypeChunkComponentType<DroneUID> DroneId;
             [ReadOnly] public ArchetypeChunkComponentType<DroneStatus> Statuses;
             public ArchetypeChunkComponentType<Waypoint> CurrentPoint;
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
             {
-                var droneIds = chunk.GetNativeArray(DroneID);
+                var droneIds = chunk.GetNativeArray(DroneId);
                 var stats = chunk.GetNativeArray(Statuses);
                 var points = chunk.GetNativeArray(CurrentPoint);
                 for (var i = 0; i < chunk.Count; ++i)
@@ -94,7 +93,7 @@ namespace DroNeS.Systems
                     var p = points[i];
                     p.index = -1;
                     points[i] = p;
-                    Completed.Enqueue(droneIds[i].uid);
+                    Completed.Enqueue(droneIds[i].Value);
                 }
                 
             }
@@ -125,19 +124,19 @@ namespace DroNeS.Systems
             
             public NativeMultiHashMap<int, Waypoint>.ParallelWriter AllQueues;
             public ArchetypeChunkComponentType<DroneStatus> Statuses;
-            [ReadOnly] public ArchetypeChunkComponentType<DroneUID> DroneID;
+            [ReadOnly] public ArchetypeChunkComponentType<DroneUID> DroneId;
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
             {
-                var droneIds = chunk.GetNativeArray(DroneID);
+                var droneIds = chunk.GetNativeArray(DroneId);
                 var stats = chunk.GetNativeArray(Statuses);
                 for (var i = 0; i < chunk.Count; ++i)
                 {
                     if (stats[i].Value != Status.RequestingWaypoints) continue;
-                    var rand = new Random((uint)droneIds[i].uid | 1);
+                    var rand = new Random((uint)droneIds[i].Value | 1);
                     for (var j = 0; j < 15; ++j)
                     {
                         var p = new float3(rand.NextFloat(), rand.NextFloat(), rand.NextFloat()) * 400;
-                        AllQueues.Add(droneIds[i].uid, new Waypoint(p, j, 15));
+                        AllQueues.Add(droneIds[i].Value, new Waypoint(p, j, 15));
                     }
                     stats[i] = new DroneStatus(Status.Ready);
                 }
@@ -149,18 +148,18 @@ namespace DroNeS.Systems
         private struct WaypointUpdateJob : IJobChunk
         {
             [ReadOnly] public NativeMultiHashMap<int, Waypoint> AllQueues;
-            [ReadOnly] public ArchetypeChunkComponentType<DroneUID> DroneID;
+            [ReadOnly] public ArchetypeChunkComponentType<DroneUID> DroneId;
             [ReadOnly] public ArchetypeChunkComponentType<DroneStatus> Statuses;
             public ArchetypeChunkComponentType<Waypoint> CurrentPoint;
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
             {
-                var droneIds = chunk.GetNativeArray(DroneID);
+                var droneIds = chunk.GetNativeArray(DroneId);
                 var stats = chunk.GetNativeArray(Statuses);
                 var points = chunk.GetNativeArray(CurrentPoint);
                 for (var i = 0; i < chunk.Count; ++i)
                 {
                     if (stats[i].Value != Status.Waiting) continue;
-                    AllQueues.TryGetFirstValue(droneIds[i].uid, out var p, out var it);
+                    AllQueues.TryGetFirstValue(droneIds[i].Value, out var p, out var it);
                     do
                     {
                         if (p.index != points[i].index + 1) continue;

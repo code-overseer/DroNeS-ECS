@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Mapbox.Map;
-using Mapbox.Platform;
 using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.Map.Interfaces;
@@ -9,7 +8,6 @@ using Mapbox.Unity.MeshGeneration.Factories;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.Unity.Utilities;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace DroNeS.Mapbox.MonoBehaviour
 {
