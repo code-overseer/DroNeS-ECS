@@ -12,4 +12,15 @@
         Dead,
         Destroy, // Flag for destruction TODO
     }
+
+    public enum Speed
+    {
+        Pause,
+        Half,
+        Normal,
+        Fast,
+        Faster,
+        Ultra,
+        Wtf
+    }
 }

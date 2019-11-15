@@ -18,16 +18,16 @@ namespace DroNeS.Systems
 
         protected override void OnCreate()
         {
-            _barrier = World.Active.GetOrCreateSystem<CityBuilderBarrierSystem>();
-            _terrain = Manager.CreateArchetype(
-                ComponentType.ReadOnly<TerrainTag>(),
-                ComponentType.ReadOnly<Translation>(),
-                typeof(LocalToWorld));
-            
-            _building = Manager.CreateArchetype(
-                ComponentType.ReadOnly<BuildingTag>(), 
-                ComponentType.ReadOnly<Translation>(),
-                typeof(LocalToWorld));
+//            _barrier = World.Active.GetOrCreateSystem<CityBuilderBarrierSystem>();
+//            _terrain = Manager.CreateArchetype(
+//                ComponentType.ReadOnly<TerrainTag>(),
+//                ComponentType.ReadOnly<Translation>(),
+//                typeof(LocalToWorld));
+//            
+//            _building = Manager.CreateArchetype(
+//                ComponentType.ReadOnly<BuildingTag>(), 
+//                ComponentType.ReadOnly<Translation>(),
+//                typeof(LocalToWorld));
 //            DronesMap.Build();
         }
 

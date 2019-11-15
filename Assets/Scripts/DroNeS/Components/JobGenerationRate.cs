@@ -2,7 +2,7 @@
 
 namespace DroNeS.Components
 {
-    public struct JobCreationTime : IComponentData
+    public struct JobGenerationRate : IComponentData
     {
         public float Value;
     }
