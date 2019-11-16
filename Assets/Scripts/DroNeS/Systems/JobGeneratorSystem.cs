@@ -9,13 +9,11 @@ using Random = Unity.Mathematics.Random;
 
 namespace DroNeS.Systems
 {
-    public class JobGeneratorBarrierSystem : EntityCommandBufferSystem
-    {
-    }
+    [UpdateAfter(typeof(SunOrbitSystem))]
     public class JobGeneratorSystem : JobComponentSystem
     {
         private static EntityArchetype _job;
-        private static JobGeneratorBarrierSystem _barrier;
+        private static EndSimulationEntityCommandBufferSystem _barrier;
         private static int _jobUid;
 
         protected override void OnCreate()
@@ -25,7 +23,7 @@ namespace DroNeS.Systems
                 ComponentType.ReadOnly<JobOrigin>(),
                     ComponentType.ReadOnly<JobDestination>(),
                     ComponentType.ReadOnly<JobCreationTime>());
-            _barrier = World.Active.GetOrCreateSystem<JobGeneratorBarrierSystem>();
+            _barrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

@@ -18,7 +18,9 @@ namespace DroNeS.Systems
 
         protected override void OnCreate()
         {
-//            _barrier = World.Active.GetOrCreateSystem<CityBuilderBarrierSystem>();
+            _barrier = World.Active.GetOrCreateSystem<CityBuilderBarrierSystem>();
+            Enabled = false;
+            _barrier.Enabled = false;
 //            _terrain = Manager.CreateArchetype(
 //                ComponentType.ReadOnly<TerrainTag>(),
 //                ComponentType.ReadOnly<Translation>(),

@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace DroNeS.Systems
 {
+    [UpdateAfter(typeof(SunOrbitSystem))]
     public class DroneMovementSystem : JobComponentSystem
     {
         protected override JobHandle OnUpdate(JobHandle inputDeps)

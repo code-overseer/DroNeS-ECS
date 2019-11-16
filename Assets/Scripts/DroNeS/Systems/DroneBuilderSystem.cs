@@ -10,13 +10,9 @@ using Random = UnityEngine.Random;
 
 namespace DroNeS.Systems
 {
-    public class DroneBuilderBarrierSystem : EntityCommandBufferSystem
-    {
-    }
-
     public class DroneBuilderSystem : ComponentSystem
     {
-        private static DroneBuilderBarrierSystem _barrier;
+        private static EndSimulationEntityCommandBufferSystem _barrier;
         private static EntityArchetype _drone;
         private static RenderMesh _droneMesh;
         private static EntityManager Manager => World.Active.EntityManager;
@@ -24,7 +20,8 @@ namespace DroNeS.Systems
 
         protected override void OnCreate()
         {
-            _barrier = World.Active.GetOrCreateSystem<DroneBuilderBarrierSystem>();
+            _barrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            
             _drone = Manager.CreateArchetype(
                 ComponentType.ReadOnly<DroneTag>(),
                 ComponentType.ReadOnly<DroneUID>(),
