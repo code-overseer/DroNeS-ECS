@@ -536,12 +536,14 @@
               <e p="JobCompletionTime.cs" t="Include" />
               <e p="JobCreationTime.cs" t="Include" />
               <e p="JobDestination.cs" t="Include" />
+              <e p="JobGenerationCounter.cs" t="Include" />
               <e p="JobGenerationRate.cs" t="Include" />
               <e p="JobGenerationTimeMark.cs" t="Include" />
               <e p="JobOrigin.cs" t="Include" />
               <e p="JobStartTime.cs" t="Include" />
               <e p="JobTag.cs" t="Include" />
               <e p="JobUID.cs" t="Include" />
+              <e p="SelectionTag.cs" t="Include" />
               <e p="TerrainTag.cs" t="Include" />
               <e p="TimeSpeed.cs" t="Include" />
               <e p="Waypoint.cs" t="Include" />
@@ -574,6 +576,9 @@
               <e p="DroneMaker.cs" t="Include" />
             </e>
             <e p="Queue.cs" t="Include" />
+            <e p="SharedComponents" t="Include">
+              <e p="ParentHub.cs" t="Include" />
+            </e>
             <e p="Systems" t="Include">
               <e p="CityBuilderSystem.cs" t="Include" />
               <e p="DroneBuilderSystem.cs" t="Include" />

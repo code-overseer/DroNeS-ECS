@@ -5,6 +5,6 @@ namespace DroNeS.Components
 {
     public struct JobGenerationTimeMark : IComponentData
     {
-        public float2 Value;
+        public double2 Value;
     }
 }

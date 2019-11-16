@@ -10,7 +10,6 @@
         Returning,
         EnRoute,
         Dead,
-        Destroy, // Flag for destruction TODO
     }
 
     public enum Speed

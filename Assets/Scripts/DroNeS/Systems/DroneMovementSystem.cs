@@ -16,7 +16,7 @@ namespace DroNeS.Systems
         {
             var job = new DroneMovementJob
             {
-                Delta = Time.deltaTime
+                Delta = Time.deltaTime * SunOrbitSystem.SpeedFactor
             };
             return job.Schedule(this, inputDeps);
         }
