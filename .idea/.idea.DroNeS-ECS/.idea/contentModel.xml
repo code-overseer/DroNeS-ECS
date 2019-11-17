@@ -528,6 +528,7 @@
           <e p="DroNeS" t="Include">
             <e p="Components" t="Include">
               <e p="BuildingTag.cs" t="Include" />
+              <e p="Clicked.cs" t="Include" />
               <e p="DestructionTag.cs" t="Include" />
               <e p="DroneStatus.cs" t="Include" />
               <e p="DroneTag.cs" t="Include" />
@@ -573,14 +574,18 @@
             </e>
             <e p="MonoBehaviours" t="Include">
               <e p="CameraMotion.cs" t="Include" />
+              <e p="ClipSpaceTest.cs" t="Include" />
               <e p="DroneMaker.cs" t="Include" />
             </e>
             <e p="Queue.cs" t="Include" />
             <e p="SharedComponents" t="Include">
+              <e p="Clickable.cs" t="Include" />
               <e p="ParentHub.cs" t="Include" />
             </e>
             <e p="Systems" t="Include">
               <e p="CityBuilderSystem.cs" t="Include" />
+              <e p="ClickProcessingSystem.cs" t="Include" />
+              <e p="ClickReceiverSystem.cs" t="Include" />
               <e p="DroneBuilderSystem.cs" t="Include" />
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="JobGeneratorSystem.cs" t="Include" />
@@ -593,6 +598,7 @@
           </e>
           <e p="Utils" t="Include">
             <e p="Bool.cs" t="Include" />
+            <e p="Ray.cs" t="Include" />
           </e>
         </e>
         <e p="TextMesh Pro" t="Include">

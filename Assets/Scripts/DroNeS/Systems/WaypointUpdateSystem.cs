@@ -12,9 +12,9 @@ namespace DroNeS.Systems
     [UpdateAfter(typeof(DroneMovementSystem))]
     public class WaypointUpdateSystem : JobComponentSystem
     {
-        private static EntityCommandBuffer _commandBuffer;
-        private static NativeQueue<int> _queuesToClear;
-        private static EntityQuery _droneQuery;
+        private EntityCommandBuffer _commandBuffer;
+        private NativeQueue<int> _queuesToClear;
+        private EntityQuery _droneQuery;
 
         protected override void OnCreate()
         {
@@ -135,7 +135,7 @@ namespace DroNeS.Systems
                     var rand = new Random((uint)droneIds[i].Value | 1);
                     for (var j = 0; j < 15; ++j)
                     {
-                        var p = new float3(rand.NextFloat(), rand.NextFloat(), rand.NextFloat()) * 400;
+                        var p = new float3(rand.NextFloat(), rand.NextFloat(), rand.NextFloat()) * 10;
                         AllQueues.Add(droneIds[i].Value, new Waypoint(p, j, 15));
                     }
                     stats[i] = new DroneStatus(Status.Ready);

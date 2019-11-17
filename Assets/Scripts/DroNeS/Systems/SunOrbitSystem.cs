@@ -12,7 +12,7 @@ namespace DroNeS.Systems
 {
     public class SunOrbitSystem : JobComponentSystem
     {
-        private static readonly Dictionary<Speed, float> TimeSpeed = new Dictionary<Speed, float>
+        private readonly Dictionary<Speed, float> TimeSpeed = new Dictionary<Speed, float>
         {
             {Speed.Pause, 0}, 
             {Speed.Half, 0.5f},
@@ -23,8 +23,8 @@ namespace DroNeS.Systems
             {Speed.Wtf, 16}
         };
 
-        public static float SpeedFactor { get; private set; }
-        public static double Clock { get; private set; }
+        public float SpeedFactor { get; private set; }
+        public double Clock { get; private set; }
         protected override void OnCreate()
         {
             base.OnCreate();
@@ -56,7 +56,7 @@ namespace DroNeS.Systems
             }
         }
 
-        public static void ChangeTimeSpeed(in Speed speed)
+        public void ChangeTimeSpeed(in Speed speed)
         {
             SpeedFactor = TimeSpeed[speed];
         }

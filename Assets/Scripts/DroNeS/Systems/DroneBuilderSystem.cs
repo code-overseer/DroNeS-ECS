@@ -1,4 +1,5 @@
 ﻿using DroNeS.Components;
+using DroNeS.SharedComponents;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -12,11 +13,11 @@ namespace DroNeS.Systems
 {
     public class DroneBuilderSystem : ComponentSystem
     {
-        private static EndSimulationEntityCommandBufferSystem _barrier;
-        private static EntityArchetype _drone;
-        private static RenderMesh _droneMesh;
-        private static EntityManager Manager => World.Active.EntityManager;
-        private static int _droneUid;
+        private EndSimulationEntityCommandBufferSystem _barrier;
+        private EntityArchetype _drone;
+        private RenderMesh _droneMesh;
+        private EntityManager Manager => World.Active.EntityManager;
+        private int _droneUid;
 
         protected override void OnCreate()
         {
@@ -36,10 +37,10 @@ namespace DroNeS.Systems
             };
         }
 
-        public static void AddDrone()
+        public void AddDrone()
         {
             var buildCommands = _barrier.CreateCommandBuffer();
-            for (var i = 0; i < 500; ++i)
+            for (var i = 0; i < 5; ++i)
             {
                 var drone = buildCommands.CreateEntity(_drone);
                 buildCommands.SetComponent(drone, new Translation {Value = Random.insideUnitSphere * 5});
@@ -47,6 +48,7 @@ namespace DroNeS.Systems
                 buildCommands.SetComponent(drone, new DroneStatus {Value = Status.New} );
                 buildCommands.SetComponent(drone, new Waypoint(float3.zero, -1,0));
                 buildCommands.AddSharedComponent(drone, _droneMesh);
+                buildCommands.AddSharedComponent(drone, new Clickable());
             }
         }
 

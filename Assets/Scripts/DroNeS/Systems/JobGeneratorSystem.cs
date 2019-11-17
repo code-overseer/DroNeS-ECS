@@ -1,6 +1,5 @@
 ﻿using DroNeS.Components;
 using DroNeS.SharedComponents;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -30,14 +29,13 @@ namespace DroNeS.Systems
             var job = new JobGenerator
             {
                 JobCreation = _barrier.CreateCommandBuffer().ToConcurrent(),
-                CurrentTime = SunOrbitSystem.Clock
+                CurrentTime = World.Active.GetOrCreateSystem<SunOrbitSystem>().Clock
             };
             inputDeps = job.Schedule(this, inputDeps);
             _barrier.AddJobHandleForProducer(inputDeps);
             return inputDeps;
         }
         
-        [BurstCompile]
         private struct JobGenerator : IJobForEach<HubUID, JobGenerationCounter, JobGenerationRate, JobGenerationTimeMark>
         {
             [WriteOnly] public EntityCommandBuffer.Concurrent JobCreation;

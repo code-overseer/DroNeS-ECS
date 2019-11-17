@@ -16,7 +16,7 @@ namespace DroNeS.Systems
         {
             var job = new DroneMovementJob
             {
-                Delta = Time.deltaTime * SunOrbitSystem.SpeedFactor
+                Delta = Time.deltaTime * World.Active.GetOrCreateSystem<SunOrbitSystem>().SpeedFactor
             };
             return job.Schedule(this, inputDeps);
         }
@@ -25,7 +25,7 @@ namespace DroNeS.Systems
         private struct DroneMovementJob : IJobForEach<DroneTag, DroneStatus, Translation, Waypoint>
         {
             public float Delta;
-            private const float Speed = 10;
+            private const float Speed = 2;
             public void Execute([ReadOnly] ref DroneTag tag, ref DroneStatus status, ref Translation pos, ref Waypoint point)
             {
                 switch (status.Value)

@@ -1,5 +1,6 @@
 ﻿using DroNeS.Systems;
 using Unity.Collections;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,9 +18,9 @@ namespace DroNeS.MonoBehaviours
             }
         }
         
-        private void Awake()
+        private void Start()
         {
-            BuildDrone.onClick.AddListener(DroneBuilderSystem.AddDrone);
+            BuildDrone.onClick.AddListener(World.Active.GetOrCreateSystem<DroneBuilderSystem>().AddDrone);
         }
 
 
