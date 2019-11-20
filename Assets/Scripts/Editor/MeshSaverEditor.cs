@@ -24,7 +24,7 @@ namespace Editor
         
             path = FileUtil.GetProjectRelativePath(path);
 
-            Mesh meshToSave = (makeNewInstance) ? Object.Instantiate(mesh) as Mesh : mesh;
+            var meshToSave = (makeNewInstance) ? Object.Instantiate(mesh) as Mesh : mesh;
 		
             if (optimizeMesh)
                 MeshUtility.Optimize(meshToSave);

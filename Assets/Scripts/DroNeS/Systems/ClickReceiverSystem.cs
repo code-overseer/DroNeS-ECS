@@ -88,7 +88,7 @@ namespace DroNeS.Systems
                 var bounds = chunk.GetNativeArray(Bounds);
                 var entities = chunk.GetNativeArray(Entities);
                 var maxVal = 5000.0f;
-                var clicked = new NativeList<Entity>(Allocator.Temp);
+                var clicked = new NativeList<Entity>(1, Allocator.Temp);
                 for (var i = 0; i < chunk.Count; ++i)
                 {
                     var w = bounds[i].Value.Center - CursorRay.Origin;
@@ -114,9 +114,8 @@ namespace DroNeS.Systems
             public void Execute()
             {
                 if (Intersected.Count == 0) return;
-                
                 var minVal = float.MaxValue;
-                var clicked = new NativeList<Entity>(Allocator.Temp);
+                var clicked = new NativeList<Entity>(1, Allocator.Temp);
                 while (Intersected.TryDequeue(out var entity))
                 {
                     if (!Position.Exists(entity)) continue;

@@ -1,8 +1,6 @@
 ﻿using DroNeS.Components;
 using DroNeS.SharedComponents;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
@@ -15,9 +13,13 @@ namespace DroNeS.Systems
     {
         private EndSimulationEntityCommandBufferSystem _barrier;
         private EntityArchetype _drone;
+        private EntityArchetype _propeller;
         private RenderMesh _droneMesh;
-        private EntityManager Manager => World.Active.EntityManager;
+        private RenderMesh _propellerMesh;
+        private static EntityManager Manager => World.Active.EntityManager;
         private int _droneUid;
+
+        private float3[] _propellerPositions;
 
         protected override void OnCreate()
         {
@@ -29,12 +31,36 @@ namespace DroNeS.Systems
                 typeof(Translation),
                 typeof(DroneStatus),
                 typeof(Waypoint),
-                typeof(LocalToWorld));
+                typeof(Rotation),
+                typeof(LocalToWorld)
+            );
+            _propeller = Manager.CreateArchetype(
+                ComponentType.ReadOnly<Parent>(),
+                ComponentType.ReadOnly<PropellerTag>(),
+                typeof(Translation),
+                typeof(Rotation),
+                typeof(LocalToParent),
+                typeof(LocalToWorld)
+            );
             _droneMesh = new RenderMesh
             {
                 mesh = Resources.Load("Meshes/Drone") as Mesh,
-                material = Resources.Load("Materials/Drone") as Material
+                material = Resources.Load("Materials/RedDrone") as Material
             };
+            _propellerMesh = new RenderMesh
+            {
+                mesh = Resources.Load("Meshes/Propeller") as Mesh,
+                material = Resources.Load("Materials/Propeller") as Material
+            };
+            
+            _propellerPositions = new[] 
+            {
+                new float3(0.756f, 0.082f, 0.59f),
+                new float3(0.756f, 0.082f, -0.59f),
+                new float3(-0.7f, 0.082f, 0.6f),
+                new float3(-0.7f, 0.082f, -0.59f),
+            };
+            
         }
 
         public void AddDrone()
@@ -44,11 +70,21 @@ namespace DroNeS.Systems
             {
                 var drone = buildCommands.CreateEntity(_drone);
                 buildCommands.SetComponent(drone, new Translation {Value = Random.insideUnitSphere * 5});
+                buildCommands.SetComponent(drone, new Rotation{ Value = quaternion.identity });
                 buildCommands.SetComponent(drone, new DroneUID {Value = ++_droneUid} );
                 buildCommands.SetComponent(drone, new DroneStatus {Value = Status.New} );
                 buildCommands.SetComponent(drone, new Waypoint(float3.zero, -1,0));
                 buildCommands.AddSharedComponent(drone, _droneMesh);
                 buildCommands.AddSharedComponent(drone, new Clickable());
+                for (var j = 0; j < 4; ++j)
+                {
+                    var prop = buildCommands.CreateEntity(_propeller);
+                    buildCommands.SetComponent(prop, new Parent {Value = drone});
+                    buildCommands.SetComponent(prop, new Translation { Value = _propellerPositions[j]});
+                    buildCommands.SetComponent(prop, new Rotation{ Value = quaternion.identity });
+                    buildCommands.AddSharedComponent(prop, _propellerMesh);
+                }
+
             }
         }
 
