@@ -523,15 +523,16 @@
           <e p="Mapbox" t="Include">
             <e p="MapboxConfiguration.txt" t="Include" />
           </e>
+          <e p="Shaders" t="Include">
+            <e p="Highlight.shader" t="Include" />
+          </e>
         </e>
         <e p="Scripts" t="Include">
           <e p="DroNeS" t="Include">
             <e p="Components" t="Include">
-              <e p="BuildingTag.cs" t="Include" />
               <e p="Clicked.cs" t="Include" />
               <e p="DestructionTag.cs" t="Include" />
               <e p="DroneStatus.cs" t="Include" />
-              <e p="DroneTag.cs" t="Include" />
               <e p="DroneUID.cs" t="Include" />
               <e p="HubUID.cs" t="Include" />
               <e p="JobCompletionTime.cs" t="Include" />
@@ -542,10 +543,15 @@
               <e p="JobGenerationTimeMark.cs" t="Include" />
               <e p="JobOrigin.cs" t="Include" />
               <e p="JobStartTime.cs" t="Include" />
-              <e p="JobTag.cs" t="Include" />
               <e p="JobUID.cs" t="Include" />
-              <e p="SelectionTag.cs" t="Include" />
-              <e p="TerrainTag.cs" t="Include" />
+              <e p="Tags" t="Include">
+                <e p="BuildingTag.cs" t="Include" />
+                <e p="DroneTag.cs" t="Include" />
+                <e p="JobTag.cs" t="Include" />
+                <e p="PropellerTag.cs" t="Include" />
+                <e p="SelectionTag.cs" t="Include" />
+                <e p="TerrainTag.cs" t="Include" />
+              </e>
               <e p="TimeSpeed.cs" t="Include" />
               <e p="Waypoint.cs" t="Include" />
             </e>
@@ -576,9 +582,13 @@
               <e p="CameraMotion.cs" t="Include" />
               <e p="ClipSpaceTest.cs" t="Include" />
               <e p="DroneMaker.cs" t="Include" />
+              <e p="EagleEyeMotion.cs" t="Include" />
+              <e p="ICameraMotion.cs" t="Include" />
+              <e p="Propeller.cs" t="Include" />
             </e>
             <e p="Queue.cs" t="Include" />
             <e p="SharedComponents" t="Include">
+              <e p="Active.cs" t="Include" />
               <e p="Clickable.cs" t="Include" />
               <e p="ParentHub.cs" t="Include" />
             </e>
@@ -588,7 +598,10 @@
               <e p="ClickReceiverSystem.cs" t="Include" />
               <e p="DroneBuilderSystem.cs" t="Include" />
               <e p="DroneMovementSystem.cs" t="Include" />
+              <e p="DroneRotationSystem.cs" t="Include" />
+              <e p="HubBuilderSystem.cs" t="Include" />
               <e p="JobGeneratorSystem.cs" t="Include" />
+              <e p="PropellerRotationSystem.cs" t="Include" />
               <e p="SunOrbitSystem.cs" t="Include" />
               <e p="WaypointUpdateSystem.cs" t="Include" />
             </e>
