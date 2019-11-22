@@ -54,7 +54,7 @@ namespace DroNeS.Systems
                 for (var i = 0; i < chunk.Count; ++i)
                 {
                     if (waypoints[i].index < 0 || waypoints[i].length < 1) continue;
-                    var forward = math.mul(models[i].Value, new float4(1, 0, 0, 0)); //TODO change forward
+                    var forward = math.mul(models[i].Value, new float4(0, 0, 1, 0));
                     var angle = SignedAngle(forward.xyz, waypoints[i].waypoint - translations[i].Value);
                     var q = rotations[i].Value;
                     rotations[i] = new Rotation {Value = RotateTowards(in q, angle)};

@@ -20,8 +20,7 @@ namespace DroNeS.Systems
                 {
                     ComponentType.ReadOnly<Parent>(),
                     ComponentType.ReadOnly<PropellerTag>(),
-                    typeof(Rotation),
-                    typeof(Active)
+                    typeof(Rotation)
                 }
             });
         }

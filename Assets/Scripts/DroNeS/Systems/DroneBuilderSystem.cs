@@ -23,6 +23,7 @@ namespace DroNeS.Systems
 
         protected override void OnCreate()
         {
+            base.OnCreate();
             _barrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             _droneUid = 0;
             _drone = Manager.CreateArchetype(
@@ -55,10 +56,10 @@ namespace DroNeS.Systems
             
             _propellerPositions = new[] 
             {
-                new float3(0.756f, 0.082f, 0.59f),
-                new float3(0.756f, 0.082f, -0.59f),
-                new float3(-0.7f, 0.082f, 0.6f),
-                new float3(-0.7f, 0.082f, -0.59f),
+                new float3(0.59f, 0.082f, 0.756f),
+                new float3(-0.59f, 0.082f, 0.756f),
+                new float3(0.6f, 0.082f, -0.7f),
+                new float3(-0.59f, 0.082f, -0.7f)
             };
             
         }

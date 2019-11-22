@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using DroNeS.Components;
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using UnityEngine;
+using Random = Unity.Mathematics.Random;
 using ReadOnlyAttribute = Unity.Collections.ReadOnlyAttribute;
 
 namespace DroNeS.Systems
@@ -42,6 +46,12 @@ namespace DroNeS.Systems
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
+            var t = Time.deltaTime;
+            uint s;
+            unsafe
+            {
+                s = *(uint*) &t;
+            }
             var job0 = new WaypointUpdateJob
             {
                 AllQueues = Queue.Waypoints,
@@ -65,7 +75,8 @@ namespace DroNeS.Systems
             {
                 AllQueues = Queue.Waypoints.AsParallelWriter(),
                 DroneId = GetArchetypeChunkComponentType<DroneUID>(),
-                Statuses = GetArchetypeChunkComponentType<DroneStatus>()
+                Statuses = GetArchetypeChunkComponentType<DroneStatus>(),
+                random = new Random(s)
             };
             
             var handle = job0.Schedule(_droneQuery, inputDeps);
@@ -125,6 +136,8 @@ namespace DroNeS.Systems
             public NativeMultiHashMap<int, Waypoint>.ParallelWriter AllQueues;
             public ArchetypeChunkComponentType<DroneStatus> Statuses;
             [ReadOnly] public ArchetypeChunkComponentType<DroneUID> DroneId;
+            public Random random;
+            
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
             {
                 var droneIds = chunk.GetNativeArray(DroneId);
@@ -132,10 +145,9 @@ namespace DroNeS.Systems
                 for (var i = 0; i < chunk.Count; ++i)
                 {
                     if (stats[i].Value != Status.RequestingWaypoints) continue;
-                    var rand = new Random((uint)droneIds[i].Value | 1);
                     for (var j = 0; j < 15; ++j)
                     {
-                        var p = new float3(rand.NextFloat(), rand.NextFloat(), rand.NextFloat()) * 25;
+                        var p = new float3(random.NextFloat(), random.NextFloat(), random.NextFloat()) * 25;
                         AllQueues.Add(droneIds[i].Value, new Waypoint(p, j, 15));
                     }
                     stats[i] = new DroneStatus(Status.Ready);
