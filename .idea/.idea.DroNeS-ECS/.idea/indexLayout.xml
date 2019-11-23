@@ -3,8 +3,6 @@
   <component name="ContentModelUserStore">
     <attachedFolders />
     <explicitIncludes>
-      <Path>Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db</Path>
-      <Path>Library/PackageCache/com.bovinelabs.naughtyattributes@3066ded4f3047463e3864b1af688f574cb3728b5</Path>
       <Path>Library/PackageCache/com.unity.ads@2.0.8</Path>
       <Path>Library/PackageCache/com.unity.analytics@3.3.2</Path>
       <Path>Library/PackageCache/com.unity.burst@1.1.2</Path>

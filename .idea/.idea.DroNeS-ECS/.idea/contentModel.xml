@@ -599,6 +599,7 @@
               <e p="DroneBuilderSystem.cs" t="Include" />
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="DroneRotationSystem.cs" t="Include" />
+              <e p="EventSystem.cs" t="Include" />
               <e p="HubBuilderSystem.cs" t="Include" />
               <e p="JobGeneratorSystem.cs" t="Include" />
               <e p="PropellerRotationSystem.cs" t="Include" />
@@ -611,6 +612,7 @@
           </e>
           <e p="Utils" t="Include">
             <e p="Bool.cs" t="Include" />
+            <e p="NativeStreamExtension.cs" t="Include" />
             <e p="Ray.cs" t="Include" />
           </e>
         </e>

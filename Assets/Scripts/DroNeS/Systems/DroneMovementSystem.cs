@@ -14,7 +14,6 @@ namespace DroNeS.Systems
     {
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return inputDeps;
             var job = new DroneMovementJob
             {
                 Delta = Time.deltaTime * World.Active.GetOrCreateSystem<SunOrbitSystem>().SpeedFactor
