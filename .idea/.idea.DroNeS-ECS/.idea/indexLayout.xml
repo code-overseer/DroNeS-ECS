@@ -3,6 +3,8 @@
   <component name="ContentModelUserStore">
     <attachedFolders />
     <explicitIncludes>
+      <Path>Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db</Path>
+      <Path>Library/PackageCache/com.bovinelabs.naughtyattributes@3066ded4f3047463e3864b1af688f574cb3728b5</Path>
       <Path>Library/PackageCache/com.unity.ads@2.0.8</Path>
       <Path>Library/PackageCache/com.unity.analytics@3.3.2</Path>
       <Path>Library/PackageCache/com.unity.burst@1.1.2</Path>
@@ -15,6 +17,7 @@
       <Path>Library/PackageCache/com.unity.jobs@0.1.1-preview</Path>
       <Path>Library/PackageCache/com.unity.mathematics@1.1.0</Path>
       <Path>Library/PackageCache/com.unity.multiplayer-hlapi@1.0.2</Path>
+      <Path>Library/PackageCache/com.unity.physics@0.2.4-preview</Path>
       <Path>Library/PackageCache/com.unity.properties@0.6.2-preview</Path>
       <Path>Library/PackageCache/com.unity.purchasing@2.0.6</Path>
       <Path>Library/PackageCache/com.unity.rendering.hybrid@0.1.1-preview</Path>
@@ -31,6 +34,7 @@
       <Path>.idea</Path>
       <Path>Library</Path>
       <Path>Logs</Path>
+      <Path>Temp</Path>
       <Path>obj</Path>
     </explicitExcludes>
   </component>

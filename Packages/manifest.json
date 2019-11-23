@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "com.bovinelabs.entities": "https://github.com/tertle/com.bovinelabs.entities.git",
+    "com.bovinelabs.naughtyattributes": "https://github.com/tertle/com.bovinelabs.naughtyattributes.git",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ads": "2.0.8",
@@ -12,6 +14,7 @@
     "com.unity.mathematics": "1.1.0",
     "com.unity.multiplayer-hlapi": "1.0.2",
     "com.unity.package-manager-ui": "2.2.0",
+    "com.unity.physics": "0.2.4-preview",
     "com.unity.purchasing": "2.0.6",
     "com.unity.rendering.hybrid": "0.1.1-preview",
     "com.unity.test-framework": "1.0.13",
@@ -50,5 +53,21 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
+  },
+  "testables": [
+    "com.unity.collections",
+    "com.unity.entities",
+    "com.unity.jobs",
+    "com.unity.test-framework.performance"
+  ],
+  "lock": {
+    "com.bovinelabs.entities": {
+      "hash": "d99af8cc90bc4ad2406a5bda84dc071decd0b0db",
+      "revision": "HEAD"
+    },
+    "com.bovinelabs.naughtyattributes": {
+      "hash": "3066ded4f3047463e3864b1af688f574cb3728b5",
+      "revision": "HEAD"
+    }
   }
 }

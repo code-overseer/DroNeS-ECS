@@ -1,19 +1,17 @@
-﻿using DroNeS.Components;
-using Unity.Collections;
+﻿using BovineLabs.Entities.Systems;
 using Unity.Entities;
 using UnityEngine;
 
 namespace DroNeS.Systems
 {
-    [UpdateAfter(typeof(UserInputBarrier))]
+    [UpdateAfter(typeof(EntityEventSystem))]
     public class ClickProcessingSystem : ComponentSystem
     {
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity entity, ref Clicked clicked) =>
+            Entities.ForEach((ref ClickEvent clickEvent) =>
             {
-                Debug.Log($"Entity {entity.Index} clicked");
-                PostUpdateCommands.RemoveComponent(entity, typeof(Clicked));
+                Debug.Log($"Entity {clickEvent.Entity.Index} clicked");
             });
         }
     }

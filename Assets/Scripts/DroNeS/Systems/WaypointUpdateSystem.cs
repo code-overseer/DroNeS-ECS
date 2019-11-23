@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using DroNeS.Components;
+﻿using DroNeS.Components;
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;

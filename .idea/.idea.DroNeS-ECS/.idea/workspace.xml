@@ -2,8 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="65bcd551-ed8a-4fb4-b5f4-4d844e6715d5" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/contentModel.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/indexLayout.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Colliders.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Colliders.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/EagleEyeMotion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/EagleEyeMotion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickProcessingSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickProcessingSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickReceiverSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickReceiverSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DroNeS-ECS.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/DroNeS-ECS.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,127 +26,21 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/HubBuilderSystem.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="32" column="14" selection-start-line="32" selection-start-column="14" selection-end-line="32" selection-end-column="14" />
-              <folding>
-                <marker date="1574434100427" expanded="true" signature="6:209" ph="..." />
-                <marker date="1574434100427" expanded="true" signature="235:2638" ph="{...}" />
-                <marker date="1574434100427" expanded="true" signature="289:2636" ph="{...}" />
-                <marker date="1574434100427" expanded="true" signature="675:1406" ph="{...}" />
-                <marker date="1574434100427" expanded="true" signature="1240:1395" ph="{...}" />
-                <marker date="1574434100427" expanded="true" signature="1465:2291" ph="{...}" />
-                <marker date="1574434100427" expanded="true" signature="2342:2558" ph="{...}" />
-                <marker date="1574434100427" expanded="true" signature="2610:2630" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/EagleEyeMotion.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="558">
-              <caret line="55" selection-start-line="55" selection-end-line="55" />
+            <state>
+              <caret column="18" selection-start-column="18" selection-end-column="18" />
               <folding>
-                <marker date="1574448953116" expanded="true" signature="6:32" ph="..." />
-                <marker date="1574448953116" expanded="true" signature="65:1397" ph="{...}" />
-                <marker date="1574448953116" expanded="true" signature="130:1395" ph="{...}" />
-                <marker date="1574448953116" expanded="true" signature="198:264" ph="{...}" />
-                <marker date="1574448953116" expanded="true" signature="295:558" ph="{...}" />
-                <marker date="1574448953116" expanded="true" signature="670:786" ph="{...}" />
-                <marker date="1574448953116" expanded="true" signature="832:951" ph="{...}" />
-                <marker date="1574448953116" expanded="true" signature="990:1150" ph="{...}" />
-                <marker date="1574448953116" expanded="true" signature="1190:1202" ph="{...}" />
-                <marker date="1574448953116" expanded="true" signature="1240:1252" ph="{...}" />
-                <marker date="1574448953116" expanded="true" signature="1293:1389" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/CameraMotion.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="9" column="60" selection-start-line="9" selection-start-column="60" selection-end-line="9" selection-end-column="60" />
-              <folding>
-                <marker date="1574448711569" expanded="true" signature="51:2223" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="114:2221" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="150:692" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="494:618" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="729:898" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="916:2214" ph="Movement Implementation" />
-                <marker date="1574448711569" expanded="true" signature="1072:1270" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="1316:1420" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="1467:1669" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="1549:1659" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="1709:1778" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="1816:1897" ph="{...}" />
-                <marker date="1574448711569" expanded="true" signature="1938:2194" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneRotationSystem.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="624">
-              <caret line="71" column="40" selection-start-line="71" selection-start-column="40" selection-end-line="71" selection-end-column="40" />
-              <folding>
-                <marker date="1574371451929" expanded="true" signature="6:113" ph="..." />
-                <marker date="1574371451929" expanded="true" signature="139:3945" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="199:3943" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="289:708" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="402:696" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="448:682" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="776:1220" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="842:1151" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="1273:3937" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="1710:2497" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="2038:2483" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="2567:2909" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="2985:3606" ph="{...}" />
-                <marker date="1574371451929" expanded="true" signature="3711:3927" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1152">
-              <caret line="90" column="9" selection-start-line="90" selection-start-column="9" selection-end-line="90" selection-end-column="9" />
-              <folding>
-                <marker date="1574372037825" expanded="false" signature="6:370" ph="..." />
-                <marker date="1574372037825" expanded="true" signature="396:7233" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="504:7231" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="696:1293" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="780:1049" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="826:1035" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="1338:1465" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="1533:3100" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="1618:1679" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="1737:2015" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="2077:2373" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="2430:2533" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="2593:2855" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="3180:4151" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="3573:4141" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="3828:4110" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="4229:4828" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="4385:4818" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="4527:4708" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="4906:5970" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="5294:5960" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="5484:5946" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="5631:5866" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="6048:7225" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="6454:7215" ph="{...}" />
-                <marker date="1574372037825" expanded="true" signature="6709:7201" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="51:1383" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="116:1381" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="184:250" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="281:544" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="656:772" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="818:937" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="976:1136" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="1176:1188" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="1226:1238" ph="{...}" />
+                <marker date="1574515320832" expanded="true" signature="1279:1375" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -146,88 +49,35 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="528">
-              <caret line="46" column="17" selection-start-line="46" selection-start-column="17" selection-end-line="46" selection-end-column="17" />
+            <state relative-caret-position="-79">
+              <caret line="16" column="29" selection-start-line="16" selection-start-column="29" selection-end-line="16" selection-end-column="29" />
               <folding>
-                <marker date="1574006697207" expanded="false" signature="6:176" ph="..." />
-                <marker date="1574006697207" expanded="true" signature="202:2188" ph="{...}" />
-                <marker date="1574006697207" expanded="true" signature="304:2186" ph="{...}" />
-                <marker date="1574006697207" expanded="true" signature="377:621" ph="{...}" />
-                <marker date="1574006697207" expanded="true" signature="443:560" ph="{...}" />
-                <marker date="1574006697207" expanded="true" signature="753:2180" ph="{...}" />
-                <marker date="1574006697207" expanded="true" signature="964:1771" ph="{...}" />
-                <marker date="1574006697207" expanded="true" signature="1016:1387" ph="{...}" />
-                <marker date="1574006697207" expanded="true" signature="1459:1633" ph="{...}" />
-                <marker date="1574006697207" expanded="true" signature="1865:2170" ph="{...}" />
+                <marker date="1574526630542" expanded="false" signature="6:176" ph="..." />
+                <marker date="1574526630542" expanded="true" signature="202:2218" ph="{...}" />
+                <marker date="1574526630542" expanded="true" signature="304:2216" ph="{...}" />
+                <marker date="1574526630542" expanded="true" signature="377:651" ph="{...}" />
+                <marker date="1574526630542" expanded="true" signature="473:590" ph="{...}" />
+                <marker date="1574526630542" expanded="true" signature="783:2210" ph="{...}" />
+                <marker date="1574526630542" expanded="true" signature="994:1801" ph="{...}" />
+                <marker date="1574526630542" expanded="true" signature="1046:1417" ph="{...}" />
+                <marker date="1574526630542" expanded="true" signature="1489:1663" ph="{...}" />
+                <marker date="1574526630542" expanded="true" signature="1895:2200" ph="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/PropellerRotationSystem.cs">
+        <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickProcessingSystem.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="464">
-              <caret line="40" column="60" selection-start-line="40" selection-start-column="60" selection-end-line="40" selection-end-column="60" />
+            <state>
+              <caret column="34" selection-start-column="34" selection-end-column="34" />
               <folding>
-                <marker date="1574293085484" expanded="true" signature="6:144" ph="..." />
-                <marker date="1574293085484" expanded="true" signature="170:1720" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="234:1718" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="329:688" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="446:676" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="492:662" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="756:985" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="826:912" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="1042:1712" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="1273:1702" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="1406:1688" ph="{...}" />
-                <marker date="1574293085484" expanded="true" signature="1580:1669" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/BuildingMeshFactory.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="368">
-              <caret line="139" column="56" selection-start-line="139" selection-start-column="56" selection-end-line="139" selection-end-column="56" />
-              <folding>
-                <marker date="1573846515831" expanded="false" signature="6:180" ph="..." />
-                <marker date="1573846515831" expanded="true" signature="209:6086" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="265:6084" ph="{...}" />
-                <marker date="1573846515831" expanded="false" signature="271:537" ph="Private/Protected Fields" />
-                <marker date="1573846515831" expanded="false" signature="541:1793" ph="Properties" />
-                <marker date="1573846515831" expanded="true" signature="590:1667" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="971:1478" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="1053:1191" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="1220:1408" ph="{...}" />
-                <marker date="1573846515831" expanded="false" signature="1797:2735" ph="Public Layer" />
-                <marker date="1573846515831" expanded="true" signature="1892:2440" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="2272:2333" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="2341:2436" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="2531:2722" ph="{...}" />
-                <marker date="1573846515831" expanded="false" signature="2739:3654" ph="AbstractFactoryOverrides" />
-                <marker date="1573846515831" expanded="true" signature="2828:3422" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="2962:3035" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="3191:3378" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="3445:3640" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="3731:3868" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="3874:6080" ph="Private Methods" />
-                <marker date="1573846515831" expanded="true" signature="3942:4576" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="4103:4353" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="4219:4348" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="4401:4476" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="4680:4969" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="4725:4774" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="4782:4965" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="4909:4960" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="5074:5441" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="5119:5168" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="5176:5344" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="5527:5842" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="5883:5997" ph="{...}" />
-                <marker date="1573846515831" expanded="true" signature="5943:5993" ph="{...}" />
+                <marker date="1574526859252" expanded="true" signature="6:75" ph="..." />
+                <marker date="1574526859252" expanded="true" signature="101:444" ph="{...}" />
+                <marker date="1574526859252" expanded="true" signature="205:442" ph="{...}" />
+                <marker date="1574526859252" expanded="true" signature="254:436" ph="{...}" />
+                <marker date="1574526859252" expanded="true" signature="337:424" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -236,27 +86,40 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickReceiverSystem.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="24" selection-start-column="24" selection-end-column="24" />
+            <state relative-caret-position="-676">
+              <caret line="22" column="27" selection-start-line="22" selection-start-column="27" selection-end-line="22" selection-end-column="27" />
               <folding>
-                <marker date="1574019257176" expanded="true" signature="6:265" ph="..." />
-                <marker date="1574019257176" expanded="true" signature="291:5044" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="355:376" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="479:5042" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="701:1184" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="821:1023" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="867:1009" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="1234:1366" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="1411:1497" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="1565:2564" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="1681:2024" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="2096:2360" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="2652:3949" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="3069:3939" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="3408:3852" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="4009:5036" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="4312:5026" ph="{...}" />
-                <marker date="1574019257176" expanded="true" signature="4559:4921" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="6:232" ph="..." />
+                <marker date="1574527391393" expanded="true" signature="258:2695" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="306:379" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="568:2693" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="790:1035" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="1099:2130" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="1414:1922" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="1465:1763" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="1618:1749" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="2188:2687" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="2384:2681" ph="{...}" />
+                <marker date="1574527391393" expanded="true" signature="2594:2669" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/EventSystem.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="54">
+              <caret line="15" column="72" lean-forward="true" selection-start-line="15" selection-start-column="72" selection-end-line="15" selection-end-column="72" />
+              <folding>
+                <marker date="1574533890543" expanded="true" signature="6:124" ph="..." />
+                <marker date="1574533890543" expanded="true" signature="150:1139" ph="{...}" />
+                <marker date="1574533890543" expanded="true" signature="199:1137" ph="{...}" />
+                <marker date="1574533890543" expanded="true" signature="378:716" ph="{...}" />
+                <marker date="1574533890543" expanded="true" signature="503:573" ph="{...}" />
+                <marker date="1574533890543" expanded="true" signature="775:1003" ph="{...}" />
+                <marker date="1574533890543" expanded="true" signature="858:928" ph="{...}" />
+                <marker date="1574533890543" expanded="true" signature="1055:1131" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -266,16 +129,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>_worldHeightFixed</find>
-      <find>VectorData</find>
-      <find>map.</find>
-      <find>Set</find>
-      <find>SetLaye</find>
-      <find>SetOp</find>
-      <find>Quad</find>
-      <find>_mapScaleFactor</find>
-      <find>Start()</find>
-      <find>Option</find>
       <find>Options.</find>
       <find>Options =&gt;</find>
       <find>Zoom</find>
@@ -296,6 +149,16 @@
       <find>Box</find>
       <find>public</find>
       <find>private</find>
+      <find>CastRay</find>
+      <find>ColliderKey</find>
+      <find>cast</find>
+      <find>Ond</find>
+      <find>archetype</find>
+      <find>Update</find>
+      <find>Dicti</find>
+      <find>Diction</find>
+      <find>write</find>
+      <find>BeginF</find>
     </findStrings>
     <replaceStrings>
       <replace>Vector3</replace>
@@ -316,80 +179,44 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Enums.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Editor/ScriptablePaletteEditor.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/GameObjectModifiers/ColliderModifier.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobOrigin.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A37D9763-635C-4B20-8D80-474DFE7C8D6E/2c/8e938189/RenderBounds.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.rider@1.0.8/Rider/Editor/RiderInitializer.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Components/TextureSelector.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Editor/PropertyDrawers/MapScalingOptionsDrawer.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Components/FeatureBehaviour.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/TerrainImageFactory.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/E5EB59E1-B82E-4242-8BA7-A99C4E347A35/48/d3acb0d3/IConvexCollider.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/E5EB59E1-B82E-4242-8BA7-A99C4E347A35/5b/b8741dc4/ICollidable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Platform/Response.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Interfaces/LayerVisualizerBase.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/BuildingMeshBuilder.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickReceiverSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Platform/IFileSource.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/LayerVisualizers/LocationPrefabsLayerVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/DronesMap.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/LayerVisualizers/VectorLayerVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/BuildingMeshFactory.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/Stubs/Unity/Debug.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Platform/IAsyncRequest.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/LayerProperties/VectorLayerProperties.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/ManhattanVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/SharedComponents/Clickable.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/CustomTile.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/SourceLayers/IImageryLayer.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/LayerProperties/ImageryLayerProperties.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/TerrainImageFetcher.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46C28768-88CA-4405-B893-CEA4E20D647F/03/b9d3e8da/VectorTile.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/LayerProperties/LayerProperties.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/LayerProperties/VectorSubLayerProperties.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/62/c4448419/Renderer.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/GeometryExtrusionOptions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/MapExtentOptions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/Propeller.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Utils/Ray.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/RangeTileProviderOptions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Shaders/Highlight.shader" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/MapLocationOptions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/MapOptions.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/MonoBehaviour/ManhattanTileProvider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/ClipSpaceTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/ExtentOptions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics.Hybrid/Utilities/DebugDisplay/DisplayBroadphaseSystem.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics.Hybrid/Utilities/DebugDisplay/DebugStream.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/d8/edf5102e/Transform.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/HubUID.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/Iterators/EntityQuery.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/HubBuilderSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/LayerSourceOptions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/GeometryMaterialOptions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/SharedComponents/ParentHub.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/MapPlacementOptions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/ImageryRasterOptions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/MapScalingOptions.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46C28768-88CA-4405-B893-CEA4E20D647F/b6/e0492486/VectorTileFeature.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/CityBuilderSystem.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickProcessingSystem.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/MonoBehaviour/DronesMap.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobUID.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/DataContainers/MapboxEnums.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobGenerationCounter.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/MonoBehaviour/ManhattanVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Data/UnityTile.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Data/VectorFeatureUnity.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Constants.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Data/MeshData.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Queue.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/Clicked.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.rendering.hybrid@0.1.1-preview/Unity.Rendering.Hybrid/LightSystem.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobStartTime.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/ICameraMotion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MapboxAccess.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8581124F-04E8-4A87-BCD9-26BCB77A4351/b7/987149e2/ImageConversion.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobCreationTime.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../DroNeS-LLV/Assets/Editor/CustomMapInspector.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/EagleEyeMotion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/MapVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
@@ -407,19 +234,15 @@
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/Interfaces/IMapPlacementStrategy.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Factories/VectorTileFactory.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Factories/ImageDataFetcher.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/da/2c4df4b8/MeshRenderer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Factories/TileProcessFinishedEventArgs.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneRotationSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/Interfaces/IMapScalingStrategy.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/Interfaces/IMap.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/EntityQueryBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/3b/bb142dfb/Vector3.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Factories/TerrainStrategies/ElevatedTerrainWithSidesStrategy.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/Conversions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Factories/TerrainStrategies/ElevatedTerrainStrategy.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Factories/TerrainStrategies/TerrainStrategy.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/Strategies/MapScalingAtWorldScaleStrategy.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/DestructionTag.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/Strategies/MapPlacementAtTileCenterStrategy.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/TileProviders/QuadTreeTileProvider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/TileProviders/TileErrorHandler.cs" root0="FORCE_HIGHLIGHTING" />
@@ -428,57 +251,127 @@
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/TileProviders/RangeTileProvider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Map/TileProviders/AbstractTileProvider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/ModifierStack.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/IJobForEach.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/49/b5de98c7/FormerlySerializedAsAttribute.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/VectorExtensions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/SunOrbitSystem.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/NodeEditorElementAttribute.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/DroneUID.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/GameObjectExtensions.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/TileCover.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/Tile.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/RigidBody/RigidBody.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/IReplacementCriteria.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobGenerationTimeMark.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/VectorEntity.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/ModifierBase.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/VectorTile.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/MapVisualizerPerformance.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/MeshModifier.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/ModifierStackBase.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/TextureSideWallModifier.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/GameObjectModifier.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/TimeSpeed.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/HTTPRequest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/MergedModifierStack.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A2BFEEC6-715C-4FDF-A897-2C2780C54EBA/9b/c6c4f96e/Stream.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/CanonicalTileId.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Colliders/Physics_Collider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/MeshGenerationBase.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/PropellerRotationSystem.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/DroneMaker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collections@0.1.1-preview/Unity.Collections/NativeStream.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6C833B9D-8D21-479D-B48D-20C8A3EDBB08/e7/63b0b4aa/GZipStream.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/MeshModifiers/ReplaceFeatureModifier.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/RawPngRasterTile.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/MeshModifiers/SnapTerrainModifier.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/CameraMotion.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/SourceLayers/AbstractLayer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Colliders/Physics_BoxCollider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A55E32A2-A12A-472B-BC26-1425ACBC489E/02/900d09a9/PhysicsScene.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/JobGeneratorSystem.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/UnwrappedTileId.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A55E32A2-A12A-472B-BC26-1425ACBC489E/cb/13b6c5e6/Physics.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/TileErrorEventArgs.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/MeshModifiers/ReplaceFeatureCollectionModifier.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/SourceLayers/TerrainLayer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/MeshModifiers/PolygonMeshModifier.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A55E32A2-A12A-472B-BC26-1425ACBC489E/1e/580435cb/BoxcastCommand.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collections@0.1.1-preview/Unity.Collections/NativeHashMap.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ED090331-8847-41E7-B029-7095E1F7F1DD/a4/3ea21514/UnityWebRequest.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/MeshModifiers/Earcut.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Queries/Collidable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/SharedComponents/Active.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Queries/Collector.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Queries/Raycast.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/GameObjectModifiers/MaterialModifier.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collections@0.1.1-preview/Unity.Collections.Tests/NativeStreamTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/GameObjectModifiers/TextureMonoBehaviourModifier.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Filter/CollisionFilter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/World/CollisionWorld.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Editor/ScriptablePaletteEditor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/GameObjectModifiers/ColliderModifier.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A37D9763-635C-4B20-8D80-474DFE7C8D6E/2c/8e938189/RenderBounds.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.rider@1.0.8/Rider/Editor/RiderInitializer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Components/TextureSelector.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Editor/PropertyDrawers/MapScalingOptionsDrawer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Components/FeatureBehaviour.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/TerrainImageFactory.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Interfaces/LayerVisualizerBase.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/BuildingMeshBuilder.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/LayerVisualizers/LocationPrefabsLayerVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/DronesMap.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/LayerVisualizers/VectorLayerVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/BuildingMeshFactory.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/LayerProperties/VectorLayerProperties.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/ManhattanVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/CustomTile.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/LayerProperties/ImageryLayerProperties.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/TerrainImageFetcher.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46C28768-88CA-4405-B893-CEA4E20D647F/03/b9d3e8da/VectorTile.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/LayerProperties/LayerProperties.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/LayerProperties/VectorSubLayerProperties.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/62/c4448419/Renderer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Utils/Ray.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/MonoBehaviour/ManhattanTileProvider.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/HubUID.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/HubBuilderSystem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46C28768-88CA-4405-B893-CEA4E20D647F/b6/e0492486/VectorTileFeature.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Base/Containers/BlockStream.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/CityBuilderSystem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickProcessingSystem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/MonoBehaviour/DronesMap.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobUID.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/ECS/Systems/BuildPhysicsWorld.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/MonoBehaviour/ManhattanVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.rendering.hybrid@0.1.1-preview/Unity.Rendering.Hybrid/RenderMeshSystemV2.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/Clicked.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.rendering.hybrid@0.1.1-preview/Unity.Rendering.Hybrid/LightSystem.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobStartTime.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8581124F-04E8-4A87-BCD9-26BCB77A4351/b7/987149e2/ImageConversion.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobCreationTime.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/Extensions/DynamicBufferExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/Systems/EntityEventSystem.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/da/2c4df4b8/MeshRenderer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/EntityQueryBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/Conversions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/Jobs/RemoveComponentJob.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/Jobs/DeallocateJob.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/DestructionTag.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/BovineLabs.Entities.asmdef" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/IJobForEach.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Editor/BovineLabs.Entities.Editor.asmdef" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/EventSystem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/VectorExtensions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/NodeEditorElementAttribute.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/e3/800dcd77/IJobExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/DroneUID.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/GameObjectExtensions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/TileCover.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Tests/Systems/EntityEventSystemTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/Tile.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/VectorEntity.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/VectorTile.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/MapVisualizerPerformance.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/Utilities/HTTPRequest.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/CanonicalTileId.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/DroneMaker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/RawPngRasterTile.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/SourceLayers/AbstractLayer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Tests/BovineLabs.Entities.Tests.asmdef" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/UnwrappedTileId.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/TileErrorEventArgs.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/SourceLayers/TerrainLayer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Editor/MeshSaverEditor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/TileResource.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A55E32A2-A12A-472B-BC26-1425ACBC489E/1e/580435cb/BoxcastCommand.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/RasterTile.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/SourceLayers/MapboxDefaultVector.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collections@0.1.1-preview/Unity.Collections/NativeHashMap.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Utils/Bool.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ED090331-8847-41E7-B029-7095E1F7F1DD/a4/3ea21514/UnityWebRequest.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/MeshModifiers/Earcut.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.1.0/Unity.Mathematics/math.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/SourceLayers/VectorLayer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobDestination.cs" root0="FORCE_HIGHLIGHTING" />
@@ -486,21 +379,15 @@
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Utils/Compression.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Utils/Constants.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/ComponentSystem.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/SharedComponents/Active.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/22/fdb37169/DeallocateOnJobCompletionAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/SourceLayers/ImageryLayer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/DroneStatus.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/GameObjectModifiers/MaterialModifier.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Utils/Vector2d/RectD.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Modifiers/GameObjectModifiers/TextureMonoBehaviourModifier.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Utils/Vector2d/Vector2d.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Assets/Mapbox/Unity/SourceLayers/VectorLayer.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/MonoBehaviour/ManhattanTileProvider.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/MonoBehaviour/DronesMap.cs" />
         <option value="$PROJECT_DIR$/Assets/Mapbox/Unity/MeshGeneration/Factories/VectorTileFactory.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/MonoBehaviour/ManhattanVisualizer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/WaypointsQueue.cs" />
@@ -529,12 +416,9 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/SharedComponents/Clickable.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Utils/Ray.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/SunOrbitSystem.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/JobGeneratorSystem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/DroneMaker.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/Clicked.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickProcessingSystem.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickReceiverSystem.cs" />
         <option value="$PROJECT_DIR$/Assets/Resources/Shaders/Outline.shader" />
         <option value="$PROJECT_DIR$/Assets/Resources/Shaders/Highlight.shader" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/Propeller.cs" />
@@ -543,12 +427,18 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/PropellerTag.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/PropellerRotationSystem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneRotationSystem.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/HubBuilderSystem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/ICameraMotion.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/CameraMotion.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/EagleEyeMotion.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs" />
+        <option value="$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Colliders/Physics_BoxCollider.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs" />
+        <option value="$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/Systems/EntityEventSystem.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickProcessingSystem.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickReceiverSystem.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/EventSystem.cs" />
       </list>
     </option>
   </component>
@@ -561,7 +451,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="284" />
+    <option name="x" value="119" />
     <option name="y" value="23" />
     <option name="width" value="1396" />
     <option name="height" value="921" />
@@ -571,10 +461,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="SolutionExplorer">
-        <option name="show-all-files" value="false" />
-      </pane>
-      <pane id="FileSystemExplorer" />
       <pane id="UnityExplorer">
         <subPane>
           <expand>
@@ -585,11 +471,6 @@
             <path>
               <item name="" type="e068e287:UnityExplorerRootNode" />
               <item name="Assets" type="8711f2a6:AssetsRoot" />
-              <item name="Scenes" type="1045f7f1:UnityExplorerNode" />
-            </path>
-            <path>
-              <item name="" type="e068e287:UnityExplorerRootNode" />
-              <item name="Assets" type="8711f2a6:AssetsRoot" />
               <item name="Scripts" type="1045f7f1:UnityExplorerNode" />
             </path>
             <path>
@@ -603,7 +484,127 @@
               <item name="Assets" type="8711f2a6:AssetsRoot" />
               <item name="Scripts" type="1045f7f1:UnityExplorerNode" />
               <item name="DroNeS" type="1045f7f1:UnityExplorerNode" />
-              <item name="MonoBehaviours" type="1045f7f1:UnityExplorerNode" />
+              <item name="Systems" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+              <item name="Editor" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+              <item name="Runtime" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+              <item name="Runtime" type="1045f7f1:UnityExplorerNode" />
+              <item name="Extensions" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+              <item name="Runtime" type="1045f7f1:UnityExplorerNode" />
+              <item name="Jobs" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+              <item name="Runtime" type="1045f7f1:UnityExplorerNode" />
+              <item name="Systems" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+              <item name="Tests" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+              <item name="Tests" type="1045f7f1:UnityExplorerNode" />
+              <item name="Extensions" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+              <item name="Tests" type="1045f7f1:UnityExplorerNode" />
+              <item name="Helpers" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db" type="a82a7030:PackageNode" />
+              <item name="Entities" type="1045f7f1:UnityExplorerNode" />
+              <item name="Tests" type="1045f7f1:UnityExplorerNode" />
+              <item name="Systems" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.unity.collections@0.1.1-preview" type="a82a7030:PackageNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.unity.collections@0.1.1-preview" type="a82a7030:PackageNode" />
+              <item name="Unity.Collections" type="1045f7f1:UnityExplorerNode" />
+            </path>
+            <path>
+              <item name="" type="e068e287:UnityExplorerRootNode" />
+              <item name="Packages" type="4e2708dd:PackagesRoot" />
+              <item name="Read only" type="7f48d1bd:ReadOnlyPackagesRoot" />
+              <item name="com.unity.collections@0.1.1-preview" type="a82a7030:PackageNode" />
+              <item name="Unity.Collections.Tests" type="1045f7f1:UnityExplorerNode" />
             </path>
           </expand>
           <select />
@@ -612,6 +613,10 @@
         <option name="show-project-names" value="true" />
       </pane>
       <pane id="AssemblyExplorer" />
+      <pane id="SolutionExplorer">
+        <option name="show-all-files" value="false" />
+      </pane>
+      <pane id="FileSystemExplorer" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -678,7 +683,8 @@
       <workItem from="1574266166653" duration="8184000" />
       <workItem from="1574371137809" duration="1003000" />
       <workItem from="1574430455401" duration="2271000" />
-      <workItem from="1574447664246" duration="1429000" />
+      <workItem from="1574447664246" duration="1452000" />
+      <workItem from="1574515141555" duration="13117000" />
     </task>
     <task id="LOCAL-00001" summary="* Imported new Drone and Propeller Mesh&#10;* Implemented Drone and Propeller rotation systems">
       <created>1574283723050</created>
@@ -701,11 +707,18 @@
       <option name="project" value="LOCAL" />
       <updated>1574449195315</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="* Added eagle eye camera">
+      <created>1574449208540</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1574449208540</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="223589000" />
+    <option name="totallyTimeSpent" value="236729000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -717,14 +730,14 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="284" y="23" width="1396" height="921" extended-state="0" />
+    <frame x="119" y="23" width="1396" height="921" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49820143" visible="true" weight="0.18611522" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49820143" visible="true" weight="0.18833087" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.50179857" side_tool="true" weight="0.24473493" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" visible="true" weight="0.3293124" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.3293124" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39927623" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -795,455 +808,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.rendering.hybrid@0.1.1-preview/Unity.Rendering.Hybrid/LightSystem.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="77">
-          <caret line="300" column="91" lean-forward="true" selection-start-line="300" selection-start-column="91" selection-end-line="300" selection-end-column="91" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobUID.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="9" column="25" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
-          <folding>
-            <marker date="1573911990853" expanded="true" signature="6:46" ph="..." />
-            <marker date="1573911990853" expanded="true" signature="116:200" ph="{...}" />
-            <marker date="1573911990853" expanded="true" signature="160:198" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobGenerationTimeMark.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="6" column="5" lean-forward="true" selection-start-line="6" selection-start-column="5" selection-end-line="6" selection-end-column="5" />
-          <folding>
-            <marker date="1573916623634" expanded="false" signature="6:46" ph="..." />
-            <marker date="1573916623634" expanded="true" signature="75:178" ph="{...}" />
-            <marker date="1573916623634" expanded="true" signature="134:176" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobCreationTime.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="4" column="44" selection-start-line="4" selection-start-column="44" selection-end-line="4" selection-end-column="44" />
-          <folding>
-            <marker date="1573916635535" expanded="true" signature="50:146" ph="{...}" />
-            <marker date="1573916635535" expanded="true" signature="103:144" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/CityBuilderSystem.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="22" column="37" selection-start-line="22" selection-start-column="37" selection-end-line="22" selection-end-column="37" />
-          <folding>
-            <marker date="1573908909001" expanded="false" signature="6:118" ph="..." />
-            <marker date="1573908909001" expanded="true" signature="144:1991" ph="{...}" />
-            <marker date="1573908909001" expanded="true" signature="216:228" ph="{...}" />
-            <marker date="1573908909001" expanded="true" signature="281:1989" ph="{...}" />
-            <marker date="1573908909001" expanded="true" signature="564:1193" ph="{...}" />
-            <marker date="1573908909001" expanded="true" signature="725:1183" ph="/* _terrain = Manager.CreateArchetype( ... */" />
-            <marker date="1573908909001" expanded="true" signature="1237:1270" ph="{...}" />
-            <marker date="1573908909001" expanded="true" signature="1357:1619" ph="{...}" />
-            <marker date="1573908909001" expanded="true" signature="1704:1983" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Enums.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
-          <folding>
-            <marker date="1573917339421" expanded="true" signature="16:495" ph="{...}" />
-            <marker date="1573917339421" expanded="true" signature="41:356" ph="{...}" />
-            <marker date="1573917339421" expanded="true" signature="379:493" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46C28768-88CA-4405-B893-CEA4E20D647F/03/b9d3e8da/VectorTile.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="14" column="32" selection-start-line="14" selection-start-column="32" selection-end-line="14" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Platform/Response.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1285">
-          <caret line="31" column="17" selection-start-line="31" selection-start-column="17" selection-end-line="31" selection-end-column="17" />
-          <folding>
-            <marker date="1570826657000" expanded="true" signature="0:269" ph="/* ----------------------------------------------------------------------- ... */" />
-            <marker date="1570826657000" expanded="true" signature="344:10493" ph="{...}" />
-            <marker date="1570826657000" expanded="false" signature="355:657" ph="..." />
-            <marker date="1570826657000" expanded="true" signature="768:10491" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="882:963" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="1060:1139" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="2253:2334" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="2445:2641" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="2456:2637" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="2868:2969" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="3069:3197" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="8081:10478" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="8179:8223" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="8228:8359" ph="/* additional string.empty check for apiResponse.error: ... */" />
-            <marker date="1570826657000" expanded="true" signature="8438:8509" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="8562:8702" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="8617:8697" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="9070:10012" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="9171:10007" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="9334:9470" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="9530:9656" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="9716:9899" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="9802:9892" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="9953:10001" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="10128:10240" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="10266:10336" ph="{...}" />
-            <marker date="1570826657000" expanded="true" signature="10389:10453" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/Tile.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-119">
-          <caret line="188" column="45" selection-start-line="188" selection-start-column="45" selection-end-line="188" selection-end-column="45" />
-          <folding>
-            <marker date="1573222636204" expanded="true" signature="0:265" ph="/* ----------------------------------------------------------------------- ... */" />
-            <marker date="1573222636204" expanded="true" signature="287:7059" ph="{...}" />
-            <marker date="1573222636204" expanded="false" signature="297:453" ph="..." />
-            <marker date="1573222636204" expanded="true" signature="457:678" ph="///    A Map tile, a square with vector or raster data representing a geographic ... " />
-            <marker date="1573222636204" expanded="true" signature="722:7057" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="955:1296" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="1300:1442" ph="///Gets the &lt;see cref=&quot;T:Mapbox.Map.CanonicalTileId&quot;/&gt; identifier. ... " />
-            <marker date="1573222636204" expanded="true" signature="1470:1516" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="1946:2142" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="1957:2138" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="2147:2249" ph="/// Sets the error message. ... " />
-            <marker date="1573222636204" expanded="true" signature="2292:2393" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="2398:2623" ph="///     Gets the current state. When fully loaded, you must ... " />
-            <marker date="1573222636204" expanded="true" signature="2785:3088" ph="///     Initializes the &lt;see cref=&quot;T:Mapbox.Map.Tile&quot;/&gt; object. It will ... " />
-            <marker date="1573222636204" expanded="true" signature="3148:3378" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="3491:3711" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="3715:4012" ph="///     Returns a &lt;see cref=&quot;T:System.String&quot;/&gt; that represents the current ... " />
-            <marker date="1573222636204" expanded="true" signature="4048:4081" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="4086:4733" ph="///     Cancels the request for the &lt;see cref=&quot;T:Mapbox.Map.Tile&quot;/&gt; object. ... " />
-            <marker date="1573222636204" expanded="true" signature="4756:4872" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="4785:4839" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="5073:5371" ph="/* TODO: Currently the tile decoding is done on the main thread. We must implement ... */" />
-            <marker date="1573222636204" expanded="true" signature="5465:6170" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="5496:5662" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="5670:6000" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="5680:5961" ph="/* only try to parse if request was successful ... */" />
-            <marker date="1573222636204" expanded="true" signature="6077:6150" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="6175:6551" ph="///    Parameters for initializing a Tile object. ... " />
-            <marker date="1573222636204" expanded="true" signature="6578:7052" ph="{...}" />
-            <marker date="1573222636204" expanded="true" signature="6658:6936" ph="///     The tileset ID, usually in the format &quot;user.mapid&quot;. Exceptionally, ... " />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Mapbox/Core/mapbox-sdk-cs/Map/VectorTile.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
-          <caret line="173" column="39" selection-start-line="173" selection-start-column="39" selection-end-line="173" selection-end-column="39" />
-          <folding>
-            <marker date="1573223428414" expanded="true" signature="0:271" ph="/* ----------------------------------------------------------------------- ... */" />
-            <marker date="1573223428414" expanded="true" signature="293:5489" ph="{...}" />
-            <marker date="1573223428414" expanded="false" signature="303:439" ph="..." />
-            <marker date="1573223428414" expanded="true" signature="442:1458" ph="///    A decoded vector tile, as specified by the ... " />
-            <marker date="1573223428414" expanded="true" signature="1510:5487" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="1516:1641" ph="/* FIXME: Namespace here is very confusing and conflicts (sematically) ... */" />
-            <marker date="1573223428414" expanded="true" signature="1807:1929" ph="///Gets the vector decoded using Mapbox.VectorTile library. ... " />
-            <marker date="1573223428414" expanded="true" signature="2009:2047" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="2105:2485" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="2185:2366" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="2374:2481" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="2489:2670" ph="/* TODO: uncomment if 'VectorTile' class changes from 'sealed' ... */" />
-            <marker date="1573223428414" expanded="true" signature="2696:2752" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="2756:2890" ph="/* TODO: change signature if 'VectorTile' class changes from 'sealed' ... */" />
-            <marker date="1573223428414" expanded="true" signature="2942:3087" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="3092:3534" ph="/// &lt;para&gt;Gets the vector in a GeoJson format.&lt;/para&gt; ... " />
-            <marker date="1573223428414" expanded="true" signature="3629:4106" ph="/// Gets all availble layer names. ... " />
-            <marker date="1573223428414" expanded="true" signature="4155:4197" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="4235:4845" ph="/// Decodes the requested layer. ... " />
-            <marker date="1573223428414" expanded="true" signature="4897:4946" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="5016:5195" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="5249:5482" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="5260:5404" ph="{...}" />
-            <marker date="1573223428414" expanded="true" signature="5428:5478" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/MouseInputs.cs" />
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/SelectionTag.cs" />
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/UserInputSystem.cs" />
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/SharedComponents/ParentHub.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="4" column="18" selection-start-line="4" selection-start-column="18" selection-end-line="4" selection-end-column="18" />
-          <folding>
-            <marker date="1573938184629" expanded="true" signature="56:149" ph="{...}" />
-            <marker date="1573938184629" expanded="true" signature="109:147" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/JobGenerationCounter.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="4" column="18" selection-start-line="4" selection-start-column="18" selection-end-line="4" selection-end-column="18" />
-          <folding>
-            <marker date="1573938184618" expanded="true" signature="50:148" ph="{...}" />
-            <marker date="1573938184618" expanded="true" signature="108:146" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/HubUID.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="5" column="18" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="18" />
-          <folding>
-            <marker date="1573846515823" expanded="false" signature="6:40" ph="..." />
-            <marker date="1573846515823" expanded="true" signature="69:153" ph="{...}" />
-            <marker date="1573846515823" expanded="true" signature="113:151" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/ClipSpaceTest.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="10" column="73" selection-start-line="10" selection-start-column="73" selection-end-line="10" selection-end-column="73" />
-          <folding>
-            <marker date="1574018407068" expanded="true" signature="51:572" ph="{...}" />
-            <marker date="1574018407068" expanded="true" signature="100:570" ph="{...}" />
-            <marker date="1574018407068" expanded="true" signature="165:562" ph="{...}" />
-            <marker date="1574018407068" expanded="true" signature="301:539" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/SharedComponents/Clickable.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="5" column="27" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="27" />
-          <folding>
-            <marker date="1574018407072" expanded="true" signature="6:40" ph="..." />
-            <marker date="1574018407072" expanded="true" signature="75:142" ph="{...}" />
-            <marker date="1574018407072" expanded="true" signature="128:140" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/Utils/Ray.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="10" column="80" selection-start-line="10" selection-start-column="80" selection-end-line="10" selection-end-column="80" />
-          <folding>
-            <marker date="1574018407000" expanded="true" signature="6:43" ph="..." />
-            <marker date="1574018407000" expanded="true" signature="60:687" ph="{...}" />
-            <marker date="1574018407000" expanded="true" signature="84:685" ph="{...}" />
-            <marker date="1574018407000" expanded="true" signature="289:389" ph="{...}" />
-            <marker date="1574018407000" expanded="true" signature="453:536" ph="{...}" />
-            <marker date="1574018407000" expanded="true" signature="608:679" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A37D9763-635C-4B20-8D80-474DFE7C8D6E/2c/8e938189/RenderBounds.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="11" column="16" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/DroneMaker.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="20" column="28" lean-forward="true" selection-start-line="20" selection-start-column="28" selection-end-line="20" selection-end-column="28" />
-          <folding>
-            <marker date="1574006697211" expanded="false" signature="6:109" ph="..." />
-            <marker date="1574006697211" expanded="true" signature="142:651" ph="{...}" />
-            <marker date="1574006697211" expanded="true" signature="188:649" ph="{...}" />
-            <marker date="1574006697211" expanded="true" signature="318:476" ph="{...}" />
-            <marker date="1574006697211" expanded="true" signature="335:466" ph="{...}" />
-            <marker date="1574006697211" expanded="true" signature="514:641" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/22/fdb37169/DeallocateOnJobCompletionAttribute.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="22" selection-start-line="16" selection-start-column="22" selection-end-line="16" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/Clicked.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="21" lean-forward="true" selection-start-column="21" selection-end-column="21" />
-          <folding>
-            <marker date="1574018407050" expanded="true" signature="50:109" ph="{...}" />
-            <marker date="1574018407050" expanded="true" signature="95:107" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickProcessingSystem.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="14" column="44" lean-forward="true" selection-start-line="14" selection-start-column="44" selection-end-line="14" selection-end-column="44" />
-          <folding>
-            <marker date="1574018407041" expanded="true" signature="6:90" ph="..." />
-            <marker date="1574018407041" expanded="true" signature="116:533" ph="{...}" />
-            <marker date="1574018407041" expanded="true" signature="219:531" ph="{...}" />
-            <marker date="1574018407041" expanded="true" signature="268:525" ph="{...}" />
-            <marker date="1574018407041" expanded="true" signature="360:513" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Resources/Shaders/SurfaceShader.shader" />
-    <entry file="file://$PROJECT_DIR$/Assets/Resources/Shaders/Outline.shader" />
-    <entry file="file://$PROJECT_DIR$/Assets/Resources/Shaders/Highlight.shader">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4944">
-          <caret line="309" column="43" selection-start-line="309" selection-start-column="43" selection-end-line="309" selection-end-column="43" />
-          <folding>
-            <marker date="1574215297208" expanded="true" signature="0:185" ph="/* Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)' ... */" />
-            <marker date="1574215297208" expanded="true" signature="213:15453" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="234:2020" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="2035:2093" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="2118:9737" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="2211:2301" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="2315:3625" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="2429:2521" ph="/* alpha not used ... */" />
-            <marker date="1574215297208" expanded="true" signature="2573:3610" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="3634:3779" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="3801:5131" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="4002:5116" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="5140:5264" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="5286:6534" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="5549:6519" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="6543:6646" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="6660:7635" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="6802:7620" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="7644:7739" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="7761:8938" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="7859:8923" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="8948:9153" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="9175:9731" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="9285:9716" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="9757:15385" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="9859:9949" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="9963:11272" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="10077:10169" ph="/* alpha not used ... */" />
-            <marker date="1574215297208" expanded="true" signature="10221:11257" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="11282:11427" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="11449:12581" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="11650:12566" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="12590:12714" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="12736:13792" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="12999:13777" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="13801:13904" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="13918:14586" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="14060:14571" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="14596:14801" ph="/* ------------------------------------------------------------------ ... */" />
-            <marker date="1574215297208" expanded="true" signature="14823:15379" ph="{...}" />
-            <marker date="1574215297208" expanded="true" signature="14933:15364" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/Propeller.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="12" column="60" selection-start-line="12" selection-start-column="60" selection-end-line="12" selection-end-column="60" />
-          <folding>
-            <marker date="1574283611612" expanded="true" signature="51:350" ph="{...}" />
-            <marker date="1574283611612" expanded="true" signature="96:348" ph="{...}" />
-            <marker date="1574283611612" expanded="true" signature="111:203" ph="/* Start is called before the first frame update ... */" />
-            <marker date="1574283611612" expanded="true" signature="233:342" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/SunOrbitSystem.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="608">
-          <caret line="58" column="22" selection-start-line="58" selection-start-column="22" selection-end-line="58" selection-end-column="22" />
-          <folding>
-            <marker date="1574006697218" expanded="true" signature="6:208" ph="..." />
-            <marker date="1574006697218" expanded="true" signature="234:1944" ph="{...}" />
-            <marker date="1574006697218" expanded="true" signature="289:1937" ph="{...}" />
-            <marker date="1574006697218" expanded="true" signature="395:618" ph="{...}" />
-            <marker date="1574006697218" expanded="true" signature="768:869" ph="{...}" />
-            <marker date="1574006697218" expanded="true" signature="933:1155" ph="{...}" />
-            <marker date="1574006697218" expanded="true" signature="997:1066" ph="{...}" />
-            <marker date="1574006697218" expanded="true" signature="1270:1813" ph="{...}" />
-            <marker date="1574006697218" expanded="true" signature="1497:1803" ph="{...}" />
-            <marker date="1574006697218" expanded="true" signature="1866:1930" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/Editor/MeshSaverEditor.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="26" column="80" selection-start-line="26" selection-start-column="80" selection-end-line="26" selection-end-column="80" />
-          <folding>
-            <marker date="1574267577786" expanded="false" signature="6:37" ph="..." />
-            <marker date="1574267577786" expanded="true" signature="55:1312" ph="{...}" />
-            <marker date="1574267577786" expanded="true" signature="98:1310" ph="{...}" />
-            <marker date="1574267577786" expanded="true" signature="223:379" ph="{...}" />
-            <marker date="1574267577786" expanded="true" signature="528:683" ph="{...}" />
-            <marker date="1574267577786" expanded="true" signature="788:1304" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/SharedComponents/Active.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="4" column="21" lean-forward="true" selection-start-line="4" selection-start-column="21" selection-end-line="4" selection-end-column="21" />
-          <folding>
-            <marker date="1574283611619" expanded="true" signature="56:120" ph="{...}" />
-            <marker date="1574283611619" expanded="true" signature="106:118" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A55E32A2-A12A-472B-BC26-1425ACBC489E/1e/580435cb/BoxcastCommand.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-841">
-          <caret line="20" column="16" selection-start-line="20" selection-start-column="16" selection-end-line="20" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A55E32A2-A12A-472B-BC26-1425ACBC489E/cb/13b6c5e6/Physics.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="411">
-          <caret line="734" column="45" selection-start-line="734" selection-start-column="45" selection-end-line="734" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/A55E32A2-A12A-472B-BC26-1425ACBC489E/02/900d09a9/PhysicsScene.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="717" column="31" selection-start-line="717" selection-start-column="31" selection-end-line="717" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/Iterators/EntityQuery.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="260">
@@ -1272,26 +836,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Components/PropellerTag.cs" />
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1072">
-          <caret line="78" column="52" selection-start-line="78" selection-start-column="52" selection-end-line="78" selection-end-column="52" />
-          <folding>
-            <marker date="1574432578813" expanded="false" signature="6:203" ph="..." />
-            <marker date="1574432578813" expanded="true" signature="229:3719" ph="{...}" />
-            <marker date="1574432578813" expanded="true" signature="285:3717" ph="{...}" />
-            <marker date="1574432578813" expanded="true" signature="720:2278" ph="{...}" />
-            <marker date="1574432578813" expanded="true" signature="1598:1752" ph="{...}" />
-            <marker date="1574432578813" expanded="true" signature="1810:1969" ph="{...}" />
-            <marker date="1574432578813" expanded="true" signature="2037:2254" ph="{...}" />
-            <marker date="1574432578813" expanded="true" signature="2310:3647" ph="{...}" />
-            <marker date="1574432578813" expanded="true" signature="2424:3637" ph="{...}" />
-            <marker date="1574432578813" expanded="true" signature="3153:3622" ph="{...}" />
-            <marker date="1574432578813" expanded="true" signature="3691:3711" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/JobGeneratorSystem.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="720">
@@ -1309,66 +853,162 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs">
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/EagleEyeSolver.cs" />
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/ICameraMotion.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1152">
-          <caret line="90" column="9" selection-start-line="90" selection-start-column="9" selection-end-line="90" selection-end-column="9" />
+        <state relative-caret-position="304">
+          <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
           <folding>
-            <marker date="1574372037825" expanded="false" signature="6:370" ph="..." />
-            <marker date="1574372037825" expanded="true" signature="396:7233" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="504:7231" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="696:1293" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="780:1049" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="826:1035" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="1338:1465" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="1533:3100" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="1618:1679" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="1737:2015" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="2077:2373" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="2430:2533" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="2593:2855" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="3180:4151" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="3573:4141" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="3828:4110" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="4229:4828" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="4385:4818" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="4527:4708" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="4906:5970" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="5294:5960" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="5484:5946" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="5631:5866" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="6048:7225" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="6454:7215" ph="{...}" />
-            <marker date="1574372037825" expanded="true" signature="6709:7201" ph="{...}" />
+            <marker date="1574448591800" expanded="true" signature="51:372" ph="{...}" />
+            <marker date="1574448591800" expanded="true" signature="88:370" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs">
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/HubBuilderSystem.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="46" column="17" selection-start-line="46" selection-start-column="17" selection-end-line="46" selection-end-column="17" />
+        <state relative-caret-position="320">
+          <caret line="32" column="14" selection-start-line="32" selection-start-column="14" selection-end-line="32" selection-end-column="14" />
           <folding>
-            <marker date="1574006697207" expanded="false" signature="6:176" ph="..." />
-            <marker date="1574006697207" expanded="true" signature="202:2188" ph="{...}" />
-            <marker date="1574006697207" expanded="true" signature="304:2186" ph="{...}" />
-            <marker date="1574006697207" expanded="true" signature="377:621" ph="{...}" />
-            <marker date="1574006697207" expanded="true" signature="443:560" ph="{...}" />
-            <marker date="1574006697207" expanded="true" signature="753:2180" ph="{...}" />
-            <marker date="1574006697207" expanded="true" signature="964:1771" ph="{...}" />
-            <marker date="1574006697207" expanded="true" signature="1016:1387" ph="{...}" />
-            <marker date="1574006697207" expanded="true" signature="1459:1633" ph="{...}" />
-            <marker date="1574006697207" expanded="true" signature="1865:2170" ph="{...}" />
+            <marker date="1574434100427" expanded="true" signature="6:209" ph="..." />
+            <marker date="1574434100427" expanded="true" signature="235:2638" ph="{...}" />
+            <marker date="1574434100427" expanded="true" signature="289:2636" ph="{...}" />
+            <marker date="1574434100427" expanded="true" signature="675:1406" ph="{...}" />
+            <marker date="1574434100427" expanded="true" signature="1240:1395" ph="{...}" />
+            <marker date="1574434100427" expanded="true" signature="1465:2291" ph="{...}" />
+            <marker date="1574434100427" expanded="true" signature="2342:2558" ph="{...}" />
+            <marker date="1574434100427" expanded="true" signature="2610:2630" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/CameraMotion.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="9" column="60" selection-start-line="9" selection-start-column="60" selection-end-line="9" selection-end-column="60" />
+          <folding>
+            <marker date="1574448711569" expanded="true" signature="51:2223" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="114:2221" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="150:692" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="494:618" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="729:898" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="916:2214" ph="Movement Implementation" />
+            <marker date="1574448711569" expanded="true" signature="1072:1270" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="1316:1420" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="1467:1669" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="1549:1659" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="1709:1778" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="1816:1897" ph="{...}" />
+            <marker date="1574448711569" expanded="true" signature="1938:2194" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.rendering.hybrid@0.1.1-preview/Unity.Rendering.Hybrid/RenderMeshSystemV2.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="219">
+          <caret line="88" column="59" selection-start-line="88" selection-start-column="39" selection-end-line="88" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/BovineLabs/README.md">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/BovineLabs/Entities/Tests/BovineLabs.Entities.Tests.asmdef">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/WaypointUpdateSystem.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <marker date="1574517625860" expanded="true" signature="6:256" ph="..." />
+            <marker date="1574517625860" expanded="true" signature="282:7119" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="390:7117" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="582:1179" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="666:935" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="712:921" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="1224:1351" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="1419:2986" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="1504:1565" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="1623:1901" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="1963:2259" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="2316:2419" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="2479:2741" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="3066:4037" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="3459:4027" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="3714:3996" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="4115:4714" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="4271:4704" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="4413:4594" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="4792:5856" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="5180:5846" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="5370:5832" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="5517:5752" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="5934:7111" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="6340:7101" ph="{...}" />
+            <marker date="1574517625860" expanded="true" signature="6595:7087" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneRotationSystem.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1072">
+          <caret line="71" column="40" selection-start-line="71" selection-start-column="40" selection-end-line="71" selection-end-column="40" />
+          <folding>
+            <marker date="1574371451929" expanded="false" signature="6:113" ph="..." />
+            <marker date="1574371451929" expanded="true" signature="139:3945" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="199:3943" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="289:708" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="402:696" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="448:682" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="776:1220" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="842:1151" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="1273:3937" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="1710:2497" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="2038:2483" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="2567:2909" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="2985:3606" ph="{...}" />
+            <marker date="1574371451929" expanded="true" signature="3711:3927" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/BovineLabs/package.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/BovineLabs/Entities/Tests/Systems/EntityEventSystemTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="111">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/EagleEyeMotion.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="18" selection-start-column="18" selection-end-column="18" />
+          <folding>
+            <marker date="1574515320832" expanded="true" signature="51:1383" ph="{...}" />
+            <marker date="1574515320832" expanded="true" signature="116:1381" ph="{...}" />
+            <marker date="1574515320832" expanded="true" signature="184:250" ph="{...}" />
+            <marker date="1574515320832" expanded="true" signature="281:544" ph="{...}" />
+            <marker date="1574515320832" expanded="true" signature="656:772" ph="{...}" />
+            <marker date="1574515320832" expanded="true" signature="818:937" ph="{...}" />
+            <marker date="1574515320832" expanded="true" signature="976:1136" ph="{...}" />
+            <marker date="1574515320832" expanded="true" signature="1176:1188" ph="{...}" />
+            <marker date="1574515320832" expanded="true" signature="1226:1238" ph="{...}" />
+            <marker date="1574515320832" expanded="true" signature="1279:1375" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/PropellerRotationSystem.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="464">
+        <state relative-caret-position="560">
           <caret line="40" column="60" selection-start-line="40" selection-start-column="60" selection-end-line="40" selection-end-column="60" />
           <folding>
-            <marker date="1574293085484" expanded="true" signature="6:144" ph="..." />
+            <marker date="1574293085484" expanded="false" signature="6:144" ph="..." />
             <marker date="1574293085484" expanded="true" signature="170:1720" ph="{...}" />
             <marker date="1574293085484" expanded="true" signature="234:1718" ph="{...}" />
             <marker date="1574293085484" expanded="true" signature="329:688" ph="{...}" />
@@ -1384,9 +1024,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Filter/CollisionFilter.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="9" column="18" selection-start-line="9" selection-start-column="18" selection-end-line="9" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/ECS/Systems/BuildPhysicsWorld.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-874">
+          <caret line="9" column="10" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Queries/Collector.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="70" column="40" selection-start-line="70" selection-start-column="40" selection-end-line="70" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/World/CollisionWorld.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="136" column="96" selection-start-line="136" selection-start-column="96" selection-end-line="136" selection-end-column="96" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/ECS/BuildingMeshFactory.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="368">
+        <state relative-caret-position="323">
           <caret line="139" column="56" selection-start-line="139" selection-start-column="56" selection-end-line="139" selection-end-column="56" />
           <folding>
             <marker date="1573846515831" expanded="false" signature="6:180" ph="..." />
@@ -1428,125 +1096,314 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickReceiverSystem.cs">
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Queries/Collidable.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="101" column="126" selection-start-line="101" selection-start-column="126" selection-end-line="101" selection-end-column="126" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/E5EB59E1-B82E-4242-8BA7-A99C4E347A35/48/d3acb0d3/IConvexCollider.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="8" column="21" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Colliders/Physics_Collider.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="121">
+          <caret line="86" column="18" selection-start-line="86" selection-start-column="18" selection-end-line="86" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/RigidBody/RigidBody.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="12" column="18" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Queries/Raycast.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="309">
+          <caret line="453" column="96" lean-forward="true" selection-start-line="453" selection-start-column="96" selection-end-line="453" selection-end-column="96" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/E5EB59E1-B82E-4242-8BA7-A99C4E347A35/5b/b8741dc4/ICollidable.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="11" column="24" selection-start-line="11" selection-start-column="24" selection-end-line="11" selection-end-column="24" />
+          <folding>
+            <marker date="1574521094759" expanded="true" signature="0:311" ph="/* Decompiled with JetBrains decompiler ... */" />
+            <marker date="1574521094759" expanded="false" signature="319:362" ph="..." />
+            <marker date="1574521094759" expanded="true" signature="387:1828" ph="{...}" />
+            <marker date="1574521094759" expanded="true" signature="420:1826" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Collision/Colliders/Physics_BoxCollider.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="294" column="44" selection-start-line="294" selection-start-column="44" selection-end-line="294" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities@0.1.1-preview/Unity.Entities/Stubs/Unity/Debug.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneBuilderSystem.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="278">
+          <caret line="102" column="17" selection-start-line="102" selection-start-column="17" selection-end-line="102" selection-end-column="17" />
+          <folding>
+            <marker date="1574524546445" expanded="false" signature="6:351" ph="..." />
+            <marker date="1574524546445" expanded="true" signature="377:4442" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="433:4440" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="929:2869" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="1848:2002" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="2060:2219" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="2287:2504" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="2555:2804" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="2901:4370" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="3015:4360" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="3877:4346" ph="{...}" />
+            <marker date="1574524546445" expanded="true" signature="4414:4434" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/Extensions/DynamicBufferExtensions.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="14" column="27" lean-forward="true" selection-start-line="14" selection-start-column="27" selection-end-line="14" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneMovementSystem.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-79">
+          <caret line="16" column="29" selection-start-line="16" selection-start-column="29" selection-end-line="16" selection-end-column="29" />
+          <folding>
+            <marker date="1574526630542" expanded="false" signature="6:176" ph="..." />
+            <marker date="1574526630542" expanded="true" signature="202:2218" ph="{...}" />
+            <marker date="1574526630542" expanded="true" signature="304:2216" ph="{...}" />
+            <marker date="1574526630542" expanded="true" signature="377:651" ph="{...}" />
+            <marker date="1574526630542" expanded="true" signature="473:590" ph="{...}" />
+            <marker date="1574526630542" expanded="true" signature="783:2210" ph="{...}" />
+            <marker date="1574526630542" expanded="true" signature="994:1801" ph="{...}" />
+            <marker date="1574526630542" expanded="true" signature="1046:1417" ph="{...}" />
+            <marker date="1574526630542" expanded="true" signature="1489:1663" ph="{...}" />
+            <marker date="1574526630542" expanded="true" signature="1895:2200" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Mapbox/Core/Plugins/Android/UniAndroidPermission/AndroidManifest-uniRP.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <caret column="24" selection-start-column="24" selection-end-column="24" />
-          <folding>
-            <marker date="1574019257176" expanded="true" signature="6:265" ph="..." />
-            <marker date="1574019257176" expanded="true" signature="291:5044" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="355:376" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="479:5042" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="701:1184" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="821:1023" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="867:1009" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="1234:1366" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="1411:1497" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="1565:2564" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="1681:2024" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="2096:2360" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="2652:3949" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="3069:3939" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="3408:3852" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="4009:5036" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="4312:5026" ph="{...}" />
-            <marker date="1574019257176" expanded="true" signature="4559:4921" ph="{...}" />
-          </folding>
+          <caret column="4" selection-start-column="4" selection-end-column="4" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/EagleEyeSolver.cs">
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Editor/BovineLabs.Entities.Editor.asmdef">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/DroneRotationSystem.cs">
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Tests/BovineLabs.Entities.Tests.asmdef">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/BovineLabs.Entities.asmdef">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/e3/800dcd77/IJobExtensions.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="624">
-          <caret line="71" column="40" selection-start-line="71" selection-start-column="40" selection-end-line="71" selection-end-column="40" />
+        <state relative-caret-position="850">
+          <caret line="60" column="13" selection-start-line="60" selection-start-column="13" selection-end-line="60" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/Jobs/RemoveComponentJob.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="448">
+          <caret line="28" column="20" selection-start-line="28" selection-start-column="20" selection-end-line="28" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/Jobs/DeallocateJob.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="15" column="26" selection-start-line="15" selection-start-column="26" selection-end-line="15" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickProcessingSystem.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="34" selection-start-column="34" selection-end-column="34" />
           <folding>
-            <marker date="1574371451929" expanded="true" signature="6:113" ph="..." />
-            <marker date="1574371451929" expanded="true" signature="139:3945" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="199:3943" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="289:708" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="402:696" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="448:682" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="776:1220" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="842:1151" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="1273:3937" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="1710:2497" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="2038:2483" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="2567:2909" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="2985:3606" ph="{...}" />
-            <marker date="1574371451929" expanded="true" signature="3711:3927" ph="{...}" />
+            <marker date="1574526859252" expanded="true" signature="6:75" ph="..." />
+            <marker date="1574526859252" expanded="true" signature="101:444" ph="{...}" />
+            <marker date="1574526859252" expanded="true" signature="205:442" ph="{...}" />
+            <marker date="1574526859252" expanded="true" signature="254:436" ph="{...}" />
+            <marker date="1574526859252" expanded="true" signature="337:424" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/ICameraMotion.cs">
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Tests/Systems/EntityEventSystemTests.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
+        <state relative-caret-position="920">
+          <caret line="61" column="86" selection-start-line="61" selection-start-column="86" selection-end-line="61" selection-end-column="86" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/ClickReceiverSystem.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-676">
+          <caret line="22" column="27" selection-start-line="22" selection-start-column="27" selection-end-line="22" selection-end-column="27" />
           <folding>
-            <marker date="1574448591800" expanded="true" signature="51:372" ph="{...}" />
-            <marker date="1574448591800" expanded="true" signature="88:370" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="6:232" ph="..." />
+            <marker date="1574527391393" expanded="true" signature="258:2695" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="306:379" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="568:2693" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="790:1035" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="1099:2130" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="1414:1922" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="1465:1763" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="1618:1749" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="2188:2687" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="2384:2681" ph="{...}" />
+            <marker date="1574527391393" expanded="true" signature="2594:2669" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/HubBuilderSystem.cs">
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.bovinelabs.entities@d99af8cc90bc4ad2406a5bda84dc071decd0b0db/Entities/Runtime/Systems/EntityEventSystem.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="32" column="14" selection-start-line="32" selection-start-column="14" selection-end-line="32" selection-end-column="14" />
+        <state relative-caret-position="160">
+          <caret line="25" column="8" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="99" />
           <folding>
-            <marker date="1574434100427" expanded="true" signature="6:209" ph="..." />
-            <marker date="1574434100427" expanded="true" signature="235:2638" ph="{...}" />
-            <marker date="1574434100427" expanded="true" signature="289:2636" ph="{...}" />
-            <marker date="1574434100427" expanded="true" signature="675:1406" ph="{...}" />
-            <marker date="1574434100427" expanded="true" signature="1240:1395" ph="{...}" />
-            <marker date="1574434100427" expanded="true" signature="1465:2291" ph="{...}" />
-            <marker date="1574434100427" expanded="true" signature="2342:2558" ph="{...}" />
-            <marker date="1574434100427" expanded="true" signature="2610:2630" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="0:133" ph="/* &lt;copyright file=&quot;EntityEventSystem.cs&quot; company=&quot;BovineLabs&quot;&gt; ... */" />
+            <marker date="1574524767561" expanded="true" signature="172:14394" ph="{...}" />
+            <marker date="1574524767561" expanded="false" signature="185:511" ph="..." />
+            <marker date="1574524767561" expanded="true" signature="517:581" ph="/// The BatchBarrierSystem. ... " />
+            <marker date="1574524767561" expanded="true" signature="791:14392" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="1119:1204" ph="/// The interface for the batch systems. ... " />
+            <marker date="1574524767561" expanded="true" signature="1256:1725" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="1279:1523" ph="/// Updates the batch, destroy, create, set. ... " />
+            <marker date="1574524767561" expanded="true" signature="1596:1689" ph="/// Resets the batch for the next frame. ... " />
+            <marker date="1574524767561" expanded="true" signature="1735:2151" ph="/// Creates a queue where any added component added will be batch created as an entity event ... " />
+            <marker date="1574524767561" expanded="true" signature="2248:2506" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="2326:2442" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="2516:3006" ph="/// Creates a new event with a component and a buffer. These events are batch created ... " />
+            <marker date="1574524767561" expanded="true" signature="3183:3530" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="3337:3445" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="3540:3677" ph="/// Add a dependency handle. ... " />
+            <marker date="1574524767561" expanded="true" signature="3739:3853" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="3925:4234" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="3977:4040" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="4122:4185" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="4305:5137" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="4590:4689" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="4738:4837" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="4956:5017" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="5066:5127" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="5236:10042" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="5489:5609" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="5773:6012" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="6054:6275" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="6150:6223" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="6322:6527" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="6412:6484" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="6676:7953" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="7184:7657" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="7329:7536" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="8035:10032" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="8423:9249" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="8594:9231" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="8865:8979" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="9031:9119" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="9331:10018" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="9471:9915" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="9666:9799" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="10201:11757" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="10535:10652" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="10725:10954" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="10822:10903" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="11001:11070" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="11219:11747" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="11373:11700" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="11818:14386" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="12012:12229" ph="/// Handles the destroying of entities. ... " />
+            <marker date="1574524767561" expanded="true" signature="12294:12582" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="12419:12491" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="12596:12675" ph="/// Optional reset method. ... " />
+            <marker date="1574524767561" expanded="true" signature="12715:12743" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="12809:12994" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="12868:12949" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="13232:13545" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="13347:13492" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="13615:14376" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="13707:13777" ph="{...}" />
+            <marker date="1574524767561" expanded="true" signature="14093:14218" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/CameraMotion.cs">
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics.Hybrid/Utilities/DebugDisplay/DisplayBroadphaseSystem.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="9" column="60" selection-start-line="9" selection-start-column="60" selection-end-line="9" selection-end-column="60" />
-          <folding>
-            <marker date="1574448711569" expanded="true" signature="51:2223" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="114:2221" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="150:692" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="494:618" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="729:898" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="916:2214" ph="Movement Implementation" />
-            <marker date="1574448711569" expanded="true" signature="1072:1270" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="1316:1420" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="1467:1669" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="1549:1659" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="1709:1778" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="1816:1897" ph="{...}" />
-            <marker date="1574448711569" expanded="true" signature="1938:2194" ph="{...}" />
-          </folding>
+        <state relative-caret-position="237">
+          <caret line="86" column="51" selection-start-line="86" selection-start-column="51" selection-end-line="86" selection-end-column="51" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/EagleEyeMotion.cs">
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics.Hybrid/Utilities/DebugDisplay/DebugStream.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="558">
-          <caret line="55" selection-start-line="55" selection-end-line="55" />
+        <state relative-caret-position="301">
+          <caret line="95" column="25" selection-start-line="95" selection-start-column="25" selection-end-line="95" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collections@0.1.1-preview/Unity.Collections.Tests/NativeStreamTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="14" column="15" selection-start-line="14" selection-start-column="15" selection-end-line="14" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collections@0.1.1-preview/Unity.Collections/NativeStream.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4195">
+          <caret line="301" column="24" lean-forward="true" selection-start-line="301" selection-start-column="24" selection-end-line="301" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics@0.2.4-preview/Unity.Physics/Base/Containers/BlockStream.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="26" column="19" lean-forward="true" selection-start-line="26" selection-start-column="19" selection-end-line="26" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Systems/EventSystem.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="15" column="72" lean-forward="true" selection-start-line="15" selection-start-column="72" selection-end-line="15" selection-end-column="72" />
           <folding>
-            <marker date="1574448953116" expanded="true" signature="6:32" ph="..." />
-            <marker date="1574448953116" expanded="true" signature="65:1397" ph="{...}" />
-            <marker date="1574448953116" expanded="true" signature="130:1395" ph="{...}" />
-            <marker date="1574448953116" expanded="true" signature="198:264" ph="{...}" />
-            <marker date="1574448953116" expanded="true" signature="295:558" ph="{...}" />
-            <marker date="1574448953116" expanded="true" signature="670:786" ph="{...}" />
-            <marker date="1574448953116" expanded="true" signature="832:951" ph="{...}" />
-            <marker date="1574448953116" expanded="true" signature="990:1150" ph="{...}" />
-            <marker date="1574448953116" expanded="true" signature="1190:1202" ph="{...}" />
-            <marker date="1574448953116" expanded="true" signature="1240:1252" ph="{...}" />
-            <marker date="1574448953116" expanded="true" signature="1293:1389" ph="{...}" />
+            <marker date="1574533890543" expanded="true" signature="6:124" ph="..." />
+            <marker date="1574533890543" expanded="true" signature="150:1139" ph="{...}" />
+            <marker date="1574533890543" expanded="true" signature="199:1137" ph="{...}" />
+            <marker date="1574533890543" expanded="true" signature="378:716" ph="{...}" />
+            <marker date="1574533890543" expanded="true" signature="503:573" ph="{...}" />
+            <marker date="1574533890543" expanded="true" signature="775:1003" ph="{...}" />
+            <marker date="1574533890543" expanded="true" signature="858:928" ph="{...}" />
+            <marker date="1574533890543" expanded="true" signature="1055:1131" ph="{...}" />
           </folding>
         </state>
       </provider>
