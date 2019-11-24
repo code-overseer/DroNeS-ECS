@@ -8,11 +8,9 @@ using Random = Unity.Mathematics.Random;
 
 namespace DroNeS.Systems
 {
-    [UpdateAfter(typeof(SunOrbitSystem))]
     public class JobGeneratorSystem : JobComponentSystem
     {
         private static EndSimulationEntityCommandBufferSystem _barrier;
-
         protected override void OnCreate()
         {
             base.OnCreate();
@@ -26,14 +24,15 @@ namespace DroNeS.Systems
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var job = new JobGenerator
+            var output = new JobGenerator
             {
                 JobCreation = _barrier.CreateCommandBuffer().ToConcurrent(),
                 CurrentTime = World.Active.GetOrCreateSystem<SunOrbitSystem>().Clock
-            };
-            inputDeps = job.Schedule(this, inputDeps);
-            _barrier.AddJobHandleForProducer(inputDeps);
-            return inputDeps;
+            }.Schedule(this, inputDeps);
+            
+            _barrier.AddJobHandleForProducer(output);
+            
+            return output;
         }
         
         private struct JobGenerator : IJobForEach<HubUID, JobGenerationCounter, JobGenerationRate, JobGenerationTimeMark>

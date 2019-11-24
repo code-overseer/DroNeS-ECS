@@ -1,23 +1,38 @@
-﻿using DroNeS.Components;
+﻿using System.Diagnostics;
+using DroNeS.Components;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 namespace DroNeS.Systems
 {
-    [UpdateAfter(typeof(SunOrbitSystem))]
     public class DroneMovementSystem : JobComponentSystem
     {
+        private SunOrbitSystem _time;
+        private Stopwatch _watch;
+        protected override void OnCreate()
+        {
+            base.OnCreate();
+            _time = World.Active.GetOrCreateSystem<SunOrbitSystem>();
+            _watch = new Stopwatch();
+        }
+        
+        protected override void OnStartRunning()
+        {
+            base.OnStartRunning();
+            _watch.Start();
+        }
+
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var job = new DroneMovementJob
             {
-                Delta = Time.deltaTime * World.Active.GetOrCreateSystem<SunOrbitSystem>().SpeedFactor
+                Delta = _watch.ElapsedMilliseconds * 0.001f * _time.SpeedFactor
             };
+            _watch.Restart();
             return job.Schedule(this, inputDeps);
         }
         

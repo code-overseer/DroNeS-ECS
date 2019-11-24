@@ -1,11 +1,13 @@
 ﻿using DroNeS.Components;
-using DroNeS.SharedComponents;
 using Unity.Entities;
+using Unity.Physics;
 using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
+using BoxCollider = Unity.Physics.BoxCollider;
 using Random = Unity.Mathematics.Random;
+using Collider = Unity.Physics.Collider;
 
 namespace DroNeS.Systems
 {
@@ -14,6 +16,7 @@ namespace DroNeS.Systems
         private EndSimulationEntityCommandBufferSystem _barrier;
         private EntityArchetype _hub;
         private RenderMesh _hubMesh;
+        private BlobAssetReference<Collider> _hubCollider;
         private int _hubUid;
         private Random _rand = new Random(1u);
         private const float Altitude = 800; 
@@ -35,8 +38,22 @@ namespace DroNeS.Systems
             _hubMesh = new RenderMesh
             {
                 mesh = Resources.Load("Meshes/Airship") as Mesh,
-                material = Resources.Load("Materials/Airship") as Material
+                material = Resources.Load("Materials/Airship") as UnityEngine.Material
             };
+            var geometry = new BoxGeometry
+            {
+                Center = new float3(0.01313019f, -0.6270895f, -16.10762f),
+                Orientation = quaternion.identity,
+                Size = new float3(43.56474f, 44.71868f, 170.6734f),
+                BevelRadius = 0.05f * 45,
+            };
+            _hubCollider = BoxCollider.Create(geometry,
+                new CollisionFilter
+                {
+                    BelongsTo = CollisionGroups.Hub,
+                    CollidesWith = CollisionGroups.Cast,
+                    GroupIndex = 0
+                });
         }
 
         public void BuildHub(float rate, float3 position)
@@ -51,7 +68,6 @@ namespace DroNeS.Systems
             buildCommands.SetComponent(hub, new JobGenerationRate {Value = rate} );
             buildCommands.SetComponent(hub, new JobGenerationTimeMark { Value = CurrentMark(in rate) });
             buildCommands.AddSharedComponent(hub, _hubMesh);
-            buildCommands.AddSharedComponent(hub, new Clickable());
         }
 
         private float2 CurrentMark(in float rate)

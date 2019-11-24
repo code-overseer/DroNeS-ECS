@@ -529,6 +529,7 @@
         </e>
         <e p="Scripts" t="Include">
           <e p="DroNeS" t="Include">
+            <e p="CollisionGroups.cs" t="Include" />
             <e p="Components" t="Include">
               <e p="Clicked.cs" t="Include" />
               <e p="DestructionTag.cs" t="Include" />
@@ -583,13 +584,13 @@
               <e p="ClipSpaceTest.cs" t="Include" />
               <e p="DroneMaker.cs" t="Include" />
               <e p="EagleEyeMotion.cs" t="Include" />
+              <e p="FixedUpdateExecution.cs" t="Include" />
               <e p="ICameraMotion.cs" t="Include" />
               <e p="Propeller.cs" t="Include" />
             </e>
             <e p="Queue.cs" t="Include" />
             <e p="SharedComponents" t="Include">
               <e p="Active.cs" t="Include" />
-              <e p="Clickable.cs" t="Include" />
               <e p="ParentHub.cs" t="Include" />
             </e>
             <e p="Systems" t="Include">

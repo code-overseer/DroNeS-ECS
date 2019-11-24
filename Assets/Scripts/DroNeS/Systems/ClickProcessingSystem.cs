@@ -18,13 +18,11 @@ namespace DroNeS.Systems
         protected override JobHandle OnUpdate(JobHandle input)
         {
             var output = _eventSystem.GetReader<ClickEvent>(input, out var reader);
-            
             output = new ProcessJob
              {
                  Reader = reader
              }.Schedule(output);
              _eventSystem.AddConsumerJobHandle<ClickEvent>(output);
-
              return output;
         }
         

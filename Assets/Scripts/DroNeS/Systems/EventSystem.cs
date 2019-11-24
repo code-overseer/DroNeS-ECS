@@ -1,36 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine.Assertions;
 using Utils;
-using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Systems
 {
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
-    public class EventBarrierSystem : EntityCommandBufferSystem
-    {
-        public JobHandle TerminationHandle;
-        protected override void OnUpdate()
-        {
-            base.OnUpdate();
-            TerminationHandle.Complete();
-        }
-    }
-    
     [UpdateAfter(typeof(ClickProcessingSystem))]
-    public class EventSystem : JobComponentSystem
+    public class EventSystem : ComponentSystem
     {
         private int _eventCount;
         private readonly Dictionary<Type, int> _handleKeys = new Dictionary<Type, int>();
         private readonly Dictionary<int, NativeStream> _eventCollection = new Dictionary<int, NativeStream>();
         private NativeHashMap<int, JobHandle> _producerHandles;
         private NativeHashMap<int, JobHandle> _consumerHandles;
-        private EventBarrierSystem _barrier;
+        private EndSimulationEntityCommandBufferSystem _barrier;
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -48,7 +35,7 @@ namespace DroNeS.Systems
             base.OnCreate();
             _producerHandles = new NativeHashMap<int, JobHandle>(10, Allocator.Persistent);
             _consumerHandles = new NativeHashMap<int, JobHandle>(10, Allocator.Persistent);
-            _barrier = World.Active.GetOrCreateSystem<EventBarrierSystem>();
+            _barrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         public void NewEvent<T>(int count)
@@ -60,6 +47,13 @@ namespace DroNeS.Systems
             }
             var key = _handleKeys[typeof(T)] = ++_eventCount;
             _eventCollection[key] = new NativeStream(count, Allocator.Persistent);
+            ResetHandles(key);
+        }
+
+        private void ResetHandles(int key)
+        {
+            _consumerHandles[key] = default;
+            _producerHandles[key] = default;
         }
 
         public NativeStream.Writer GetWriter<T>() where T : struct
@@ -80,38 +74,33 @@ namespace DroNeS.Systems
         
         public JobHandle GetReader<T>(JobHandle dependencies, out NativeStream.Reader readers) where T : struct
         {
-            readers = _eventCollection[_handleKeys[typeof(T)]].AsReader();
-            return JobHandle.CombineDependencies(_producerHandles[_handleKeys[typeof(T)]], dependencies);
+            var key = _handleKeys[typeof(T)];
+            readers = _eventCollection[key].AsReader();
+            return JobHandle.CombineDependencies(_producerHandles[key], dependencies);
         }
         
-        public void AddConsumerJobHandle<T>(JobHandle handlers) where T : struct
+        public void AddConsumerJobHandle<T>(JobHandle consumer) where T : struct
         {
             var key = _handleKeys[typeof(T)];
             if (!_consumerHandles.TryGetValue(key, out var handle))
             {
-                _consumerHandles.TryAdd(key, handlers);
+                _consumerHandles.TryAdd(key, consumer);
                 return;
             }
-            _consumerHandles[key] = JobHandle.CombineDependencies(handle, handlers);
+            _consumerHandles[key] = JobHandle.CombineDependencies(handle, consumer);
         }
         
-        protected override JobHandle OnUpdate(JobHandle input)
+        protected override void OnUpdate()
         {
             JobHandle output = default;
-            
             foreach (var key in _handleKeys.Values)
             {
-                _consumerHandles[key] = JobHandle.CombineDependencies(input, _consumerHandles[key]);
                 output = JobHandle.CombineDependencies(
-                    new ClearStreamJob(_eventCollection[key]).Schedule(_consumerHandles[key]),
-                    output);
+                    new ClearStreamJob(_eventCollection[key]).Schedule(_consumerHandles[key]), output);
 
-                _consumerHandles[key] = default;
-                _producerHandles[key] = default;
+                ResetHandles(key);
             }
-
-            _barrier.TerminationHandle = output;
-            return output;
+            _barrier.AddJobHandleForProducer(output);
         }
         
         [BurstCompile]

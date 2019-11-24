@@ -67,14 +67,20 @@ namespace DroNeS.Systems
                 new float3(0.6f, 0.082f, -0.7f),
                 new float3(-0.59f, 0.082f, -0.7f)
             };
-            var bg = new BoxGeometry
+            var geometry = new BoxGeometry
             {
                 Center = new float3(-0.001946479f, -0.0465135f, 0.03175002f),
                 BevelRadius = 0.015f,
                 Orientation = quaternion.identity,
                 Size = new float3(1.421171f, 0.288217f, 1.492288f)
             };
-            _droneCollider = BoxCollider.Create(bg);
+            _droneCollider = BoxCollider.Create(geometry,
+                new CollisionFilter
+                {
+                    BelongsTo = CollisionGroups.Drone,
+                    CollidesWith = CollisionGroups.Buildings | CollisionGroups.Cast,
+                    GroupIndex = 0
+                });
 
         }
 
@@ -92,7 +98,6 @@ namespace DroNeS.Systems
                 buildCommands.SetComponent(drone, new Waypoint(float3.zero, -1,0));
                 buildCommands.SetComponent(drone, new PhysicsCollider { Value = _droneCollider });
                 buildCommands.AddSharedComponent(drone, _droneMesh);
-                buildCommands.AddSharedComponent(drone, new Clickable());
                 for (var j = 0; j < 4; ++j)
                 {
                     var prop = buildCommands.CreateEntity(_propeller);
