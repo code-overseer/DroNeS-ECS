@@ -9,7 +9,7 @@ using Utils;
 
 namespace DroNeS.Systems
 {
-    [UpdateAfter(typeof(ClickProcessingSystem))]
+    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public class EventSystem : ComponentSystem
     {
         private int _eventCount;
@@ -41,10 +41,8 @@ namespace DroNeS.Systems
         public void NewEvent<T>(int count)
         {
             Assert.AreNotEqual(0, count);
-            if (_handleKeys.ContainsKey(typeof(T)))
-            {
-                throw new Exception("Event already exists");
-            }
+            if (_handleKeys.ContainsKey(typeof(T))) return;
+            
             var key = _handleKeys[typeof(T)] = ++_eventCount;
             _eventCollection[key] = new NativeStream(count, Allocator.Persistent);
             ResetHandles(key);
@@ -64,30 +62,20 @@ namespace DroNeS.Systems
         public void AddProducerJobHandle<T>(JobHandle producer) where T : struct
         {
             var key = _handleKeys[typeof(T)];
-            if (!_producerHandles.TryGetValue(key, out var handle))
-            {
-                _producerHandles.TryAdd(key, producer);
-                return;
-            }
-            _producerHandles[key] = JobHandle.CombineDependencies(handle, producer);
+            _producerHandles[key] = JobHandle.CombineDependencies(_producerHandles[key], producer);
         }
         
-        public JobHandle GetReader<T>(JobHandle dependencies, out NativeStream.Reader readers) where T : struct
+        public NativeStream.Reader GetReader<T>(ref JobHandle dependencies) where T : struct
         {
             var key = _handleKeys[typeof(T)];
-            readers = _eventCollection[key].AsReader();
-            return JobHandle.CombineDependencies(_producerHandles[key], dependencies);
+            dependencies = JobHandle.CombineDependencies(dependencies, _producerHandles[key]);
+            return _eventCollection[key].AsReader();
         }
-        
+
         public void AddConsumerJobHandle<T>(JobHandle consumer) where T : struct
         {
             var key = _handleKeys[typeof(T)];
-            if (!_consumerHandles.TryGetValue(key, out var handle))
-            {
-                _consumerHandles.TryAdd(key, consumer);
-                return;
-            }
-            _consumerHandles[key] = JobHandle.CombineDependencies(handle, consumer);
+            _consumerHandles[key] = JobHandle.CombineDependencies(_consumerHandles[key], consumer);
         }
         
         protected override void OnUpdate()

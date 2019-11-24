@@ -595,8 +595,7 @@
             </e>
             <e p="Systems" t="Include">
               <e p="CityBuilderSystem.cs" t="Include" />
-              <e p="ClickProcessingSystem.cs" t="Include" />
-              <e p="ClickReceiverSystem.cs" t="Include" />
+              <e p="ClickEventProducerSystem.cs" t="Include" />
               <e p="DroneBuilderSystem.cs" t="Include" />
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="DroneRotationSystem.cs" t="Include" />
@@ -604,6 +603,7 @@
               <e p="HubBuilderSystem.cs" t="Include" />
               <e p="JobGeneratorSystem.cs" t="Include" />
               <e p="PropellerRotationSystem.cs" t="Include" />
+              <e p="SelectionHandlerSystem.cs" t="Include" />
               <e p="SunOrbitSystem.cs" t="Include" />
               <e p="WaypointUpdateSystem.cs" t="Include" />
             </e>

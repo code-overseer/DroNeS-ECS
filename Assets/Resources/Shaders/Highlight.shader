@@ -7,8 +7,6 @@ Shader "Custom/Highlight"
     Properties
     {
         _Color("Color", Color) = (1,1,1,1)
-        _OutlineColor ("Outline Color", Color) = (0.8,0.8,1.0,1)
-		_Outline ("Outline width", Range (0.0, 0.05)) = .03
         _MainTex("Albedo", 2D) = "white" {}
 
         _Cutoff("Alpha Cutoff", Range(0.0, 1.0)) = 0.5
@@ -61,60 +59,13 @@ Shader "Custom/Highlight"
         Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
         LOD 300
         // ------------------------------------------------------------------
-        //  Outline 
-        Pass {
-			Name "OUTLINE"
-			Tags { "LightMode" = "Always" }
-			Cull Off
-			ZWrite Off
-			ZTest Always
-			ColorMask RGB // alpha not used
- 
-			// you can choose what kind of blending mode you want for the outline
-			Blend one zero // Normal
- 
-            CGPROGRAM
-            #pragma vertex highlight_vert
-            #pragma fragment highlight_frag
-            #include "UnityCG.cginc"
- 
-            struct appdata {
-                float4 vertex : POSITION;
-                float3 normal : NORMAL;
-            };
-             
-            struct v2f {
-                float4 pos : POSITION;
-                float4 color : COLOR;
-            };
-             
-            uniform float _Outline;
-            uniform float4 _OutlineColor;
-             
-            v2f highlight_vert(appdata v) {
-                // just make a copy of incoming vertex data but scaled according to normal direction
-                v2f o;
-				o.pos = UnityObjectToClipPos(v.vertex);
-                float3 n = mul((float3x3) UNITY_MATRIX_VP, mul((float3x3) UNITY_MATRIX_M, v.normal));
-                o.pos.xy += normalize(n.xy) * _Outline * o.pos.w;
-
-                return o;
-            }
-             
-            half4 highlight_frag(v2f i) :COLOR {
-                return _OutlineColor;
-            }
-            ENDCG
-        }
-        // ------------------------------------------------------------------
         //  Base forward pass (directional light, emission, lightmaps, ...)
         Pass
         {
             Name "FORWARD"
             Tags { "LightMode" = "ForwardBase" }
 
-            //Blend [_SrcBlend] [_DstBlend]
-            Blend one zero
+            Blend [_SrcBlend] [_DstBlend]
             ZWrite [_ZWrite]
 
             CGPROGRAM
@@ -269,25 +220,19 @@ Shader "Custom/Highlight"
             #include "UnityStandardMeta.cginc"
             ENDCG
         }
-    }
-
-    SubShader
-    {
-        Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
-        LOD 150
         
         // ------------------------------------------------------------------
-        //  Outline 
+        //  Highlight 
         Pass {
-			Name "OUTLINE"
+			Name "Highlight"
 			Tags { "LightMode" = "Always" }
-			Cull Off
+			Cull Back
 			ZWrite Off
 			ZTest Always
 			ColorMask RGB // alpha not used
  
 			// you can choose what kind of blending mode you want for the outline
-			Blend one zero // Normal
+			Blend SrcAlpha OneMinusSrcAlpha
  
             CGPROGRAM
             #pragma vertex highlight_vert
@@ -304,23 +249,25 @@ Shader "Custom/Highlight"
                 float4 color : COLOR;
             };
              
-            uniform float _Outline;
-            uniform float4 _OutlineColor;
+            uniform float4 _Color;
              
             v2f highlight_vert(appdata v) {
-                // just make a copy of incoming vertex data but scaled according to normal direction
                 v2f o;
 				o.pos = UnityObjectToClipPos(v.vertex);
-                float3 n = mul((float3x3) UNITY_MATRIX_VP, mul((float3x3) UNITY_MATRIX_M, v.normal));
-                o.pos.xy += normalize(n.xy) * _Outline * o.pos.w;
                 return o;
             }
              
             half4 highlight_frag(v2f i) :COLOR {
-                return _OutlineColor;
+                return _Color;
             }
             ENDCG
         }
+    }
+
+    SubShader
+    {
+        Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
+        LOD 150
 
         // ------------------------------------------------------------------
         //  Base forward pass (directional light, emission, lightmaps, ...)
@@ -437,9 +384,51 @@ Shader "Custom/Highlight"
             #include "UnityStandardMeta.cginc"
             ENDCG
         }
+        
+        // ------------------------------------------------------------------
+        //  Highlight 
+        Pass {
+			Name "Highlight"
+			Tags { "LightMode" = "Always" }
+			Cull Back
+			ZWrite Off
+			ZTest Always
+			ColorMask RGB // alpha not used
+ 
+			// you can choose what kind of blending mode you want for the outline
+			Blend SrcAlpha OneMinusSrcAlpha
+ 
+            CGPROGRAM
+            #pragma vertex highlight_vert
+            #pragma fragment highlight_frag
+            #include "UnityCG.cginc"
+ 
+            struct appdata {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+            };
+             
+            struct v2f {
+                float4 pos : POSITION;
+                float4 color : COLOR;
+            };
+             
+            uniform float4 _Color;
+             
+            v2f highlight_vert(appdata v) {
+                v2f o;
+				o.pos = UnityObjectToClipPos(v.vertex);
+                return o;
+            }
+             
+            half4 highlight_frag(v2f i) : COLOR {
+                return _Color;
+            }
+            ENDCG
+        }
     }
 
 
     FallBack "VertexLit"
-//    CustomEditor "StandardShaderGUI"
+    CustomEditor "StandardShaderGUI"
 }

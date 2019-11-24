@@ -1,5 +1,4 @@
 ﻿using DroNeS.Components;
-using DroNeS.SharedComponents;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -19,8 +18,9 @@ namespace DroNeS.Systems
         private EntityArchetype _drone;
         private BlobAssetReference<Collider> _droneCollider;
         private EntityArchetype _propeller;
-        private RenderMesh _droneMesh;
         private RenderMesh _propellerMesh;
+        public RenderMesh DroneMesh;
+        public RenderMesh DroneSelection;
         private static EntityManager Manager => World.Active.EntityManager;
         private int _droneUid;
 
@@ -49,11 +49,16 @@ namespace DroNeS.Systems
                 typeof(LocalToParent),
                 typeof(LocalToWorld)
             );
-            _droneMesh = new RenderMesh
+            DroneMesh = new RenderMesh
             {
                 mesh = Resources.Load("Meshes/Drone") as Mesh,
                 material = Resources.Load("Materials/RedDrone") as Material
             };
+            
+            DroneSelection = DroneMesh;
+            DroneSelection.material = Object.Instantiate(DroneSelection.material);
+            DroneSelection.material.shader = Shader.Find("Custom/Highlight");
+            
             _propellerMesh = new RenderMesh
             {
                 mesh = Resources.Load("Meshes/Propeller") as Mesh,
@@ -97,7 +102,7 @@ namespace DroNeS.Systems
                 buildCommands.SetComponent(drone, new DroneStatus {Value = Status.New} );
                 buildCommands.SetComponent(drone, new Waypoint(float3.zero, -1,0));
                 buildCommands.SetComponent(drone, new PhysicsCollider { Value = _droneCollider });
-                buildCommands.AddSharedComponent(drone, _droneMesh);
+                buildCommands.AddSharedComponent(drone, DroneMesh);
                 for (var j = 0; j < 4; ++j)
                 {
                     var prop = buildCommands.CreateEntity(_propeller);
@@ -111,6 +116,9 @@ namespace DroNeS.Systems
 
         protected override void OnUpdate()
         {
+            var c = DroneSelection.material.color;
+            c.a = math.sin(8 * Time.unscaledTime);
+            DroneSelection.material.color = c;
         }
     }
 }

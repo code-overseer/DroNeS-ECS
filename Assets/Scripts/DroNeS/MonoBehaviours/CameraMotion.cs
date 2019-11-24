@@ -65,11 +65,7 @@ namespace DroNeS.MonoBehaviours
 
         public void Rotate(float input)
         {
-            var t = transform;
-            var pos = t.position;
-            var forward = t.forward;
-            pos -= forward * pos.y / (forward.y > 0 ? forward.y : 0.01f);
-            transform.RotateAround(pos, Vector3.up, input);
+            transform.Rotate(0, input * 30, 0, Space.World);
         }
 
         #endregion
