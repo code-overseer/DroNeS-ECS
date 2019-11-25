@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using DroNeS.Systems.FixedUpdates;
 using Unity.Entities;
 using UnityEngine;
 
 namespace DroNeS.MonoBehaviours
 {
-    public class FixedUpdateGroup : ComponentSystemGroup {}
     public class FixedUpdateExecution : MonoBehaviour
     {
         // Start is called before the first frame update

@@ -545,6 +545,10 @@
               <e p="JobOrigin.cs" t="Include" />
               <e p="JobStartTime.cs" t="Include" />
               <e p="JobUID.cs" t="Include" />
+              <e p="Singletons" t="Include">
+                <e p="Clock.cs" t="Include" />
+                <e p="View.cs" t="Include" />
+              </e>
               <e p="Tags" t="Include">
                 <e p="BuildingTag.cs" t="Include" />
                 <e p="DroneTag.cs" t="Include" />
@@ -600,16 +604,22 @@
             </e>
             <e p="Systems" t="Include">
               <e p="CityBuilderSystem.cs" t="Include" />
-              <e p="ClickEventProducerSystem.cs" t="Include" />
-              <e p="DroneBuilderSystem.cs" t="Include" />
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="DroneRotationSystem.cs" t="Include" />
-              <e p="EventSystem.cs" t="Include" />
-              <e p="HubBuilderSystem.cs" t="Include" />
+              <e p="EventSystem" t="Include">
+                <e p="ClickEventProducerSystem.cs" t="Include" />
+                <e p="DroneBuilderSystem.cs" t="Include" />
+                <e p="EventSystem.cs" t="Include" />
+                <e p="HubBuilderSystem.cs" t="Include" />
+                <e p="SelectionHandlerSystem.cs" t="Include" />
+              </e>
+              <e p="FixedUpdates" t="Include">
+                <e p="FixedUpdateGroup.cs" t="Include" />
+                <e p="SunOrbitSystem.cs" t="Include" />
+              </e>
+              <e p="HighlightBlinkingSystem.cs" t="Include" />
               <e p="JobGeneratorSystem.cs" t="Include" />
               <e p="PropellerRotationSystem.cs" t="Include" />
-              <e p="SelectionHandlerSystem.cs" t="Include" />
-              <e p="SunOrbitSystem.cs" t="Include" />
               <e p="WaypointUpdateSystem.cs" t="Include" />
             </e>
           </e>
@@ -619,6 +629,7 @@
           </e>
           <e p="Utils" t="Include">
             <e p="Bool.cs" t="Include" />
+            <e p="Bootstrap.cs" t="Include" />
             <e p="NativeStreamExtension.cs" t="Include" />
             <e p="Ray.cs" t="Include" />
             <e p="Vector3Extension.cs" t="Include" />

@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
-using UnityEngine;
 
-namespace DroNeS.Components
+namespace DroNeS.Components.Tags
 {
     public struct TerrainTag : IComponentData
     {

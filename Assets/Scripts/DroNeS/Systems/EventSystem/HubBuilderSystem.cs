@@ -1,17 +1,19 @@
 ﻿using DroNeS.Components;
+using DroNeS.Systems.FixedUpdates;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Physics;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Rendering;
 using Unity.Transforms;
-using UnityEngine;
 using BoxCollider = Unity.Physics.BoxCollider;
+using Clock = DroNeS.Components.Singletons.Clock;
 using Random = Unity.Mathematics.Random;
 using Collider = Unity.Physics.Collider;
 
-namespace DroNeS.Systems
+namespace DroNeS.Systems.EventSystem
 {
+    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public class HubBuilderSystem : ComponentSystem
     {
         private EntityArchetype _hub;

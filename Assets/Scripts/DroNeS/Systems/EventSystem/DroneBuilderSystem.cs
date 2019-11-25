@@ -1,17 +1,16 @@
 ﻿using DroNeS.Components;
+using DroNeS.Components.Tags;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Rendering;
 using Unity.Transforms;
-using UnityEngine;
 using BoxCollider = Unity.Physics.BoxCollider;
 using Collider = Unity.Physics.Collider;
-using Material = UnityEngine.Material;
 using Random = UnityEngine.Random;
 
-namespace DroNeS.Systems
+namespace DroNeS.Systems.EventSystem
 {
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public class DroneBuilderSystem : ComponentSystem

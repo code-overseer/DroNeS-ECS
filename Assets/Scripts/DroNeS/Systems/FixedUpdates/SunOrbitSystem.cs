@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using DroNeS.MonoBehaviours;
+using DroNeS.Components.Singletons;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -8,16 +8,9 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
-using UnityEngine;
-using UnityEngine.Experimental.PlayerLoop;
-using Debug = UnityEngine.Debug;
 
-namespace DroNeS.Systems
+namespace DroNeS.Systems.FixedUpdates
 {
-    public struct Clock : IComponentData
-    {
-        public double Value;
-    }
     [UpdateInGroup(typeof(FixedUpdateGroup))]
     public class SunOrbitSystem : JobComponentSystem
     {
@@ -39,7 +32,7 @@ namespace DroNeS.Systems
         {
             base.OnCreate();
             SpeedFactor = 1;
-            var clockEntity = EntityManager.CreateEntity(typeof(Clock));
+            EntityManager.CreateEntity(typeof(Clock));
         }
 
         protected override void OnStartRunning()

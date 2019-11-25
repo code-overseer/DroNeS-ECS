@@ -7,7 +7,7 @@ using Unity.Jobs;
 using UnityEngine.Assertions;
 using Utils;
 
-namespace DroNeS.Systems
+namespace DroNeS.Systems.EventSystem
 {
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public class EventSystem : ComponentSystem

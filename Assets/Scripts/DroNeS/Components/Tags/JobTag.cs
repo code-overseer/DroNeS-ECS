@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-namespace DroNeS.Components
+namespace DroNeS.Components.Tags
 {
     public struct JobTag : IComponentData
     {

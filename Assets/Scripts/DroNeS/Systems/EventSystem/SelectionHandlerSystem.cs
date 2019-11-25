@@ -1,13 +1,12 @@
-﻿using DroNeS.Components;
+﻿using DroNeS.Components.Tags;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
 
 // ReSharper disable AccessToDisposedClosure
 
-namespace DroNeS.Systems
+namespace DroNeS.Systems.EventSystem
 {
     public class SelectionHandlerSystem : ComponentSystem
     {
@@ -17,12 +16,10 @@ namespace DroNeS.Systems
         private RenderMesh _droneMesh;
         private RenderMesh _hubHighlight;
         private RenderMesh _hubMesh;
-        private Color _highlight;
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            _highlight = Color.white;
             _droneMesh = EntityData.Drone.ToRenderMesh();
             _droneHighlight = EntityData.Drone.ToHighlightMesh();
             _hubHighlight = EntityData.Hub.ToHighlightMesh();
@@ -34,7 +31,6 @@ namespace DroNeS.Systems
 
         protected override void OnUpdate()
         {
-            UpdateHighlights();
             SelectAction(out var clicked, out var selected);
             DeselectAction(ref selected);
             clicked.Dispose();
@@ -66,12 +62,5 @@ namespace DroNeS.Systems
             EntityManager.SetSharedComponentData(selected[0], isDrone ? _droneMesh : _hubMesh);
         }
 
-        private void UpdateHighlights()
-        {
-            _highlight.a = math.sin(8 * Time.unscaledTime);
-            _hubHighlight.material.color = _highlight;
-            _droneHighlight.material.color = _highlight;
-        }
-        
     }
 }

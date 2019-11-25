@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using DroNeS.Components;
+using DroNeS.Components.Tags;
+using DroNeS.Systems.FixedUpdates;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -57,7 +59,7 @@ namespace DroNeS.Systems
 
                 if (math.lengthsq(pos.Value - point.waypoint) < 1e-3f)
                 {
-                    status = (point.index >= point.length - 1) ? Status.RequestingWaypoints : Status.Waiting;
+                    status = point.index >= point.length - 1 ? Status.RequestingWaypoints : Status.Waiting;
                     return;
                 }
                 status = Status.EnRoute;

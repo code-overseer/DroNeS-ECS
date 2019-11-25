@@ -1,4 +1,4 @@
-﻿using DroNeS.Components;
+﻿using DroNeS.Components.Tags;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -7,7 +7,7 @@ using Unity.Physics;
 using Unity.Physics.Systems;
 using UnityEngine;
 
-namespace DroNeS.Systems
+namespace DroNeS.Systems.EventSystem
 {
     public struct ClickEvent
     {
