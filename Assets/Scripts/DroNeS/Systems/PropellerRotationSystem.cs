@@ -1,5 +1,6 @@
 ﻿using DroNeS.Components;
 using DroNeS.SharedComponents;
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -35,6 +36,7 @@ namespace DroNeS.Systems
             return job.Schedule(_propellerQuery, inputDeps);
         }
 
+        [BurstCompile]
         private struct PropellerRotationJob : IJobChunk
         {
             public ArchetypeChunkComponentType<Rotation> Rotations;

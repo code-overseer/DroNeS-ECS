@@ -14,7 +14,11 @@ using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Systems
 {
-//    [UpdateInGroup(typeof(FixedUpdateGroup))]
+    public struct Clock : IComponentData
+    {
+        public double Value;
+    }
+    [UpdateInGroup(typeof(FixedUpdateGroup))]
     public class SunOrbitSystem : JobComponentSystem
     {
         private readonly Dictionary<Speed, float> _timeSpeed = new Dictionary<Speed, float>
@@ -30,19 +34,19 @@ namespace DroNeS.Systems
 
         private readonly Stopwatch _watch = new Stopwatch();
         public float SpeedFactor { get; private set; }
-        public double Clock { get; private set; }
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            Clock = 0;
             SpeedFactor = 1;
+            var clockEntity = EntityManager.CreateEntity(typeof(Clock));
         }
 
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
             _watch.Start();
+            SetSingleton(new Clock{ Value = 0});
         }
 
         protected override JobHandle OnUpdate(JobHandle input)
@@ -52,8 +56,7 @@ namespace DroNeS.Systems
                 Delta = _watch.ElapsedMilliseconds * 0.001f * SpeedFactor,
             };
             _watch.Restart();
-            Clock += job.Delta;
-            return job.Schedule(this, input);
+            return new UpdateClockJob{ Delta = job.Delta }.Schedule(this, job.Schedule(this, input));
         }
 
         [BurstCompile]
@@ -67,6 +70,16 @@ namespace DroNeS.Systems
                 var q = quaternion.AxisAngle(new float3(0, 0, 1), dTheta);
                 pos = new Translation {Value = math.rotate(q, pos.Value)};
                 rotation = new Rotation { Value = math.mul(q, rotation.Value)};
+            }
+        }
+        
+        [BurstCompile]
+        private struct UpdateClockJob : IJobForEach<Clock>
+        {
+            public float Delta;
+            public void Execute(ref Clock clock)
+            {
+                clock.Value += Delta;
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using DroNeS.Components;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -12,24 +13,23 @@ using Random = UnityEngine.Random;
 
 namespace DroNeS.Systems
 {
+    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public class DroneBuilderSystem : ComponentSystem
     {
-        private EndSimulationEntityCommandBufferSystem _barrier;
         private EntityArchetype _drone;
         private BlobAssetReference<Collider> _droneCollider;
         private EntityArchetype _propeller;
         private RenderMesh _propellerMesh;
-        public RenderMesh DroneMesh;
-        public RenderMesh DroneSelection;
+        private RenderMesh _droneMesh;
         private static EntityManager Manager => World.Active.EntityManager;
         private int _droneUid;
+        private int _buildQueue;
 
         private float3[] _propellerPositions;
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            _barrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             _droneUid = 0;
             _drone = Manager.CreateArchetype(
                 ComponentType.ReadOnly<DroneTag>(),
@@ -49,37 +49,11 @@ namespace DroNeS.Systems
                 typeof(LocalToParent),
                 typeof(LocalToWorld)
             );
-            DroneMesh = new RenderMesh
-            {
-                mesh = Resources.Load("Meshes/Drone") as Mesh,
-                material = Resources.Load("Materials/RedDrone") as Material
-            };
             
-            DroneSelection = DroneMesh;
-            DroneSelection.material = Object.Instantiate(DroneSelection.material);
-            DroneSelection.material.shader = Shader.Find("Custom/Highlight");
-            
-            _propellerMesh = new RenderMesh
-            {
-                mesh = Resources.Load("Meshes/Propeller") as Mesh,
-                material = Resources.Load("Materials/Propeller") as Material
-            };
-            
-            _propellerPositions = new[] 
-            {
-                new float3(0.59f, 0.082f, 0.756f),
-                new float3(-0.59f, 0.082f, 0.756f),
-                new float3(0.6f, 0.082f, -0.7f),
-                new float3(-0.59f, 0.082f, -0.7f)
-            };
-            var geometry = new BoxGeometry
-            {
-                Center = new float3(-0.001946479f, -0.0465135f, 0.03175002f),
-                BevelRadius = 0.015f,
-                Orientation = quaternion.identity,
-                Size = new float3(1.421171f, 0.288217f, 1.492288f)
-            };
-            _droneCollider = BoxCollider.Create(geometry,
+            _droneMesh = EntityData.Drone.ToRenderMesh();
+            _propellerMesh = EntityData.Drone.ToPropellerMesh();
+            _propellerPositions = EntityData.Drone.PropellerPositions;
+            _droneCollider = BoxCollider.Create(EntityData.Drone.BoxGeometry,
                 new CollisionFilter
                 {
                     BelongsTo = CollisionGroups.Drone,
@@ -91,34 +65,39 @@ namespace DroNeS.Systems
 
         public void AddDrone()
         {
-            var buildCommands = _barrier.CreateCommandBuffer();
-            for (var i = 0; i < 5; ++i)
-            {
-                var drone = buildCommands.CreateEntity(_drone);
-                float3 pos = Random.insideUnitSphere * 5;
-                buildCommands.SetComponent(drone, new Translation {Value = pos});
-                buildCommands.SetComponent(drone, new Rotation{ Value = quaternion.identity });
-                buildCommands.SetComponent(drone, new DroneUID {Value = ++_droneUid} );
-                buildCommands.SetComponent(drone, new DroneStatus {Value = Status.New} );
-                buildCommands.SetComponent(drone, new Waypoint(float3.zero, -1,0));
-                buildCommands.SetComponent(drone, new PhysicsCollider { Value = _droneCollider });
-                buildCommands.AddSharedComponent(drone, DroneMesh);
-                for (var j = 0; j < 4; ++j)
-                {
-                    var prop = buildCommands.CreateEntity(_propeller);
-                    buildCommands.SetComponent(prop, new Parent {Value = drone});
-                    buildCommands.SetComponent(prop, new Translation { Value = _propellerPositions[j]});
-                    buildCommands.SetComponent(prop, new Rotation{ Value = quaternion.identity });
-                    buildCommands.AddSharedComponent(prop, _propellerMesh);
-                }
-            }
+            _buildQueue += 5;
         }
 
         protected override void OnUpdate()
         {
-            var c = DroneSelection.material.color;
-            c.a = math.sin(8 * Time.unscaledTime);
-            DroneSelection.material.color = c;
+            if (_buildQueue < 1) return;
+            
+            var drones = new NativeArray<Entity>(_buildQueue, Allocator.TempJob);
+            var propellers = new NativeArray<Entity>(_buildQueue * 4, Allocator.TempJob);
+            _buildQueue = 0;
+            Manager.CreateEntity(_drone, drones);
+            Manager.CreateEntity(_propeller, propellers);
+            for (var i = 0; i < drones.Length; ++i)
+            {
+                Manager.SetComponentData(drones[i], new Translation {Value = Random.insideUnitSphere * 5});
+                Manager.SetComponentData(drones[i], new Rotation{ Value = quaternion.identity });
+                Manager.SetComponentData(drones[i], new DroneUID {Value = ++_droneUid} );
+                Manager.SetComponentData(drones[i], new DroneStatus {Value = Status.New} );
+                Manager.SetComponentData(drones[i], new Waypoint(float3.zero, -1,0));
+                Manager.SetComponentData(drones[i], new PhysicsCollider { Value = _droneCollider });
+                Manager.AddSharedComponentData(drones[i], _droneMesh);
+                for (var j = 0; j < 4; ++j)
+                {
+                    var k = j + 4 * i;
+                    Manager.SetComponentData(propellers[k], new Parent {Value = drones[i]});
+                    Manager.SetComponentData(propellers[k], new Translation { Value = _propellerPositions[j]});
+                    Manager.SetComponentData(propellers[k], new Rotation{ Value = quaternion.identity });
+                    Manager.AddSharedComponentData(propellers[k], _propellerMesh);
+                }
+            }
+            drones.Dispose();
+            propellers.Dispose();
+
         }
     }
 }

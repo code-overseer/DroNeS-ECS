@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9065b8721e90d4fc185156714ff2f638, type: 3}
+  m_Name: DroneData
+  m_EditorClassIdentifier: 
+  drone: {fileID: 2768856054854836019, guid: 28c14037a1a2545e4a738239bd1fad29, type: 3}
+  material: {fileID: 2100000, guid: 9e3a50a03b6b44e9a8eaeaa9fa2288d3, type: 2}
+  mesh: {fileID: 4300000, guid: 59be2b9608a5f4033b90616c8f397be0, type: 2}
+  propellerMaterial: {fileID: 2100000, guid: 29a8bf4f0f82a4f26bfb2be5fcd2851a, type: 2}
+  propellerMesh: {fileID: 4300000, guid: 8191975659ed848f7b4e56d360b43005, type: 2}

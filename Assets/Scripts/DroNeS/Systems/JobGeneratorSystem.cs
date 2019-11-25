@@ -27,7 +27,7 @@ namespace DroNeS.Systems
             var output = new JobGenerator
             {
                 JobCreation = _barrier.CreateCommandBuffer().ToConcurrent(),
-                CurrentTime = World.Active.GetOrCreateSystem<SunOrbitSystem>().Clock
+                CurrentTime = (float)GetSingleton<Clock>().Value
             }.Schedule(this, inputDeps);
             
             _barrier.AddJobHandleForProducer(output);
