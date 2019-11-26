@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DroNeS.Systems.EventSystem;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ namespace DroNeS.MonoBehaviours
     {
         // TODO make this cleaner
         private Button _button;
-        private Camera[] _cameras;
+        private CameraMovementSystem _camerasMovementSystem;
         private Button Change {
             get
             {
@@ -16,20 +17,11 @@ namespace DroNeS.MonoBehaviours
                 return _button;
             }
         }
-        
-        private IEnumerable<Camera> Cameras => _cameras ?? (_cameras = FindObjectsOfType<Camera>());
 
         private void Start()
         {
-            Change.onClick.AddListener(Swap);
-        }
-
-        private void Swap()
-        {
-            foreach (var cam in Cameras)
-            {
-                cam.enabled = !cam.enabled;
-            }
+            _camerasMovementSystem = World.Active.GetOrCreateSystem<CameraMovementSystem>();
+            Change.onClick.AddListener(_camerasMovementSystem.OnCameraSwap);
         }
     }
 }

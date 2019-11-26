@@ -1,10 +1,19 @@
-﻿using Unity.Mathematics;
+﻿using DroNeS.Components.Singletons;
+using DroNeS.Systems.EventSystem;
+using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace DroNeS.Components
 {
     public struct PlayerInput
     {
+        private static CameraMovementSystem _cameraMovementSystem;
+
+        private static CameraMovementSystem CameraMovementSystem =>
+            _cameraMovementSystem ??
+            (_cameraMovementSystem = World.Active.GetOrCreateSystem<CameraMovementSystem>());
+
         public static PlayerInput Get()
         {
             var output = new PlayerInput{ _value = float3x3.zero };
@@ -15,8 +24,7 @@ namespace DroNeS.Components
             output._value.c1.y = Input.GetAxis("Mouse Y");
             output._value.c1.z = Input.GetAxis("Mouse ScrollWheel");
             output._value.c2.x = Input.GetMouseButton(2) ? 1 : 0;
-            var main = Camera.main;
-            output._value.c2.y = main != null && main.orthographic ? 1 : 0;
+            output._value.c2.y = CameraMovementSystem.GetSingleton<View>().CameraType == CameraTypeValue.Main ? 1 : 0;
             
             return output;
         }

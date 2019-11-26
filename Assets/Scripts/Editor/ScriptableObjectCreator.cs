@@ -25,5 +25,15 @@ namespace Editor
 
             ProjectWindowUtil.CreateAsset (asset, "Assets/Resources/EntityData/HubData.asset");
         } 
+        
+        [MenuItem("Assets/Create/BuildingColliderData")]
+        public static void CreateBuildingData()
+        {
+            var asset = ScriptableObject.CreateInstance<BuildingColliderEntity> ();
+
+            asset.buildingCollider = Resources.Load("Prefabs/Colliders") as GameObject;
+
+            ProjectWindowUtil.CreateAsset (asset, "Assets/Resources/EntityData/BuildingColliderData.asset");
+        } 
     }
 }

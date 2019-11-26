@@ -20,7 +20,6 @@ namespace DroNeS.Systems.EventSystem
         private EntityArchetype _propeller;
         private RenderMesh _propellerMesh;
         private RenderMesh _droneMesh;
-        private static EntityManager Manager => World.Active.EntityManager;
         private int _droneUid;
         private int _buildQueue;
 
@@ -30,7 +29,7 @@ namespace DroNeS.Systems.EventSystem
         {
             base.OnCreate();
             _droneUid = 0;
-            _drone = Manager.CreateArchetype(
+            _drone = EntityManager.CreateArchetype(
                 ComponentType.ReadOnly<DroneTag>(),
                 ComponentType.ReadOnly<DroneUID>(),
                 typeof(Translation),
@@ -40,7 +39,7 @@ namespace DroNeS.Systems.EventSystem
                 typeof(LocalToWorld),
                 typeof(PhysicsCollider)
             );
-            _propeller = Manager.CreateArchetype(
+            _propeller = EntityManager.CreateArchetype(
                 ComponentType.ReadOnly<Parent>(),
                 ComponentType.ReadOnly<PropellerTag>(),
                 typeof(Translation),
@@ -74,24 +73,24 @@ namespace DroNeS.Systems.EventSystem
             var drones = new NativeArray<Entity>(_buildQueue, Allocator.TempJob);
             var propellers = new NativeArray<Entity>(_buildQueue * 4, Allocator.TempJob);
             _buildQueue = 0;
-            Manager.CreateEntity(_drone, drones);
-            Manager.CreateEntity(_propeller, propellers);
+            EntityManager.CreateEntity(_drone, drones);
+            EntityManager.CreateEntity(_propeller, propellers);
             for (var i = 0; i < drones.Length; ++i)
             {
-                Manager.SetComponentData(drones[i], new Translation {Value = Random.insideUnitSphere * 5});
-                Manager.SetComponentData(drones[i], new Rotation{ Value = quaternion.identity });
-                Manager.SetComponentData(drones[i], new DroneUID {Value = ++_droneUid} );
-                Manager.SetComponentData(drones[i], new DroneStatus {Value = Status.New} );
-                Manager.SetComponentData(drones[i], new Waypoint(float3.zero, -1,0));
-                Manager.SetComponentData(drones[i], new PhysicsCollider { Value = _droneCollider });
-                Manager.AddSharedComponentData(drones[i], _droneMesh);
+                EntityManager.SetComponentData(drones[i], new Translation {Value = Random.insideUnitSphere * 5});
+                EntityManager.SetComponentData(drones[i], new Rotation{ Value = quaternion.identity });
+                EntityManager.SetComponentData(drones[i], new DroneUID {Value = ++_droneUid} );
+                EntityManager.SetComponentData(drones[i], new DroneStatus {Value = Status.New} );
+                EntityManager.SetComponentData(drones[i], new Waypoint(float3.zero, -1,0));
+                EntityManager.SetComponentData(drones[i], new PhysicsCollider { Value = _droneCollider });
+                EntityManager.AddSharedComponentData(drones[i], _droneMesh);
                 for (var j = 0; j < 4; ++j)
                 {
                     var k = j + 4 * i;
-                    Manager.SetComponentData(propellers[k], new Parent {Value = drones[i]});
-                    Manager.SetComponentData(propellers[k], new Translation { Value = _propellerPositions[j]});
-                    Manager.SetComponentData(propellers[k], new Rotation{ Value = quaternion.identity });
-                    Manager.AddSharedComponentData(propellers[k], _propellerMesh);
+                    EntityManager.SetComponentData(propellers[k], new Parent {Value = drones[i]});
+                    EntityManager.SetComponentData(propellers[k], new Translation { Value = _propellerPositions[j]});
+                    EntityManager.SetComponentData(propellers[k], new Rotation{ Value = quaternion.identity });
+                    EntityManager.AddSharedComponentData(propellers[k], _propellerMesh);
                 }
             }
             drones.Dispose();

@@ -532,6 +532,7 @@
             <e p="CollisionGroups.cs" t="Include" />
             <e p="Components" t="Include">
               <e p="Clicked.cs" t="Include" />
+              <e p="CostFunction.cs" t="Include" />
               <e p="DestructionTag.cs" t="Include" />
               <e p="DroneStatus.cs" t="Include" />
               <e p="DroneUID.cs" t="Include" />
@@ -548,6 +549,7 @@
               <e p="PlayerInput.cs" t="Include" />
               <e p="Singletons" t="Include">
                 <e p="Clock.cs" t="Include" />
+                <e p="SimulationType.cs" t="Include" />
                 <e p="View.cs" t="Include" />
               </e>
               <e p="Tags" t="Include">
@@ -589,17 +591,14 @@
             </e>
             <e p="MonoBehaviours" t="Include">
               <e p="CameraChanger.cs" t="Include" />
-              <e p="CameraMotion.cs" t="Include" />
               <e p="CameraTypeClass.cs" t="Include" />
               <e p="ClipSpaceTest.cs" t="Include" />
               <e p="DroneMaker.cs" t="Include" />
-              <e p="EagleEyeMotion.cs" t="Include" />
               <e p="FixedUpdateExecution.cs" t="Include" />
-              <e p="ICameraMotion.cs" t="Include" />
-              <e p="Propeller.cs" t="Include" />
             </e>
             <e p="Queue.cs" t="Include" />
             <e p="ScriptableObjects" t="Include">
+              <e p="BuildingColliderEntity.cs" t="Include" />
               <e p="DroneEntity.cs" t="Include" />
               <e p="HubEntity.cs" t="Include" />
             </e>
@@ -608,6 +607,7 @@
               <e p="ParentHub.cs" t="Include" />
             </e>
             <e p="Systems" t="Include">
+              <e p="BuildingColliderInitializer.cs" t="Include" />
               <e p="CityBuilderSystem.cs" t="Include" />
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="DroneRotationSystem.cs" t="Include" />

@@ -28,4 +28,10 @@
         Satellite,
         Main
     }
+    
+    public enum SimulationTypeValue
+    {
+        Emergency,
+        Delivery
+    }
 }

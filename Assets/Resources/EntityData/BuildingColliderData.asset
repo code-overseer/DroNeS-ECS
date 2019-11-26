@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a99173a68a3db4651b717f549fddd457, type: 3}
+  m_Name: BuildingColliderData
+  m_EditorClassIdentifier: 
+  buildingCollider: {fileID: 3251204408825988059, guid: 340125dff449f4333966631e68f120ce,
+    type: 3}

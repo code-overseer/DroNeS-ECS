@@ -56,7 +56,7 @@ namespace DroNeS.Systems.FixedUpdates
         private struct SunMovementJob : IJobForEach<Translation, Rotation, LightComponent>
         {
             public float Delta;
-            private const float RadPerSec = 2 * math.PI / (24 * 3600); 
+            private const float RadPerSec = 2 * math.PI * 0.00001157407407f; 
             public void Execute(ref Translation pos, ref Rotation rotation, [ReadOnly] ref LightComponent light)
             {
                 var dTheta = Delta * RadPerSec;

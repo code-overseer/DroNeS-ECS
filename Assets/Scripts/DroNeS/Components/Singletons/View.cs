@@ -1,18 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Unity.Entities;
 using UnityEngine;
 
-public class View : MonoBehaviour
+namespace DroNeS.Components.Singletons
 {
-    // Start is called before the first frame update
-    void Start()
+    public struct View : IComponentData
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public CameraTypeValue CameraType;
     }
 }

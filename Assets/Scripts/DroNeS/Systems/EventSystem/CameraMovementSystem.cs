@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using DroNeS.Components;
+using DroNeS.Components.Singletons;
 using DroNeS.Components.Tags;
 using DroNeS.MonoBehaviours;
 using Unity.Burst;
@@ -34,6 +35,7 @@ namespace DroNeS.Systems.EventSystem
                 else
                 {
                     EntityManager.AddComponentData(entity, new MainCameraTag());
+                    World.Active.GetOrCreateSystem<CameraMovementSystem>().Main = camera;
                 }
                 
                 EntityManager.RemoveComponent<CameraTypeClass>(entity);
@@ -50,6 +52,7 @@ namespace DroNeS.Systems.EventSystem
         private EntityQuery _satelliteCamera;
         private Stopwatch _watch;
         public Camera Satellite;
+        public Camera Main;
         private NativeArray<float> _orthographicSize;
         protected override void OnCreate()
         {
@@ -60,6 +63,17 @@ namespace DroNeS.Systems.EventSystem
                 ComponentType.ReadOnly<SatelliteCameraTag>());
             _watch = new Stopwatch();
             _orthographicSize = new NativeArray<float>(1, Allocator.Persistent);
+            EntityManager.CreateEntity(typeof(View));
+            SetSingleton(new View{CameraType = CameraTypeValue.Main});
+        }
+
+        public void OnCameraSwap()
+        {
+            var v = GetSingleton<View>();
+            SetSingleton(new View
+                {CameraType = v.CameraType == CameraTypeValue.Main ? CameraTypeValue.Satellite : CameraTypeValue.Main});
+            Main.enabled = !Main.enabled;
+            Satellite.enabled = !Satellite.enabled;
         }
 
         protected override void OnStartRunning()
