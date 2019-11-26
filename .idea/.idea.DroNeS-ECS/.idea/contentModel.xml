@@ -545,6 +545,7 @@
               <e p="JobOrigin.cs" t="Include" />
               <e p="JobStartTime.cs" t="Include" />
               <e p="JobUID.cs" t="Include" />
+              <e p="PlayerInput.cs" t="Include" />
               <e p="Singletons" t="Include">
                 <e p="Clock.cs" t="Include" />
                 <e p="View.cs" t="Include" />
@@ -553,7 +554,9 @@
                 <e p="BuildingTag.cs" t="Include" />
                 <e p="DroneTag.cs" t="Include" />
                 <e p="JobTag.cs" t="Include" />
+                <e p="MainCameraTag.cs" t="Include" />
                 <e p="PropellerTag.cs" t="Include" />
+                <e p="SatelliteCameraTag.cs" t="Include" />
                 <e p="SelectionTag.cs" t="Include" />
                 <e p="TerrainTag.cs" t="Include" />
               </e>
@@ -585,7 +588,9 @@
               </e>
             </e>
             <e p="MonoBehaviours" t="Include">
+              <e p="CameraChanger.cs" t="Include" />
               <e p="CameraMotion.cs" t="Include" />
+              <e p="CameraTypeClass.cs" t="Include" />
               <e p="ClipSpaceTest.cs" t="Include" />
               <e p="DroneMaker.cs" t="Include" />
               <e p="EagleEyeMotion.cs" t="Include" />
@@ -607,6 +612,7 @@
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="DroneRotationSystem.cs" t="Include" />
               <e p="EventSystem" t="Include">
+                <e p="CameraMovementSystem.cs" t="Include" />
                 <e p="ClickEventProducerSystem.cs" t="Include" />
                 <e p="DroneBuilderSystem.cs" t="Include" />
                 <e p="EventSystem.cs" t="Include" />

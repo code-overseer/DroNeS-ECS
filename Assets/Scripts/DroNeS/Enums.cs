@@ -22,4 +22,10 @@
         Ultra,
         Wtf
     }
+
+    public enum CameraTypeValue
+    {
+        Satellite,
+        Main
+    }
 }

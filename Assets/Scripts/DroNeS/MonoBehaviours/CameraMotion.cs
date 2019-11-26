@@ -8,14 +8,14 @@ namespace DroNeS.MonoBehaviours
         {
             MoveLongitudinal(Input.GetAxis("Vertical") * SpeedScale);
             MoveLateral(Input.GetAxis("Horizontal") * SpeedScale);
-            Rotate(Input.GetAxis("Rotate") * 0.05f);
+            Rotate(Input.GetAxis("Rotate") * 30);
 
             Zoom(Input.GetAxis("Mouse ScrollWheel") * SpeedScale);
             //FPS mouse hold click
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(2))
             {
-                Pitch(Input.GetAxis("Mouse Y"));
-                Yaw(Input.GetAxis("Mouse X"));
+                Pitch(Input.GetAxis("Mouse Y") * 30);
+                Yaw(Input.GetAxis("Mouse X") * 30);
             }
             // Bounds
             ClampVertical();
@@ -55,17 +55,17 @@ namespace DroNeS.MonoBehaviours
 
         public void Pitch(float input)
         {
-            transform.Rotate(-input * 30, 0, 0);
+            transform.Rotate(-input, 0, 0);
         }
 
         public void Yaw(float input)
         {
-            transform.Rotate(0, input * 30, 0, Space.World);
+            transform.Rotate(0, input, 0, Space.World);
         }
 
         public void Rotate(float input)
         {
-            transform.Rotate(0, input * 30, 0, Space.World);
+            transform.Rotate(0, input, 0, Space.World);
         }
 
         #endregion
