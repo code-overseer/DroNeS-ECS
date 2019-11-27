@@ -557,6 +557,7 @@
                 <e p="DroneTag.cs" t="Include" />
                 <e p="JobTag.cs" t="Include" />
                 <e p="MainCameraTag.cs" t="Include" />
+                <e p="PreSelectionTag.cs" t="Include" />
                 <e p="PropellerTag.cs" t="Include" />
                 <e p="SatelliteCameraTag.cs" t="Include" />
                 <e p="SelectionTag.cs" t="Include" />
@@ -613,17 +614,18 @@
               <e p="DroneRotationSystem.cs" t="Include" />
               <e p="EventSystem" t="Include">
                 <e p="CameraMovementSystem.cs" t="Include" />
-                <e p="ClickEventProducerSystem.cs" t="Include" />
                 <e p="DroneBuilderSystem.cs" t="Include" />
-                <e p="EventSystem.cs" t="Include" />
                 <e p="HubBuilderSystem.cs" t="Include" />
-                <e p="SelectionHandlerSystem.cs" t="Include" />
+                <e p="InterStreamingSystem.cs" t="Include" />
+                <e p="OnClickSystem.cs" t="Include" />
+                <e p="SelectionHighlightSystem.cs" t="Include" />
               </e>
               <e p="FixedUpdates" t="Include">
                 <e p="FixedUpdateGroup.cs" t="Include" />
                 <e p="SunOrbitSystem.cs" t="Include" />
               </e>
               <e p="HighlightBlinkingSystem.cs" t="Include" />
+              <e p="JobEntitySystem.cs" t="Include" />
               <e p="JobGeneratorSystem.cs" t="Include" />
               <e p="PropellerRotationSystem.cs" t="Include" />
               <e p="WaypointUpdateSystem.cs" t="Include" />
@@ -637,6 +639,7 @@
             <e p="Bool.cs" t="Include" />
             <e p="Bootstrap.cs" t="Include" />
             <e p="NativeStreamExtension.cs" t="Include" />
+            <e p="RandomExtension.cs" t="Include" />
             <e p="Ray.cs" t="Include" />
             <e p="Vector3Extension.cs" t="Include" />
           </e>

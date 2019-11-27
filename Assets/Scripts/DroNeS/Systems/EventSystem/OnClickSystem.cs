@@ -9,25 +9,17 @@ using UnityEngine;
 
 namespace DroNeS.Systems.EventSystem
 {
-    public struct ClickEvent
-    {
-        public Entity Entity;
-    }
     [UpdateAfter(typeof(BuildPhysicsWorld)), UpdateBefore(typeof(EndFramePhysicsSystem))]
-    public class ClickEventProducerSystem : JobComponentSystem
+    public class OnClickSystem : JobComponentSystem
     {
         private BuildPhysicsWorld _buildPhysicsWorldSystem;
         private EndFramePhysicsSystem _endFramePhysicsSystem;
-        private EndSimulationEntityCommandBufferSystem _barrier;
-        private EventSystem _eventSystem;
-        private Camera _camera;
+        private OnClickEntityCommandBufferSystem _barrier;
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            _eventSystem = World.Active.GetOrCreateSystem<EventSystem>();
-            _eventSystem.NewEvent<ClickEvent>(1);
-            _barrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            _barrier = World.Active.GetOrCreateSystem<OnClickEntityCommandBufferSystem>();
         }
 
         protected override void OnStartRunning()
@@ -35,15 +27,14 @@ namespace DroNeS.Systems.EventSystem
             base.OnStartRunning();
             _buildPhysicsWorldSystem = World.Active.GetExistingSystem<BuildPhysicsWorld>();
             _endFramePhysicsSystem = World.Active.GetOrCreateSystem<EndFramePhysicsSystem>();
-            _camera = Camera.main;
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            if (!Input.GetMouseButtonDown(0)) return inputDeps;
+            if (!Input.GetMouseButtonDown(0) || Camera.main == null) return inputDeps;
             
             inputDeps = JobHandle.CombineDependencies(inputDeps, _buildPhysicsWorldSystem.FinalJobHandle);
-            var screenRay = _camera.ScreenPointToRay(Input.mousePosition);
+            var screenRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             var job = new RayCastJob
             {
@@ -59,19 +50,19 @@ namespace DroNeS.Systems.EventSystem
                     }
                 },
                 World = _buildPhysicsWorldSystem.PhysicsWorld,
-                Clicked = _eventSystem.GetWriter<ClickEvent>()
+                Clicked = new NativeArray<Entity>(1, Allocator.TempJob)
             };
             var handle = job.Schedule(inputDeps);
             _endFramePhysicsSystem.HandlesToWaitFor.Add(handle);
-            _eventSystem.AddProducerJobHandle<ClickEvent>(handle);
-            var reader = _eventSystem.GetReader<ClickEvent>(ref handle);
-            handle = new SelectJob
+            
+            handle = new PreSelectJob
             {
-                Clicked = reader,
+                Clicked = job.Clicked,
                 Buffer = _barrier.CreateCommandBuffer(),
             }.Schedule(handle);
-            _eventSystem.AddConsumerJobHandle<ClickEvent>(handle);
             
+            _barrier.AddJobHandleForProducer(handle);
+
             return handle;
 
         }
@@ -81,27 +72,27 @@ namespace DroNeS.Systems.EventSystem
         {
             [ReadOnly] public PhysicsWorld World;
             [ReadOnly] public RaycastInput Input;
-            [WriteOnly] public NativeStream.Writer Clicked;
+            [WriteOnly] public NativeArray<Entity> Clicked;
 
             public void Execute()
             {
-                if (!World.CollisionWorld.CastRay(Input, out var hit)) return;
-                Clicked.BeginForEachIndex(0);
-                Clicked.Write(new ClickEvent {Entity = World.Bodies[hit.RigidBodyIndex].Entity});
-                Clicked.EndForEachIndex();
+                if (!World.CollisionWorld.CastRay(Input, out var hit))
+                {
+                    Clicked[0] = Entity.Null;
+                    return;
+                }
+                Clicked[0] = World.Bodies[hit.RigidBodyIndex].Entity;
             }
         }
 
-        private struct SelectJob : IJob
+        private struct PreSelectJob : IJob
         {
-            [ReadOnly] public NativeStream.Reader Clicked;
+            [DeallocateOnJobCompletion, ReadOnly] public NativeArray<Entity> Clicked;
             [WriteOnly] public EntityCommandBuffer Buffer;
             public void Execute()
             {
-                if (Clicked.ComputeItemCount() < 1) return;
-                Clicked.BeginForEachIndex(0);
-                Buffer.AddComponent(Clicked.Read<ClickEvent>().Entity, new SelectionTag());
-                Clicked.EndForEachIndex();
+                if (Clicked[0] == Entity.Null) return;
+                Buffer.AddComponent(Clicked[0], new PreSelectionTag());
             }
         }
     }

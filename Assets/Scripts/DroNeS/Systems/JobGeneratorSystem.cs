@@ -1,83 +1,167 @@
 ﻿using DroNeS.Components;
-using DroNeS.Components.Singletons;
-using DroNeS.Components.Tags;
 using DroNeS.SharedComponents;
+using DroNeS.Systems.EventSystem;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Physics;
+using Unity.Physics.Systems;
+using Unity.Transforms;
+using Utils;
 using Clock = DroNeS.Components.Singletons.Clock;
 using Random = Unity.Mathematics.Random;
+using SimulationType = DroNeS.Components.Singletons.SimulationType;
 
 namespace DroNeS.Systems
 {
+    public struct JobEntityProxy
+    {
+        public JobUID id;
+        public JobCreationTime created;
+        public JobOrigin origin;
+        public JobDestination destination;
+        public CostFunction costFunction;
+        public ParentHub hub;
+    }
+    [UpdateAfter(typeof(BuildPhysicsWorld)), UpdateBefore(typeof(EndFramePhysicsSystem))]
     public class JobGeneratorSystem : JobComponentSystem
     {
-        private static EndSimulationEntityCommandBufferSystem _barrier;
+        private InterStreamingSystem _eventSystem;
+        private BuildPhysicsWorld _buildPhysicsWorld;
+        private EndFramePhysicsSystem _endFramePhysicsSystem;
+        private EntityQuery _query;
+        private Random _rand;
         protected override void OnCreate()
         {
             base.OnCreate();
-            JobGenerator.Job = World.Active.EntityManager.CreateArchetype(
-                ComponentType.ReadOnly<JobTag>(),
-                ComponentType.ReadOnly<JobUID>(),
-                ComponentType.ReadOnly<JobOrigin>(),
-                ComponentType.ReadOnly<JobDestination>(),
-                ComponentType.ReadOnly<JobCreationTime>(),
-                ComponentType.ReadOnly<CostFunction>());
-            _barrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            _eventSystem = World.GetOrCreateSystem<InterStreamingSystem>();
+            _query = GetEntityQuery(new EntityQueryDesc
+                {
+                    All = new[]
+                    {
+                        ComponentType.ReadOnly<HubUID>(),
+                        typeof(Translation),
+                        typeof(JobGenerationCounter),
+                        typeof(JobGenerationRate),
+                        typeof(JobGenerationTimeMark),
+                    }
+                }
+            );
             EntityManager.CreateEntity(typeof(SimulationType));
             SetSingleton(new SimulationType{Value = SimulationTypeValue.Delivery});
+            _eventSystem.NewEvent<JobEntityProxy>(4);
+            _rand = new Random(1u);
+        }
+
+        protected override void OnStartRunning()
+        {
+            base.OnStartRunning();
+            _buildPhysicsWorld = World.GetOrCreateSystem<BuildPhysicsWorld>();
+            _endFramePhysicsSystem = World.GetOrCreateSystem<EndFramePhysicsSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var output = new JobGenerator
+            inputDeps = JobHandle.CombineDependencies(inputDeps, _buildPhysicsWorld.FinalJobHandle);
+            var job = new JobGeneratorChunk
             {
-                JobCreation = _barrier.CreateCommandBuffer().ToConcurrent(),
-                CurrentTime = (float)GetSingleton<Clock>().Value,
-                SimulationType = GetSingleton<SimulationType>().Value
-            }.Schedule(this, inputDeps);
-            
-            _barrier.AddJobHandleForProducer(output);
-            
-            return output;
+                CreatedJobs = _eventSystem.GetWriter<JobEntityProxy>(ref inputDeps, _query.CalculateChunkCount()),
+                World = _buildPhysicsWorld.PhysicsWorld.CollisionWorld,
+                CurrentTime = GetSingleton<Clock>().Value,
+                SimulationType = GetSingleton<SimulationType>().Value,
+                HubUids = GetArchetypeChunkComponentType<HubUID>(true),
+                Positions = GetArchetypeChunkComponentType<Translation>(true),
+                Rates = GetArchetypeChunkComponentType<JobGenerationRate>(true),
+                Counters = GetArchetypeChunkComponentType<JobGenerationCounter>(),
+                Marks = GetArchetypeChunkComponentType<JobGenerationTimeMark>(),
+                Rand = _rand
+            };
+            var handle = job.Schedule(_query, inputDeps);
+            _eventSystem.AddProducerJobHandle<JobEntityProxy>(handle);
+            _endFramePhysicsSystem.HandlesToWaitFor.Add(handle);
+
+            return handle;
         }
         
-        private struct JobGenerator : IJobForEach<HubUID, JobGenerationCounter, JobGenerationRate, JobGenerationTimeMark>
+        [BurstCompile]
+        private struct JobGeneratorChunk : IJobChunk
         {
-            [WriteOnly] public EntityCommandBuffer.Concurrent JobCreation;
+            [WriteOnly] public NativeStream.Writer CreatedJobs;
+            [ReadOnly] public CollisionWorld World;
+            [ReadOnly] public ArchetypeChunkComponentType<HubUID> HubUids;
+            [ReadOnly] public ArchetypeChunkComponentType<JobGenerationRate> Rates;
+            [ReadOnly] public ArchetypeChunkComponentType<Translation> Positions;
+            public ArchetypeChunkComponentType<JobGenerationCounter> Counters;
+            public ArchetypeChunkComponentType<JobGenerationTimeMark> Marks;
             public double CurrentTime;
-            public static EntityArchetype Job;
-            private static Random _rand = new Random(1u);
             public SimulationTypeValue SimulationType;
-            public void Execute(ref HubUID hub, ref JobGenerationCounter counter, ref JobGenerationRate rate, ref JobGenerationTimeMark mark)
+            public Random Rand;
+
+            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
             {
-                if (CurrentTime - mark.Value.x < mark.Value.y) return;
+                var hubUids = chunk.GetNativeArray(HubUids);
+                var counters = chunk.GetNativeArray(Counters);
+                var rates = chunk.GetNativeArray(Rates);
+                var marks = chunk.GetNativeArray(Marks);
+                var pos = chunk.GetNativeArray(Positions);
 
-                var job = JobCreation.CreateEntity(hub.Value, Job);
-                counter.Value += 1;
-                JobCreation.SetComponent(hub.Value, job, new JobUID {Value = counter.Value});
-                JobCreation.SetComponent(hub.Value, job, new JobCreationTime{Value = CurrentTime});
-                
-                var pos = new float3(_rand.NextFloat(-200, 200), _rand.NextFloat(-200, 200), _rand.NextFloat(-200, 200));
-                JobCreation.SetComponent(hub.Value, job, new JobOrigin{Value = pos});
-                
-                pos = new float3(_rand.NextFloat(-200, 200), _rand.NextFloat(-200, 200), _rand.NextFloat(-200, 200));
-                JobCreation.SetComponent(hub.Value, job, new JobDestination{Value = pos});
+                for (var i = 0; i < chunk.Count; ++i)
+                {
+                    if (CurrentTime - marks[i].Value.x < marks[i].Value.y) continue;
 
-                JobCreation.SetComponent(hub.Value, job,
-                    SimulationType == SimulationTypeValue.Delivery
-                        ? CostFunction.GetDelivery(Reward())
-                        : CostFunction.GetEmergency());
+                    var val = counters[i].Value + 1;
+                    counters[i] = new JobGenerationCounter{Value = val};
+                    var mark = marks[i].Value;
+                    mark.x = CurrentTime;
+                    mark.y = -math.log(1 - Rand.NextFloat(0, 1)) / rates[i].Value;
+                    marks[i] = new JobGenerationTimeMark{Value = mark};
+                    var origin = pos[i].Value;
+                    var destination = GetDestination();
+                    var dist = math.lengthsq(destination - new float3(origin.x, 0, origin.z));
+                    var input = new RaycastInput
+                    {
+                        Start = new float3(destination.x, 2000, destination.z),
+                        End = destination,
+                        Filter = new CollisionFilter
+                        {
+                            BelongsTo = CollisionGroups.Cast,
+                            CollidesWith = CollisionGroups.Buildings
+                        }
+                    };
+                    while (dist < 10000 || World.CastRay(input, out _))
+                    {
+                        destination = GetDestination();
+                        dist = math.lengthsq(destination - new float3(origin.x, 0, origin.z));
+                        input.Start = new float3(destination.x, 2000, destination.z);
+                        input.End = destination;
+                    }
+                    CreatedJobs.BeginForEachIndex(chunkIndex);
+                    CreatedJobs.Write(new JobEntityProxy
+                    {
+                        id = new JobUID {Value = counters[i].Value},
+                        created = new JobCreationTime{Value = CurrentTime},
+                        origin = new JobOrigin{Value = pos[i].Value},
+                        destination = new JobDestination{Value = destination},
+                        costFunction = SimulationType == SimulationTypeValue.Delivery
+                            ? CostFunction.GetDelivery(Reward())
+                            : CostFunction.GetEmergency(Rand),
+                        hub = new ParentHub{Value = hubUids[i].Value }
+                    });
+                    CreatedJobs.EndForEachIndex();
+                }
 
-                JobCreation.AddSharedComponent(hub.Value, job, new ParentHub{ Value = hub.Value });
-                mark.Value.x = CurrentTime;
-                mark.Value.y = -math.log(1 - _rand.NextFloat(0, 1)) / rate.Value;
             }
-            
-            private static float Reward()
+
+            private float3 GetDestination()
             {
-                var weight = _rand.NextFloat(0.1f, 2.5f);
+                var circle = Rand.InsideUnitCircle() * (SimulationType == SimulationTypeValue.Delivery ? 7000 : 3500);
+                return new float3(circle.x, 0, circle.y);
+            }
+            private float Reward()
+            {
+                var weight = Rand.NextFloat(0.1f, 2.5f);
                 if (weight <= 0.25) return 2.02f;
                 if (weight <= 0.5) return 2.14f;
                 if (weight <= 1) return 2.30f;
@@ -86,8 +170,8 @@ namespace DroNeS.Systems
                 if (weight <= 4) return 3.83f;
 
                 var oz = weight * 35.274f;
-                if (oz <= 10) return _rand.NextFloat(0,1) < 0.5f ? 2.41f : 3.19f;
-                if (oz <= 16) return _rand.NextFloat(0,1) < 0.5f ? 2.49f : 3.28f;
+                if (oz <= 10) return Rand.NextFloat(0,1) < 0.5f ? 2.41f : 3.19f;
+                if (oz <= 16) return Rand.NextFloat(0,1) < 0.5f ? 2.49f : 3.28f;
 
                 var lbs = weight * 2.204625f;
                 if (lbs <= 2) return 4.76f;

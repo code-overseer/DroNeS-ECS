@@ -5,7 +5,6 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Rendering;
 using Unity.Transforms;
-using UnityEngine;
 using BoxCollider = Unity.Physics.BoxCollider;
 using Collider = Unity.Physics.Collider;
 

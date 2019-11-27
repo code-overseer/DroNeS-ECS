@@ -74,7 +74,7 @@ namespace DroNeS.Systems
                 AllQueues = Queue.Waypoints.AsParallelWriter(),
                 DroneId = GetArchetypeChunkComponentType<DroneUID>(),
                 Statuses = GetArchetypeChunkComponentType<DroneStatus>(),
-                random = new Random(s)
+                Rand = new Random(s)
             };
             
             var handle = job0.Schedule(_droneQuery, inputDeps);
@@ -122,7 +122,7 @@ namespace DroNeS.Systems
                     var idx = Completed.Dequeue();
                     if (AllQueues.TryGetFirstValue(idx, out _, out _)) AllQueues.Remove(idx);
                 }
-
+        
                 while (AllQueues.Capacity - AllQueues.Length < space) AllQueues.Capacity *= 2;
             }
         }
@@ -134,7 +134,7 @@ namespace DroNeS.Systems
             public NativeMultiHashMap<int, Waypoint>.ParallelWriter AllQueues;
             public ArchetypeChunkComponentType<DroneStatus> Statuses;
             [ReadOnly] public ArchetypeChunkComponentType<DroneUID> DroneId;
-            public Random random;
+            public Random Rand;
             
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
             {
@@ -145,7 +145,7 @@ namespace DroNeS.Systems
                     if (stats[i].Value != Status.RequestingWaypoints) continue;
                     for (var j = 0; j < 15; ++j)
                     {
-                        var p = new float3(random.NextFloat(), random.NextFloat(), random.NextFloat()) * 25;
+                        var p = new float3(Rand.NextFloat(), Rand.NextFloat(), Rand.NextFloat()) * 25;
                         AllQueues.Add(droneIds[i].Value, new Waypoint(p, j, 15));
                     }
                     stats[i] = new DroneStatus(Status.Ready);
