@@ -11,7 +11,7 @@ namespace DroNeS.Mapbox.ECS
 {
     public static class ManhattanTileProvider
     {
-        private static readonly ExtentArgs Tiles = new ExtentArgs();
+        private static readonly HashSet<UnwrappedTileId> Tiles = new HashSet<UnwrappedTileId>();
         private static readonly float2[] West = {
             new float2(40.83f,-73.958f),
             new float2(40.814f,-73.963f),
@@ -57,14 +57,13 @@ namespace DroNeS.Mapbox.ECS
             new float2(40.702f,-74.003f),
             new float2(40.699f,-74.003f)};
 
-        public static void Initialize(IMap map, Action<ExtentArgs> redraw)
+        public static HashSet<UnwrappedTileId> GetTiles(DronesMap map)
         {
-            Tiles.activeTiles = new HashSet<UnwrappedTileId>();
             SetUpTiles(map);
-            redraw(Tiles);
+            return Tiles;
         }
 
-        private static void SetUpTiles(IMapReadable map)
+        private static void SetUpTiles(DronesMap map)
         {
             var n = West.Length;
             for (var i = 0; i < n; i++)
@@ -78,7 +77,7 @@ namespace DroNeS.Mapbox.ECS
                 {
                     for (var x = xy0.X; x <= xn; x++)
                     {
-                        Tiles.activeTiles.Add(new UnwrappedTileId(map.AbsoluteZoom, x, y));
+                        Tiles.Add(new UnwrappedTileId(map.AbsoluteZoom, x, y));
                     }
                 }
             }
@@ -95,10 +94,5 @@ namespace DroNeS.Mapbox.ECS
 
             return new UnwrappedTileId(zoom, x, y);
         }
-
-        public static bool Cleanup(UnwrappedTileId tile) {
-            return !Tiles.activeTiles.Contains(tile);
-        }
-
     }
 }

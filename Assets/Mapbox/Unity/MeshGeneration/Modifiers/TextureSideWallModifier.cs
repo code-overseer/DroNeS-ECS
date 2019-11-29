@@ -11,13 +11,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	{
 		#region ModifierOptions
 
-		private float _scaledFirstFloorHeight = 0;
+		private float _scaledFirstFloorHeight;
 
-		private float _scaledTopFloorHeight = 0;
+		private float _scaledTopFloorHeight;
 
 		private float _scaledPreferredWallLength;
 		[SerializeField] private bool _centerSegments = true;
-		[SerializeField] private bool _separateSubmesh = true;
+		[SerializeField] private bool _separateSubmesh = false;
 
 		#endregion
 
@@ -52,7 +52,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private GeometryExtrusionWithAtlasOptions _options;
 		private int _counter = 0;
-		private float height = 0.0f;
+		private float _height = 0.0f;
 		private float _scale = 0.7571877f;
 		private float _minWallLength;
 		private float _singleFloorHeight;
@@ -99,11 +99,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
+//			Debug.Log($"1. {md.Triangles.Count}");
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
 				return;
 
 			if (tile != null) _scale = tile.TileScale;
-
 			//facade texture to decorate this building
 			_currentFacade =
 				_options.atlasInfo.Textures[UnityEngine.Random.Range(0, _options.atlasInfo.Textures.Count)];
@@ -119,29 +119,35 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_singleColumnLength = _scaledPreferredWallLength / _currentFacade.ColumnCount;
 
 			//read or force height
-			float maxHeight = 1, minHeight = 0;
 
 			//query height and push polygon up to create roof
 			//can we do this vice versa and create roof at last?
-			QueryHeight(feature, md, tile, out maxHeight, out minHeight);
+			QueryHeight(feature, md, tile, out var maxHeight, out var minHeight);
 			maxHeight = maxHeight * _options.extrusionScaleFactor * _scale;
 			minHeight = minHeight * _options.extrusionScaleFactor * _scale;
-			height = (maxHeight - minHeight);
+			_height = (maxHeight - minHeight);
 
 			//we can GenerateRoofMesh even if extrusion type is sidewall-only
 			//it pushes the vertices to building height, then we clear top polygon triangles
 			//to remove roof.
 			GenerateRoofMesh(md, minHeight, maxHeight);
-			if (_options.extrusionGeometryType == ExtrusionGeometryType.SideOnly)
+			switch (_options.extrusionGeometryType)
 			{
-				md.Triangles[0].Clear();
+				case ExtrusionGeometryType.SideOnly:
+					md.Triangles[0].Clear();
+					break;
+				case ExtrusionGeometryType.RoofOnly:
+					return;
+				case ExtrusionGeometryType.RoofAndSide:
+					break;
+				default:
+					throw new ArgumentOutOfRangeException();
 			}
 
-			if (_options.extrusionGeometryType == ExtrusionGeometryType.RoofOnly) return;
 			//limiting section heights, first floor gets priority, then we draw top floor, then mid if we still have space
-			finalFirstHeight = Mathf.Min(height, _scaledFirstFloorHeight);
-			finalTopHeight = (height - finalFirstHeight) < _scaledTopFloorHeight ? 0 : _scaledTopFloorHeight;
-			finalMidHeight = Mathf.Max(0, height - (finalFirstHeight + finalTopHeight));
+			finalFirstHeight = Mathf.Min(_height, _scaledFirstFloorHeight);
+			finalTopHeight = (_height - finalFirstHeight) < _scaledTopFloorHeight ? 0 : _scaledTopFloorHeight;
+			finalMidHeight = Mathf.Max(0, _height - (finalFirstHeight + finalTopHeight));
 			wallTriangles = new List<int>();
 
 			//cuts long edges into smaller ones using PreferredEdgeSectionLength
@@ -153,7 +159,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			if (finalMidHeight > 0)
 			{
 				finalLeftOverRowHeight = finalMidHeight;
-				finalLeftOverRowHeight = finalLeftOverRowHeight % _singleFloorHeight;
+				finalLeftOverRowHeight %= _singleFloorHeight;
 				finalMidHeight -= finalLeftOverRowHeight;
 			}
 			else
@@ -218,6 +224,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				md.Triangles.Capacity = md.Triangles.Count + wallTriangles.Count;
 				md.Triangles[0].AddRange(wallTriangles);
+//				Debug.Log($"3. {md.Triangles.Count}");
 			}
 		}
 
@@ -247,7 +254,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			//moving leftover row to top
 			LeftOverRow(md, finalLeftOverRowHeight);
 
-			FirstFloor(md, height);
+			FirstFloor(md, _height);
 			TopFloor(md, finalLeftOverRowHeight);
 			MidFloors(md);
 		}
@@ -255,56 +262,55 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private void LeftOverRow(MeshData md, float leftOver)
 		{
 			//leftover. we're moving small leftover row to top of the building
-			if (leftOver > 0)
+			if (!(leftOver > 0)) return;
+			
+			md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, currentY1, wallSegmentFirstVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, currentY2, wallSegmentSecondVertex.z));
+			//move offsets bottom
+			currentY1 -= leftOver;
+			currentY2 -= leftOver;
+			//bottom two vertices
+			md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, currentY1, wallSegmentFirstVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, currentY2, wallSegmentSecondVertex.z));
+
+			if (wallSegmentLength >= _minWallLength)
 			{
-				md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, currentY1, wallSegmentFirstVertex.z));
-				md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, currentY2, wallSegmentSecondVertex.z));
-				//move offsets bottom
-				currentY1 -= leftOver;
-				currentY2 -= leftOver;
-				//bottom two vertices
-				md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, currentY1, wallSegmentFirstVertex.z));
-				md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, currentY2, wallSegmentSecondVertex.z));
-
-				if (wallSegmentLength >= _minWallLength)
-				{
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
-					md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin,
-						_currentTextureRect.yMax - _shortRowHeightDelta));
-					md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax - _shortRowHeightDelta));
-				}
-				else
-				{
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
-					md.UV[0].Add(
-						new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, _currentTextureRect.yMax));
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin,
-						_currentTextureRect.yMax - _shortRowHeightDelta));
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta,
-						_currentTextureRect.yMax - _shortRowHeightDelta));
-				}
-
-				md.Normals.Add(wallNormal);
-				md.Normals.Add(wallNormal);
-				md.Normals.Add(wallNormal);
-				md.Normals.Add(wallNormal);
-
-				md.Tangents.Add(wallDirection);
-				md.Tangents.Add(wallDirection);
-				md.Tangents.Add(wallDirection);
-				md.Tangents.Add(wallDirection);
-
-				wallTriangles.Add(triIndex);
-				wallTriangles.Add(triIndex + 1);
-				wallTriangles.Add(triIndex + 2);
-
-				wallTriangles.Add(triIndex + 1);
-				wallTriangles.Add(triIndex + 3);
-				wallTriangles.Add(triIndex + 2);
-
-				triIndex += 4;
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin,
+					_currentTextureRect.yMax - _shortRowHeightDelta));
+				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax - _shortRowHeightDelta));
 			}
+			else
+			{
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
+				md.UV[0].Add(
+					new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin,
+					_currentTextureRect.yMax - _shortRowHeightDelta));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta,
+					_currentTextureRect.yMax - _shortRowHeightDelta));
+			}
+
+			md.Normals.Add(wallNormal);
+			md.Normals.Add(wallNormal);
+			md.Normals.Add(wallNormal);
+			md.Normals.Add(wallNormal);
+
+			md.Tangents.Add(wallDirection);
+			md.Tangents.Add(wallDirection);
+			md.Tangents.Add(wallDirection);
+			md.Tangents.Add(wallDirection);
+
+			wallTriangles.Add(triIndex);
+			wallTriangles.Add(triIndex + 1);
+			wallTriangles.Add(triIndex + 2);
+
+			wallTriangles.Add(triIndex + 1);
+			wallTriangles.Add(triIndex + 3);
+			wallTriangles.Add(triIndex + 2);
+
+			triIndex += 4;
 		}
 
 		private void MidFloors(MeshData md)
@@ -483,17 +489,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				case ExtrusionType.None:
 					break;
 				case ExtrusionType.PropertyHeight:
-					for (int i = 0; i < _counter; i++)
+					for (var i = 0; i < _counter; i++)
 					{
-						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight,
-							md.Vertices[i].z);
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
 					}
 
 					break;
 				case ExtrusionType.MinHeight:
 					{
 						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-						for (int i = 0; i < _counter; i++)
+						for (var i = 0; i < _counter; i++)
 						{
 							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
 						}
@@ -502,16 +507,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				case ExtrusionType.MaxHeight:
 					{
 						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-						for (int i = 0; i < _counter; i++)
+						for (var i = 0; i < _counter; i++)
 						{
 							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
 						}
 
-						height += minmax.max - minmax.min;
+						_height += minmax.max - minmax.min;
 					}
 					break;
 				case ExtrusionType.RangeHeight:
-					for (int i = 0; i < _counter; i++)
+					for (var i = 0; i < _counter; i++)
 					{
 						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight,
 							md.Vertices[i].z);
@@ -519,7 +524,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 					break;
 				case ExtrusionType.AbsoluteHeight:
-					for (int i = 0; i < _counter; i++)
+					for (var i = 0; i < _counter; i++)
 					{
 						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight,
 							md.Vertices[i].z);
@@ -546,7 +551,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				case ExtrusionType.MaxHeight:
 					if (feature.Properties.ContainsKey(_options.propertyName))
 					{
-						maxHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+						maxHeight = Convert.ToSingle(feature.Properties[_options.propertyName]); // only this is ran
 						if (feature.Properties.ContainsKey("min_height"))
 						{
 							minHeight = Convert.ToSingle(feature.Properties["min_height"]);

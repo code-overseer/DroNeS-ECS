@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using DroNeS.Utils;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine.Assertions;
-using Utils;
 using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Systems.EventSystem

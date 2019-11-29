@@ -7,6 +7,7 @@ using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Factories;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.Unity.Utilities;
+using Unity.Rendering;
 using UnityEngine;
 
 namespace DroNeS.Mapbox.MonoBehaviour
@@ -41,6 +42,7 @@ namespace DroNeS.Mapbox.MonoBehaviour
                 },
                 moveFeaturePositionTo = PositionTargetType.CenterOfVertices
             };
+
             vectorSubLayerProperties.coreOptions.sublayerName = "Buildings";
             var atlasInfo = Resources.Load("Atlases/BuildingAtlas") as AtlasInfo;
             var material = Resources.Load("Materials/BuildingMaterial") as Material;
@@ -71,8 +73,8 @@ namespace DroNeS.Mapbox.MonoBehaviour
             {
                 rasterOptions = new ImageryRasterOptions
                 {
-                    useCompression = false,
-                    useMipMap = true,
+                    useCompression = true,
+                    useMipMap = false,
                     useRetina = false
                 },
                 sourceType = ImagerySourceType.Custom,
@@ -96,6 +98,7 @@ namespace DroNeS.Mapbox.MonoBehaviour
             if (QuadMesh != null) return;
             var verts = new Vector3[4];
             var tileScale = tile.TileScale;
+            
             var rect = tile.Rect;
             verts[0] = tileScale * (rect.Min - rect.Center).ToVector3xz();
             verts[1] = tileScale * new Vector3((float)(rect.Max.x - rect.Center.x), 0, (float)(rect.Min.y - rect.Center.y));
@@ -123,10 +126,13 @@ namespace DroNeS.Mapbox.MonoBehaviour
             var tile = new GameObject().AddComponent<UnityTile>();
             tile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom);
             MakeFlatTerrain(tile);
+            
             tile.MeshFilter.sharedMesh = QuadMesh;
             tile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
+            
             tile.transform.SetParent(_map.Root, false);
             tile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _map.LoadingTexture);
+            tile.gameObject.layer = LayerMask.NameToLayer("Terrain");
             PlaceTile(tileId, tile, _map);
             
 #if UNITY_EDITOR
@@ -134,7 +140,12 @@ namespace DroNeS.Mapbox.MonoBehaviour
 #endif
             imageFactory.Register(tile);
             meshFactory.Register(tile);
-
+            
+            var l = LayerMask.NameToLayer("Buildings");
+            foreach (Transform go in tile.transform)
+            {
+                go.gameObject.layer = l;
+            }
             return tile;
         } 
         protected override void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map)

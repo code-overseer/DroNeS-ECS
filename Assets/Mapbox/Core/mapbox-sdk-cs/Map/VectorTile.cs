@@ -4,6 +4,9 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
+
 namespace Mapbox.Map
 {
 	using System.Collections.ObjectModel;
@@ -173,8 +176,10 @@ namespace Mapbox.Map
 
 		internal override bool ParseTileData(byte[] data)
 		{
+			
 			try
 			{
+				
 				var decompressed = Compression.Decompress(data);
 				this.data = new Mapbox.VectorTile.VectorTile(decompressed);
 				return true;

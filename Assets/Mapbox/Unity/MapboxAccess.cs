@@ -82,6 +82,7 @@ namespace Mapbox.Unity
 					   && throwExecptions)
 					{
 						configuration.AccessToken = string.Empty;
+						Debug.Log("Exception Here");
 						Debug.LogError(new InvalidTokenException(response.Status.ToString().ToString()));
 					}
 				});
@@ -135,6 +136,7 @@ namespace Mapbox.Unity
 				var configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
 				if (null == configurationTextAsset)
 				{
+					Debug.Log("Exception Here");
 					throw new InvalidTokenException(_tokenNotSetErrorMessage);
 				}
 				ConfigurationJSON = configurationTextAsset.text;

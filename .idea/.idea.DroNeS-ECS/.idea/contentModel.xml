@@ -525,6 +525,7 @@
           </e>
           <e p="Shaders" t="Include">
             <e p="Highlight.shader" t="Include" />
+            <e p="TerrainShader.shader" t="Include" />
           </e>
         </e>
         <e p="Scripts" t="Include">
@@ -566,6 +567,10 @@
               <e p="TimeSpeed.cs" t="Include" />
               <e p="Waypoint.cs" t="Include" />
             </e>
+            <e p="Editor" t="Include">
+              <e p="MeshSaverEditor.cs" t="Include" />
+              <e p="ScriptableObjectCreator.cs" t="Include" />
+            </e>
             <e p="EntityData.cs" t="Include" />
             <e p="Enums.cs" t="Include" />
             <e p="Mapbox" t="Include">
@@ -584,6 +589,12 @@
                 <e p="TerrainImageFactory.cs" t="Include" />
                 <e p="TerrainImageFetcher.cs" t="Include" />
               </e>
+              <e p="JobSystem" t="Include">
+                <e p="EarcutLibrary.cs" t="Include" />
+                <e p="PolygonMeshModifierJob.cs" t="Include" />
+                <e p="TextureWallModifierJob.cs" t="Include" />
+                <e p="UnmanagedStructs.cs" t="Include" />
+              </e>
               <e p="MonoBehaviour" t="Include">
                 <e p="DronesMap.cs" t="Include" />
                 <e p="ManhattanTileProvider.cs" t="Include" />
@@ -593,9 +604,9 @@
             <e p="MonoBehaviours" t="Include">
               <e p="CameraChanger.cs" t="Include" />
               <e p="CameraTypeClass.cs" t="Include" />
-              <e p="ClipSpaceTest.cs" t="Include" />
               <e p="DroneMaker.cs" t="Include" />
               <e p="FixedUpdateExecution.cs" t="Include" />
+              <e p="TestScript.cs" t="Include" />
             </e>
             <e p="Queue.cs" t="Include" />
             <e p="ScriptableObjects" t="Include">
@@ -630,18 +641,14 @@
               <e p="PropellerRotationSystem.cs" t="Include" />
               <e p="WaypointUpdateSystem.cs" t="Include" />
             </e>
-          </e>
-          <e p="Editor" t="Include">
-            <e p="MeshSaverEditor.cs" t="Include" />
-            <e p="ScriptableObjectCreator.cs" t="Include" />
-          </e>
-          <e p="Utils" t="Include">
-            <e p="Bool.cs" t="Include" />
-            <e p="Bootstrap.cs" t="Include" />
-            <e p="NativeStreamExtension.cs" t="Include" />
-            <e p="RandomExtension.cs" t="Include" />
-            <e p="Ray.cs" t="Include" />
-            <e p="Vector3Extension.cs" t="Include" />
+            <e p="Utils" t="Include">
+              <e p="Bool.cs" t="Include" />
+              <e p="Bootstrap.cs" t="Include" />
+              <e p="NativeStreamExtension.cs" t="Include" />
+              <e p="RandomExtension.cs" t="Include" />
+              <e p="Ray.cs" t="Include" />
+              <e p="Vector3Extension.cs" t="Include" />
+            </e>
           </e>
         </e>
         <e p="TextMesh Pro" t="Include">

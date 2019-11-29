@@ -1,6 +1,7 @@
 ﻿using DroNeS.Components;
 using DroNeS.SharedComponents;
 using DroNeS.Systems.EventSystem;
+using DroNeS.Utils;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -9,7 +10,6 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
-using Utils;
 using Clock = DroNeS.Components.Singletons.Clock;
 using Random = Unity.Mathematics.Random;
 using SimulationType = DroNeS.Components.Singletons.SimulationType;

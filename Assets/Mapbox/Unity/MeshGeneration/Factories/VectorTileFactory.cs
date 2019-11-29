@@ -6,6 +6,8 @@ using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using System;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
@@ -344,6 +346,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var nameList = new List<string>();
 			var builderList = new List<LayerVisualizerBase>();
 
+			
 			foreach (var layerName in tile.VectorData.Data.LayerNames())
 			{
 				if (!_layerBuilder.ContainsKey(layerName)) continue;
@@ -362,6 +365,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			builderList.Clear();
+			
 			
 			var emptyLayer = "";
 			if (_layerBuilder.ContainsKey(emptyLayer))
@@ -382,6 +386,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				tile.VectorDataState = TilePropertyState.Loaded;
 			}
+
 		}
 
 		private void TrackFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
@@ -403,6 +408,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void CreateFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
 		{
+			
 			if (!builder.Active) return;
 			if (_layerProgress.ContainsKey(tile))
 			{
@@ -416,7 +422,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					_tilesWaitingProcessing.Add(tile);
 				}
 			}
-
+			
 			builder.Create(
 				layerName != ""
 					? tile.VectorData.Data.GetLayer(layerName)

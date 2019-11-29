@@ -4,7 +4,7 @@ using Mapbox.Map;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
-using Ray = Utils.Ray;
+using Ray = DroNeS.Utils.Ray;
 
 namespace Mapbox.Unity.Map.TileProviders
 {

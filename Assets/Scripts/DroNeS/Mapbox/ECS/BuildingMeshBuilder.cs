@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using DroNeS.Mapbox.JobSystem;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -12,23 +14,25 @@ using Mapbox.Unity.Utilities;
 using Mapbox.VectorTile;
 using Mapbox.VectorTile.Geometry;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
+using TextureSideWallModifier = Mapbox.Unity.MeshGeneration.Modifiers.TextureSideWallModifier;
 
 namespace DroNeS.Mapbox.ECS
 {
 	// ReSharper disable once ClassNeverInstantiated.Global
 	public class BuildingMeshBuilderProperties
     {
-        public FeatureProcessingStage featureProcessingStage;
-        public bool buildingsWithUniqueIds = false;
-        public VectorTileLayer vectorTileLayer;
-        public ILayerFeatureFilterComparer[] layerFeatureFilters;
-        public ILayerFeatureFilterComparer layerFeatureFilterCombiner;
+        public FeatureProcessingStage FeatureProcessingStage;
+        public bool BuildingsWithUniqueIds;
+        public VectorTileLayer VectorTileLayer;
+        public ILayerFeatureFilterComparer[] LayerFeatureFilters;
+        public ILayerFeatureFilterComparer LayerFeatureFilterCombiner;
+        public int FeatureCount;
     }
     
     public class BuildingMeshBuilder
     {
 	    public VectorSubLayerProperties SubLayerProperties { get; set; }
-
 	    public LayerPerformanceOptions PerformanceOptions;
 		public Dictionary<CustomTile, List<int>> ActiveCoroutines;
 		private int _entityInCurrentCoroutine;
@@ -100,11 +104,11 @@ namespace DroNeS.Mapbox.ECS
 		}
 		private static bool IsFeatureEligibleAfterFiltering(CustomFeatureUnity feature, BuildingMeshBuilderProperties layerProperties)
 		{
-			return !layerProperties.layerFeatureFilters.Any() || layerProperties.layerFeatureFilterCombiner.Try((VectorFeatureUnity)feature);
+			return layerProperties.LayerFeatureFilters.Length < 1 || layerProperties.LayerFeatureFilterCombiner.Try((VectorFeatureUnity)feature);
 		}
 		private bool ShouldSkipProcessingFeatureWithId(ulong featureId, BuildingMeshBuilderProperties layerProperties)
 		{
-			return layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId);
+			return layerProperties.BuildingsWithUniqueIds && _activeIds.Contains(featureId);
 		}
 		private bool IsCoroutineBucketFull()
 		{
@@ -128,85 +132,70 @@ namespace DroNeS.Mapbox.ECS
 		
 		public void Create(VectorTileLayer layer, CustomTile tile, Action<CustomTile, BuildingMeshBuilder> callback)
 		{
+			if (tile == null || layer == null) return;
 			if (!ActiveCoroutines.ContainsKey(tile))
 				ActiveCoroutines.Add(tile, new List<int>());
-			ActiveCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, tile.UnwrappedTileId, callback)));
+			
+			
+			ActiveCoroutines[tile].Add(Runnable.Run(ProcessLayer(MakeProperties(layer), tile, tile.UnwrappedTileId, callback)));
 		}
 
-		private IEnumerator ProcessLayer(VectorTileLayer layer, CustomTile tile, UnwrappedTileId tileId, Action<CustomTile, BuildingMeshBuilder> callback = null)
+		private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)
 		{
-			if (tile == null) yield break;
-
-			var tempLayerProperties = new BuildingMeshBuilderProperties
+			var output = new BuildingMeshBuilderProperties
 			{
-				vectorTileLayer = layer,
-				featureProcessingStage = FeatureProcessingStage.PreProcess,
-				layerFeatureFilters =
+				VectorTileLayer = layer,
+				FeatureCount = layer?.FeatureCount() ?? 0,
+				FeatureProcessingStage = FeatureProcessingStage.PreProcess,
+				LayerFeatureFilters =
 					SubLayerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray(),
-				layerFeatureFilterCombiner = new LayerFilterComparer()
+				LayerFeatureFilterCombiner = new LayerFilterComparer()
 			};
-			
 			switch (SubLayerProperties.filterOptions.combinerType)
 			{
 				case LayerFilterCombinerOperationType.Any:
-					tempLayerProperties.layerFeatureFilterCombiner = LayerFilterComparer.AnyOf(tempLayerProperties.layerFeatureFilters);
+					output.LayerFeatureFilterCombiner = LayerFilterComparer.AnyOf(output.LayerFeatureFilters);
 					break;
 				case LayerFilterCombinerOperationType.All:
-					tempLayerProperties.layerFeatureFilterCombiner = LayerFilterComparer.AllOf(tempLayerProperties.layerFeatureFilters);
+					output.LayerFeatureFilterCombiner = LayerFilterComparer.AllOf(output.LayerFeatureFilters);
 					break;
 				case LayerFilterCombinerOperationType.None:
-					tempLayerProperties.layerFeatureFilterCombiner = LayerFilterComparer.NoneOf(tempLayerProperties.layerFeatureFilters);
+					output.LayerFeatureFilterCombiner = LayerFilterComparer.NoneOf(output.LayerFeatureFilters);
 					break;
+				default:
+					throw new ArgumentOutOfRangeException();
 			}
+			output.BuildingsWithUniqueIds = SubLayerProperties.honorBuildingIdSetting && SubLayerProperties.buildingsWithUniqueIds;
+			return output;
+		}
 
-			tempLayerProperties.buildingsWithUniqueIds = (SubLayerProperties.honorBuildingIdSetting) && SubLayerProperties.buildingsWithUniqueIds;
-
-			//find any replacement criteria and assign them
-			foreach (var goModifier in _defaultStack.GoModifiers)
-			{
-				if (goModifier is IReplacementCriteria criteria && goModifier.Active)
-				{
-					SetReplacementCriteria(criteria);
-				}
-			}
-
+		private IEnumerator ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile, UnwrappedTileId tileId, Action<CustomTile, BuildingMeshBuilder> callback = null)
+		{
 			#region PreProcess & Process.
-
-			var featureCount = tempLayerProperties.vectorTileLayer?.FeatureCount() ?? 0;
+			
 			do
 			{
-				for (var i = 0; i < featureCount; i++)
+				for (var i = 0; i < properties.FeatureCount; i++)
 				{
-					//checking if tile is recycled and changed
-					if (tile.UnwrappedTileId != tileId 
-					    || !ActiveCoroutines.ContainsKey(tile))
-					{
-						yield break;
-					}
-
-					ProcessFeature(i, tile, tempLayerProperties, layer.Extent);
-
-					if (!IsCoroutineBucketFull() || Application.isEditor && !Application.isPlaying) continue;
-					//Reset bucket..
-					_entityInCurrentCoroutine = 0;
+					ProcessFeature(i, tile, properties);
 					yield return null;
 				}
 				// move processing to next stage.
-				tempLayerProperties.featureProcessingStage++;
-			} while (tempLayerProperties.featureProcessingStage == FeatureProcessingStage.PreProcess 
-			         || tempLayerProperties.featureProcessingStage == FeatureProcessingStage.Process);
+				properties.FeatureProcessingStage++;
+			} while (properties.FeatureProcessingStage == FeatureProcessingStage.PreProcess || properties.FeatureProcessingStage == FeatureProcessingStage.Process);
 
 			#endregion
-
-			_defaultStack.End(tile);
+			_defaultStack.Terminate(tile);
 			callback?.Invoke(tile, this);
 		}
 
-		private bool ProcessFeature(int index, CustomTile tile, BuildingMeshBuilderProperties layerProperties, float layerExtent)
+		private bool ProcessFeature(int index, CustomTile tile, BuildingMeshBuilderProperties layerProperties)
 		{
-			var fe = layerProperties.vectorTileLayer.GetFeature(index);
+			var layerExtent = layerProperties.VectorTileLayer.Extent;
+			var fe = layerProperties.VectorTileLayer.GetFeature(index);
 			List<List<Point2d<float>>> geom;
-			if (layerProperties.buildingsWithUniqueIds) //ids from building dataset is big ulongs
+			
+			if (layerProperties.BuildingsWithUniqueIds) //ids from building dataset is big ulongs
 			{
 				geom = fe.Geometry<float>(); //and we're not clipping by passing no parameters
 
@@ -221,19 +210,22 @@ namespace DroNeS.Mapbox.ECS
 			}
 
 			var feature = new CustomFeatureUnity(
-				layerProperties.vectorTileLayer.GetFeature(index),
+				layerProperties.VectorTileLayer.GetFeature(index),
 				geom,
 				tile,
-				layerProperties.vectorTileLayer.Extent,
-				layerProperties.buildingsWithUniqueIds);
+				layerProperties.VectorTileLayer.Extent,
+				layerProperties.BuildingsWithUniqueIds);
 
 
 			if (!IsFeatureEligibleAfterFiltering(feature, layerProperties)) return true;
 			if (tile == null || tile.VectorDataState == TilePropertyState.Cancelled) return true;
 
-			if (layerProperties.featureProcessingStage != FeatureProcessingStage.PostProcess)
+			if (layerProperties.FeatureProcessingStage != FeatureProcessingStage.PostProcess)
 			{
-				if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, layerProperties)) return false;
+				if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, layerProperties))
+				{
+					return false;
+				}
 			
 				AddFeatureToTileObjectPool(feature);
 				Build(feature, tile);
@@ -252,11 +244,9 @@ namespace DroNeS.Mapbox.ECS
 		}
 		private void Build(CustomFeatureUnity feature, CustomTile tile)
 		{
-			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))
-				return;
+			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"])) return;
 
-			if (feature.Points.Count < 1)
-				return;
+			if (feature.Points.Count < 1) return;
 			
 			var styleSelectorKey = SubLayerProperties.coreOptions.sublayerName;
 

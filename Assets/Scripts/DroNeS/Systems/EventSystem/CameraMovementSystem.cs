@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using DroNeS.Components;
 using DroNeS.Components.Singletons;
 using DroNeS.Components.Tags;
@@ -26,20 +27,23 @@ namespace DroNeS.Systems.EventSystem
         {
             Entities.With(_query).ForEach((Entity entity, CameraTypeClass type, Camera camera) =>
             {
-                
-                if (type.value == CameraTypeValue.Satellite)
+                switch (type.value)
                 {
-                    EntityManager.AddComponentData(entity, new SatelliteCameraTag());
-                    World.Active.GetOrCreateSystem<CameraMovementSystem>().Satellite = camera;
+                    case CameraTypeValue.Satellite:
+                        EntityManager.AddComponentData(entity, new SatelliteCameraTag());
+                        World.GetOrCreateSystem<CameraMovementSystem>().Satellite = camera;
+                        break;
+                    case CameraTypeValue.Main:
+                        EntityManager.AddComponentData(entity, new MainCameraTag());
+                        World.GetOrCreateSystem<CameraMovementSystem>().Main = camera;
+                        break;
+                    case CameraTypeValue.MainLong:
+                        World.GetOrCreateSystem<CameraMovementSystem>().MainLong = camera;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                else
-                {
-                    EntityManager.AddComponentData(entity, new MainCameraTag());
-                    World.Active.GetOrCreateSystem<CameraMovementSystem>().Main = camera;
-                }
-                
                 EntityManager.RemoveComponent<CameraTypeClass>(entity);
-                    
             });
             Enabled = false;
         }
@@ -53,6 +57,7 @@ namespace DroNeS.Systems.EventSystem
         private Stopwatch _watch;
         public Camera Satellite;
         public Camera Main;
+        public Camera MainLong;
         private NativeArray<float> _orthographicSize;
         protected override void OnCreate()
         {
@@ -73,6 +78,7 @@ namespace DroNeS.Systems.EventSystem
             SetSingleton(new View
                 {CameraType = v.CameraType == CameraTypeValue.Main ? CameraTypeValue.Satellite : CameraTypeValue.Main});
             Main.enabled = !Main.enabled;
+            MainLong.enabled = !MainLong.enabled;
             Satellite.enabled = !Satellite.enabled;
         }
 

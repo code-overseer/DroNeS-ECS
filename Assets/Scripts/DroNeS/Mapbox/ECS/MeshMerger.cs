@@ -9,151 +9,164 @@ namespace DroNeS.Mapbox.ECS
 {
 	public class MeshMerger : ModifierStackBase
     {
-        private readonly Dictionary<CustomTile, int> _cacheVertexCount = new Dictionary<CustomTile, int>();
-		private readonly Dictionary<CustomTile, List<MeshData>> _cached = new Dictionary<CustomTile, List<MeshData>>();
-		private readonly Dictionary<CustomTile, int> _buildingCount = new Dictionary<CustomTile, int>();
-
-		private Dictionary<CustomTile, List<RenderMesh>> _activeObjects = new Dictionary<CustomTile, List<RenderMesh>>();
-		private MeshData _tempMeshData;
-		private MeshData _temp2MeshData;
-		private RenderMesh _tempVectorEntity;
-		private ObjectPool<List<MeshData>> _meshDataPool;
+	    private readonly Dictionary<CustomTile, int> _buildingCount = new Dictionary<CustomTile, int>();
+		private readonly Dictionary<CustomTile, MeshData> _accumulation = new Dictionary<CustomTile, MeshData>();
+		
 		private static Material _buildingMaterial;
-		private int _counter, _counter2;
 
 		private void OnEnable()
 		{
 			_buildingMaterial = Resources.Load("Materials/BuildingMaterial") as Material;
-			_meshDataPool = new ObjectPool<List<MeshData>>(() => new List<MeshData>());
-			_tempMeshData = new MeshData();
 		}
 
 	    public override void Initialize()
-		{
-			_cacheVertexCount.Clear();
-			_cached.Clear();
-			_buildingCount.Clear();
-			_counter = MeshModifiers.Count;
-			for (var i = 0; i < _counter; i++)
-			{
-				MeshModifiers[i].Initialize();
-			}
-		}
-
-	    public void Execute(CustomTile tile, CustomFeatureUnity feature, MeshData meshData, string type = "")
 	    {
-		    if (!_cacheVertexCount.ContainsKey(tile))
+		    _buildingCount.Clear();
+		    foreach (var modifier in MeshModifiers)
 		    {
-			    _cacheVertexCount.Add(tile, 0);
-			    _cached.Add(tile, _meshDataPool.GetObject());
-			    _buildingCount.Add(tile, 0);
-		    }
-		    
-		    _buildingCount[tile]++;
-		    _counter = MeshModifiers.Count;
-		    for (var i = 0; i < _counter; i++)
-		    {
-			    if (MeshModifiers[i] != null && MeshModifiers[i].Active)
-			    {
-				    MeshModifiers[i].Run((VectorFeatureUnity)feature, meshData);
-			    }
-		    }
-		    
-		    //65000 is the vertex limit for meshes, keep stashing it until that
-		    _counter = meshData.Vertices.Count;
-		    if (_cacheVertexCount[tile] + _counter < 65000)
-		    {
-			    _cacheVertexCount[tile] += _counter;
-			    _cached[tile].Add(meshData);
-		    }
-		    else
-		    {
-			    End(tile);
+			    modifier.Initialize();
 		    }
 	    }
 
-	    public void End(CustomTile tile)
-		{
-			if (!_cached.ContainsKey(tile)) return;
-			_tempMeshData.Clear();
+	    public void Execute(CustomTile tile, CustomFeatureUnity feature, MeshData meshData, string type = "")
+	    {
+		    if (!_accumulation.ContainsKey(tile))
+		    {
+			    _buildingCount.Add(tile, 0);
+			    _accumulation.Add(tile, new MeshData
+			    {
+					Edges = new List<int>(),
+					Normals = new List<Vector3>(),
+					Tangents = new List<Vector4>(),
+					Triangles = new List<List<int>>{new List<int>()},
+					UV = new List<List<Vector2>>{new List<Vector2>()},
+					Vertices = new List<Vector3>()
+			    });
+		    }
+		    
+		    _buildingCount[tile]++;
 
-			//concat mesh data into _tempMeshData
-			_counter = _cached[tile].Count;
-			for (var i = 0; i < _counter; i++)
-			{
-				_temp2MeshData = _cached[tile][i];
-				if (_temp2MeshData.Vertices.Count <= 3)  continue;
+		    foreach (var modifier in MeshModifiers)
+		    {
+			    if (modifier != null && modifier.Active)
+			    {
+				    modifier.Run((VectorFeatureUnity)feature, meshData);
+			    }
+		    }
+		    
+		    if (_accumulation[tile].Vertices.Count + meshData.Vertices.Count < 65000)
+		    {
+			    Append(tile, meshData);
+		    }
+		    else
+		    {
+			    Terminate(tile, meshData);
+		    }
+	    }
 
-				var st = _tempMeshData.Vertices.Count;
-				_tempMeshData.Vertices.AddRange(_temp2MeshData.Vertices);
-				_tempMeshData.Normals.AddRange(_temp2MeshData.Normals);
+	    private void Append(CustomTile tile, MeshData data)
+	    {
+		    if (!_accumulation.TryGetValue(tile, out var value))
+		    {
+			    value = _accumulation[tile] = data;
+		    }
+		    if (data.Vertices.Count <= 3) return;
+		    var st = value.Vertices.Count;
+		    value.Vertices.AddRange(data.Vertices);
+		    value.Normals.AddRange(data.Normals);
+		    
+		    for (var j = 0; j < data.UV.Count; j++)
+		    {
+			    if (value.UV.Count <= j)
+			    {
+				    value.UV.Add(new List<Vector2>(data.UV[j].Count));
+			    }
+		    }
+		    
+		    for (var j = 0; j < data.UV.Count; j++)
+		    {
+			    value.UV[j].AddRange(data.UV[j]);
+		    }
+		    
+		    for (var j = 0; j < data.Triangles.Count; j++)
+		    {
+			    if (value.Triangles.Count <= j)
+			    {
+				    value.Triangles.Add(new List<int>(data.Triangles[j].Count));
+			    }
+		    }
+		    
+		    for (var j = 0; j < data.Triangles.Count; j++)
+		    {
+			    for (var k = 0; k < data.Triangles[j].Count; k++)
+			    {
+				    value.Triangles[j].Add(data.Triangles[j][k] + st);
+			    }
+		    }
+		    
+	    }
 
-				var c2 = _temp2MeshData.UV.Count;
-				for (var j = 0; j < c2; j++)
-				{
-					if (_tempMeshData.UV.Count <= j)
-					{
-						_tempMeshData.UV.Add(new List<Vector2>(_temp2MeshData.UV[j].Count));
-					}
-				}
+	    private void Terminate(CustomTile tile, MeshData data)
+	    {
+		    if (!_accumulation.TryGetValue(tile, out var value) || value.Vertices.Count <= 3) return;
+		    var renderMesh = new RenderMesh
+		    {
+			    mesh = new Mesh(),
+			    material = _buildingMaterial
+		    };
+		    renderMesh.mesh.subMeshCount = value.Triangles.Count;
+		    renderMesh.mesh.SetVertices(value.Vertices);
+		    renderMesh.mesh.SetNormals(value.Normals);
+		    
+		    for (var i = 0; i < value.Triangles.Count; i++)
+		    {
+			    renderMesh.mesh.SetTriangles(value.Triangles[i], i);
+		    }
 
-				c2 = _temp2MeshData.UV.Count;
-				for (var j = 0; j < c2; j++)
-				{
-					_tempMeshData.UV[j].AddRange(_temp2MeshData.UV[j]);
-				}
+		    for (var i = 0; i < value.UV.Count; i++)
+		    {
+			    renderMesh.mesh.SetUVs(i, value.UV[i]);
+		    }
+		    renderMesh.layer = LayerMask.NameToLayer("Buildings");
 
-				c2 = _temp2MeshData.Triangles.Count;
-				for (var j = 0; j < c2; j++)
-				{
-					if (_tempMeshData.Triangles.Count <= j)
-					{
-						_tempMeshData.Triangles.Add(new List<int>(_temp2MeshData.Triangles[j].Count));
-					}
-				}
-
-				for (var j = 0; j < c2; j++)
-				{
-					for (var k = 0; k < _temp2MeshData.Triangles[j].Count; k++)
-					{
-						_tempMeshData.Triangles[j].Add(_temp2MeshData.Triangles[j][k] + st);
-					}
-				}
-			}
-
-			//update pooled vector entity with new data
-			if (_tempMeshData.Vertices.Count <= 3) return;
+		    var pos = tile.Position;
 			
-			_cached[tile].Clear();
-			_cacheVertexCount[tile] = 0;
-			_tempVectorEntity = new RenderMesh
-			{
-				mesh = new Mesh(),
-				material = _buildingMaterial
-			};
-			_tempVectorEntity.mesh.subMeshCount = _tempMeshData.Triangles.Count;
-			_tempVectorEntity.mesh.SetVertices(_tempMeshData.Vertices);
-			_tempVectorEntity.mesh.SetNormals(_tempMeshData.Normals);
+		    CityBuilderSystem.MakeBuilding(in pos, in renderMesh);
 
-			_counter = _tempMeshData.Triangles.Count;
-			for (var i = 0; i < _counter; i++)
-			{
-				_tempVectorEntity.mesh.SetTriangles(_tempMeshData.Triangles[i], i);
-			}
+		    _accumulation[tile] = data;
+	    }
+	    
+	    public void Terminate(CustomTile tile)
+	    {
+		    if (_accumulation.TryGetValue(tile, out var value) && value.Vertices.Count > 3)
+		    {
+			    var renderMesh = new RenderMesh
+			    {
+				    mesh = new Mesh(),
+				    material = _buildingMaterial
+			    };
+			    renderMesh.mesh.subMeshCount = value.Triangles.Count;
+			    renderMesh.mesh.SetVertices(value.Vertices);
+			    renderMesh.mesh.SetNormals(value.Normals);
+		    
+			    for (var i = 0; i < value.Triangles.Count; i++)
+			    {
+				    renderMesh.mesh.SetTriangles(value.Triangles[i], i);
+			    }
 
-			_counter = _tempMeshData.UV.Count;
-			for (var i = 0; i < _counter; i++)
-			{
-				_tempVectorEntity.mesh.SetUVs(i, _tempMeshData.UV[i]);
-			}
-			_tempVectorEntity.mesh.SetTriangles(_tempVectorEntity.mesh.triangles, 0);
-			_tempVectorEntity.mesh.subMeshCount = 1;
+			    for (var i = 0; i < value.UV.Count; i++)
+			    {
+				    renderMesh.mesh.SetUVs(i, value.UV[i]);
+			    }
+			    renderMesh.layer = LayerMask.NameToLayer("Buildings");
 
-			var pos = tile.Position;
+			    var pos = tile.Position;
 			
-			CityBuilderSystem.MakeBuilding(in pos, in _tempVectorEntity);
-
-
-		}
+			    CityBuilderSystem.MakeBuilding(in pos, in renderMesh);
+		    }
+		    
+		    _accumulation.Remove(tile);
+	    }
+	    
     }
 }

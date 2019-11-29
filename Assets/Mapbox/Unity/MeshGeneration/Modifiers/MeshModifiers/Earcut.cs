@@ -16,7 +16,6 @@ namespace Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
 			var outerNode = linkedList(data, 0, outerLen, dim, true);
 			var triangles = new List<int>((int)(outerNode.i * 1.5));
 
-			if (outerNode == null) return triangles;
 			var minX = 0f;
 			var minY = 0f;
 			var maxX = 0f;
@@ -672,7 +671,7 @@ namespace Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
 		}
 	}
 
-	public class Data
+	public class Data // native stream
 	{
 		public List<float> Vertices;
 		public List<int> Holes;

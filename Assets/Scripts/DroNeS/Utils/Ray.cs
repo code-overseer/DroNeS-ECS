@@ -1,7 +1,6 @@
 ﻿using Unity.Mathematics;
-using UnityEngine;
 
-namespace Utils
+namespace DroNeS.Utils
 {
     public struct Ray
     {

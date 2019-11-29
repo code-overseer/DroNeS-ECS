@@ -21,9 +21,11 @@ namespace DroNeS.Systems
             base.OnCreate();
             _buildingCollider = EntityManager.CreateArchetype(
                 ComponentType.ReadOnly<BuildingTag>(),
+                typeof(Static),
                 typeof(LocalToWorld),
                 typeof(PhysicsCollider)
             );
+            
             _cubeMesh = EntityData.BuildingCollider.ToRenderMesh();
             _collider = BoxCollider.Create(EntityData.BuildingCollider.BoxGeometry,
                 new CollisionFilter

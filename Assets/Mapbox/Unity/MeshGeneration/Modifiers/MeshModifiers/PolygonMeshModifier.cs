@@ -89,7 +89,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						triList.Capacity = triList.Count + polygonVertexCount;
 					}
 
-					for (int j = 0; j < polygonVertexCount; j++)
+					for (var j = 0; j < polygonVertexCount; j++)
 					{
 						triList.Add(result[j] + currentIndex);
 					}
@@ -104,7 +104,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				md.Vertices.Capacity = md.Vertices.Count + polygonVertexCount;
 				md.Normals.Capacity = md.Normals.Count + polygonVertexCount;
 				md.Edges.Capacity = md.Edges.Count + polygonVertexCount * 2;
-				var _size = md.TileRect.Size;
+				var size = md.TileRect.Size;
 
 				for (var j = 0; j < polygonVertexCount; j++)
 				{
@@ -117,8 +117,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					if (_options.style == StyleTypes.Satellite)
 					{
 						var fromBottomLeft = new Vector2(
-							(float) (((sub[j].x + md.PositionInTile.x) / tile.TileScale + _size.x / 2) / _size.x),
-							(float) (((sub[j].z + md.PositionInTile.z) / tile.TileScale + _size.x / 2) / _size.x));
+							(float) (((sub[j].x + md.PositionInTile.x) / tile.TileScale + size.x / 2) / size.x),
+							(float) (((sub[j].z + md.PositionInTile.z) / tile.TileScale + size.x / 2) / size.x));
 						md.UV[0].Add(fromBottomLeft);
 					}
 					else if (_options.texturingType == UvMapType.Tiled)
@@ -185,7 +185,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				triList.Add(result[i] + currentIndex);
 			}
-
 			md.Triangles.Add(triList);
 		}
 

@@ -37,7 +37,8 @@ namespace DroNeS.ScriptableObjects
             return new RenderMesh
             {
                 material = Material,
-                mesh = Mesh
+                mesh = Mesh,
+                layer = LayerMask.NameToLayer("Colliders")
             };
         }
         

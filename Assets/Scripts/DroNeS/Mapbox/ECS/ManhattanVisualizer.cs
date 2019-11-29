@@ -8,23 +8,21 @@ namespace DroNeS.Mapbox.ECS
     {
         public BuildingMeshFactory MeshFactory;
         public TerrainImageFactory ImageFactory;
-        private readonly IMapReadable _map;
+        private readonly DronesMap _map;
         private int _counter;
 
-        public ManhattanVisualizer(IMapReadable map)
+        public ManhattanVisualizer(DronesMap map)
         {
             _map = map;
             MeshFactory = new BuildingMeshFactory();
             ImageFactory = new TerrainImageFactory();
         }
 
-        public CustomTile LoadTile(UnwrappedTileId tileId)
+        public void LoadTile(UnwrappedTileId tileId)
         {
             var tile = new CustomTile(in _map, in tileId);
             ImageFactory.Register(tile);
             MeshFactory.Register(tile);
-
-            return tile;
         }
         
     

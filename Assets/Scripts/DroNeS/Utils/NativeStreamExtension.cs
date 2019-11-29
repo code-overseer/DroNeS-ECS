@@ -3,14 +3,16 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs.LowLevel.Unsafe;
 
-namespace Utils
+namespace DroNeS.Utils
 {
     public static unsafe class NativeStreamExtensions
     {
-        private unsafe struct NativeStreamHeader
+        private struct NativeStreamHeader
         {
+#pragma warning disable 649
             public NativeStream.BlockStreamData* Block;
             public Allocator AllocatorLabel;
+#pragma warning restore 649
         }
 
         public static void Clear(this NativeStream stream)

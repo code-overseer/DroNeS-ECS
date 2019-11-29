@@ -39,6 +39,7 @@ namespace DroNeS.Mapbox.ECS
 			TilesWaitingResponse.Remove(tile);
 			var pos = tile.Position;
 			var rm = tile.SetRasterData(rasterTile.Data);
+			rm.layer = LayerMask.NameToLayer("Terrain");
 			CityBuilderSystem.MakeTerrain(in pos, in rm);
 		}
 		#endregion

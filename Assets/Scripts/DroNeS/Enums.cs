@@ -26,7 +26,8 @@
     public enum CameraTypeValue
     {
         Satellite,
-        Main
+        Main,
+        MainLong
     }
     
     public enum SimulationTypeValue

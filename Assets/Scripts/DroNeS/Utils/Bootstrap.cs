@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Experimental.LowLevel;
 using UnityEngine.Experimental.PlayerLoop;
 
-namespace Utils
+namespace DroNeS.Utils
 {
     
     public static class Bootstrap

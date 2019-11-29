@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Utils
+namespace DroNeS.Utils
 {
     public static class Vector3Extension
     {

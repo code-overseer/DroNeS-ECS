@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Utils
+﻿namespace DroNeS.Utils
 {
     public struct Bool
     {

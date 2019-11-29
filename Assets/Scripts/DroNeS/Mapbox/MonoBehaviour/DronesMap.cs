@@ -12,6 +12,7 @@ using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Mapbox.MonoBehaviour
 {
@@ -128,7 +129,6 @@ namespace DroNeS.Mapbox.MonoBehaviour
             _options.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
             
             InitializeMap();
-            
         }
 
         private void InitializeMap()
@@ -160,10 +160,11 @@ namespace DroNeS.Mapbox.MonoBehaviour
 
         private IEnumerator TriggerTileRedrawForExtent(ExtentArgs extent, Stopwatch t)
         {
+            // 286 tiles
             foreach (var tileId in extent.activeTiles)
             {
                 Visualizer.LoadTile(tileId);
-                if (t.ElapsedMilliseconds <= 13) continue;
+                if (t.ElapsedMilliseconds <= 5) continue;
                 yield return null;
                 t.Restart();
             }

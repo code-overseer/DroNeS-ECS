@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Mapbox.ECS
 {
@@ -129,6 +131,7 @@ namespace DroNeS.Mapbox.ECS
 			tile.SetVectorData(vectorTile);
 			
 			CreateMeshes(tile);
+			
 		}
 		
 		#region Private Methods
@@ -144,7 +147,6 @@ namespace DroNeS.Mapbox.ECS
 				{
 					nameList.Add(layerName);
 					builderList.Add(builder);
-					TrackFeatureWithBuilder(tile, layerName, builder);
 				}
 			}
 			
@@ -175,26 +177,11 @@ namespace DroNeS.Mapbox.ECS
 
 		private void CreateFeatureWithBuilder(CustomTile tile, string layerName, BuildingMeshBuilder builder)
 		{
-			if (_layerProgress.ContainsKey(tile))
-			{
-				_layerProgress[tile].Add(builder);
-			}
-			else
-			{
-				_layerProgress.Add(tile, new HashSet<BuildingMeshBuilder> { builder });
-				if (!TilesWaitingProcessing.Contains(tile)) TilesWaitingProcessing.Add(tile);
-			}
-
 			builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
 		}
 
 		private void DecreaseProgressCounter(CustomTile tile, BuildingMeshBuilder builder)
 		{
-			if (!_layerProgress.ContainsKey(tile)) return;
-			if (_layerProgress[tile].Contains(builder)) _layerProgress[tile].Remove(builder);
-			if (_layerProgress[tile].Count != 0) return;
-			_layerProgress.Remove(tile);
-			TilesWaitingProcessing.Remove(tile);
 			tile.VectorDataState = TilePropertyState.Loaded;
 		}
 

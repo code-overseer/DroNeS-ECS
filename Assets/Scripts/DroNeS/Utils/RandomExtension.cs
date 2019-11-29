@@ -1,6 +1,6 @@
 ﻿using Unity.Mathematics;
 
-namespace Utils
+namespace DroNeS.Utils
 {
     public static class RandomExtension
     {

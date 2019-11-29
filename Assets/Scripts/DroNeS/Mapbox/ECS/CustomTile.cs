@@ -27,21 +27,19 @@ namespace DroNeS.Mapbox.ECS
 		public readonly int CurrentZoom;
 		public UnwrappedTileId UnwrappedTileId { get; }
 		public CanonicalTileId CanonicalTileId => UnwrappedTileId.Canonical;
-		private static Texture2D _loadingTexture;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
 		private readonly List<Tile> _tiles = new List<Tile>();
     
 
-		public CustomTile(in IMapReadable map, in UnwrappedTileId tileId)
+		public CustomTile(in DronesMap map, in UnwrappedTileId tileId)
 		{
 			CurrentZoom = map.AbsoluteZoom;
-			if (_loadingTexture == null) _loadingTexture = map.LoadingTexture;
 			ElevationType = TileTerrainType.None;
 			TileScale = map.WorldRelativeScale;
 			RelativeScale = math.rcp(math.cos(math.radians((float)map.CenterLatitudeLongitude.x)));
 			Rect = Conversions.TileBounds(tileId);
 			UnwrappedTileId = tileId;
-			_material = new Material(Shader.Find("Diffuse"));
+			_material = new Material(Shader.Find("Standard"));
 			var scaleFactor = math.pow(2, map.InitialZoom - map.AbsoluteZoom);
 			Position = new float3(
 				(float)(Rect.Center.x - map.CenterMercator.x) * TileScale * scaleFactor,

@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace Editor
+namespace DroNeS.Editor
 {
     public static class MeshSaverEditor {
         [MenuItem("CONTEXT/MeshFilter/Save Mesh...")]

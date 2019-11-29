@@ -49,10 +49,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected virtual void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
 		{
 			var handler = OnTileError;
-			if (handler != null)
-			{
-				handler(this, e);
-			}
+			handler?.Invoke(this, e);
 		}
 
 		public virtual void Initialize(IFileSource fileSource)
