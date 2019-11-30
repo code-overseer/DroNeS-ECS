@@ -57,14 +57,6 @@ namespace DroNeS.Mapbox.JobSystem
 			};
 		}
 	}
-	
-	public unsafe struct MeshDataProxy
-	{
-		public Vector3* Vertices;
-		public Vector3* Normals;
-		public int* Triangles;
-		public Vector2* Uv;
-	}
 
 	public struct MeshDataStruct : IDisposable
 	{
@@ -72,7 +64,6 @@ namespace DroNeS.Mapbox.JobSystem
 		public int Index;
 		public MathRect TileRect;
 		public NativeList<int> Edges;
-		public NativeList<Vector4> Tangents;
 		public NativeList<Vector3> Vertices;
 		public NativeList<Vector3> Normals;
 		public NativeList<int> Triangles;
@@ -89,7 +80,6 @@ namespace DroNeS.Mapbox.JobSystem
 			Edges = new NativeList<int>(allocator);
 			Vertices = new NativeList<Vector3>(allocator);
 			Normals = new NativeList<Vector3>(allocator);
-			Tangents = new NativeList<Vector4>(allocator);
 			Triangles = new NativeList<int>(allocator);
 			UV = new NativeList<Vector2>(allocator);
 		}
@@ -104,7 +94,6 @@ namespace DroNeS.Mapbox.JobSystem
 				Edges = default;
 				Vertices = default;
 				Normals = default;
-				Tangents = default;
 				Triangles = default;
 				UV = default;
 			}
@@ -116,8 +105,6 @@ namespace DroNeS.Mapbox.JobSystem
 				Vertices.AddRange(other.Vertices);
 				Normals = new NativeList<Vector3>(other.Normals.Capacity, allocator);
 				Normals.AddRange(other.Normals);
-				Tangents = new NativeList<Vector4>(other.Tangents.Capacity, allocator);
-				Tangents.AddRange(other.Tangents);
 				Triangles = new NativeList<int>(other.Triangles.Capacity, allocator);
 				Triangles.AddRange(other.Triangles);
 				UV = new NativeList<Vector2>(other.UV.Capacity, allocator);
@@ -131,7 +118,6 @@ namespace DroNeS.Mapbox.JobSystem
 			Edges.AddRange(other.Edges);
 			Vertices.AddRange(other.Vertices);
 			Normals.AddRange(other.Normals);
-			Tangents.AddRange(other.Tangents);
 			Triangles.AddRange(other.Edges);
 			UV.AddRange(other.UV);
 		}
@@ -145,7 +131,6 @@ namespace DroNeS.Mapbox.JobSystem
 			if (Edges.IsCreated) Edges.Dispose();
 			if (Vertices.IsCreated) Vertices.Dispose();
 			if (Normals.IsCreated) Normals.Dispose();
-			if (Tangents.IsCreated) Tangents.Dispose();
 			if (Triangles.IsCreated) Triangles.Dispose();
 			if (UV.IsCreated) UV.Dispose();
 		}
@@ -155,7 +140,6 @@ namespace DroNeS.Mapbox.JobSystem
 			Edges.Clear();
 			Vertices.Clear();
 			Normals.Clear();
-			Tangents.Clear();
 			Triangles.Clear();
 			UV.Clear();
 		}
@@ -211,13 +195,5 @@ namespace DroNeS.Mapbox.JobSystem
 			WallToFloorRatio = (1 - TopSectionRatio - BottomSectionRatio) * (TextureRect.height / TextureRect.width);
 		}
 		
-	}
-
-	public unsafe struct MeshProxy
-	{
-		public Vector3* Vertices;
-		public Vector3* Normals;
-		public Vector2* Uv;
-		public int* Triangles;
 	}
 }

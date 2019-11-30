@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using DroNeS.Systems;
+using DroNeS.Utils;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Modifiers;
@@ -118,6 +119,7 @@ namespace DroNeS.Mapbox.ECS
 		    renderMesh.mesh.subMeshCount = value.Triangles.Count;
 		    renderMesh.mesh.SetVertices(value.Vertices);
 		    renderMesh.mesh.SetNormals(value.Normals);
+		    
 		    
 		    for (var i = 0; i < value.Triangles.Count; i++)
 		    {

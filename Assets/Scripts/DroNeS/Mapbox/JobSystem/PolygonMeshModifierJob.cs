@@ -119,7 +119,6 @@ namespace DroNeS.Mapbox.JobSystem
 						_mesh.Edges.Add(vertCount + ((j + 1) % polygonVertexCount));
 						_mesh.Edges.Add(vertCount + j);
 						_mesh.Vertices.Add(val);
-						_mesh.Tangents.Add(new float4(math.forward(quaternion.identity), 0));
 						_mesh.Normals.Add(math.up());
 						
 						if (_textureType == UvMapType.Tiled)

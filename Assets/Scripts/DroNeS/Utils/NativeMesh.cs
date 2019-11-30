@@ -21,8 +21,8 @@ namespace DroNeS.Utils
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         internal AtomicSafetyHandle m_Safety;
 
-        [NativeSetClassTypeToNullOnSchedule]
-        DisposeSentinel m_DisposeSentinel;
+        [NativeSetClassTypeToNullOnSchedule] 
+        private DisposeSentinel m_DisposeSentinel;
 #endif
         [NativeDisableUnsafePtrRestriction]
         internal UnsafeList* m_vertices;
@@ -308,11 +308,42 @@ namespace DroNeS.Utils
 #endif
             list->Add(element);
         }
+
+        public int[] TriangleAsArray() => AsArray<int>(m_triangles).ToArray();
+        public Vector3[] VerticesAsArray() => AsArray<Vector3>(m_vertices).ToArray();
+        public Vector3[] NormalsAsArray() => AsArray<Vector3>(m_normals).ToArray();
+        public Vector2[] UVAsArray() => AsArray<Vector2>(m_uv).ToArray();
+
+        private static NativeArray<T> AsArray<T>(in UnsafeList* list) where T : unmanaged
+        {
+            return NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(list->Ptr, list->Length, Allocator.Invalid);
+        }
+
+        public Mesh AsMesh()
+        {
+            return new Mesh
+            {
+                normals = NormalsAsArray(),
+                triangles = TriangleAsArray(),
+                vertices = VerticesAsArray(),
+                uv = UVAsArray()
+            };
+        }
         
     }
 
     internal struct NativeMeshDebugView
     {
-        
+        private NativeMesh m_Mesh;
+
+        public NativeMeshDebugView(NativeMesh mesh)
+        {
+            m_Mesh = mesh;
+        }
+
+        public int[] Triangles => m_Mesh.TriangleAsArray();
+        public Vector3[] Normals => m_Mesh.NormalsAsArray();
+        public Vector3[] Vertices => m_Mesh.VerticesAsArray();
+        public Vector2[] UV => m_Mesh.UVAsArray();
     }
 }

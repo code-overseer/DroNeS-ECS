@@ -259,11 +259,6 @@ namespace DroNeS.Mapbox.JobSystem
 			md.Normals.Add(_wallNormal);
 			md.Normals.Add(_wallNormal);
 
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-
 			_wallTriangles.Add(_triIndex);
 			_wallTriangles.Add(_triIndex + 1);
 			_wallTriangles.Add(_triIndex + 2);
@@ -322,11 +317,6 @@ namespace DroNeS.Mapbox.JobSystem
 				md.Normals.Add(_wallNormal);
 				md.Normals.Add(_wallNormal);
 
-				md.Tangents.Add(new float4(_wallDirection, 0.0f));
-				md.Tangents.Add(new float4(_wallDirection, 0.0f));
-				md.Tangents.Add(new float4(_wallDirection, 0.0f));
-				md.Tangents.Add(new float4(_wallDirection, 0.0f));
-
 				_wallTriangles.Add(_triIndex);
 				_wallTriangles.Add(_triIndex + 1);
 				_wallTriangles.Add(_triIndex + 2);
@@ -375,12 +365,6 @@ namespace DroNeS.Mapbox.JobSystem
 			md.Normals.Add(_wallNormal);
 			md.Normals.Add(_wallNormal);
 
-
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-
 			_wallTriangles.Add(_triIndex);
 			_wallTriangles.Add(_triIndex + 1);
 			_wallTriangles.Add(_triIndex + 2);
@@ -407,10 +391,7 @@ namespace DroNeS.Mapbox.JobSystem
 			md.Normals.Add(_wallNormal);
 			md.Normals.Add(_wallNormal);
 			md.Normals.Add(_wallNormal);
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
-			md.Tangents.Add(new float4(_wallDirection, 0.0f));
+
 
 			if (_wallSegmentLength >= _minWallLength)
 			{
