@@ -197,11 +197,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			{
 				return false;
 			}
-			if (propertyValue >= Max)
-			{
-				return false;
-			}
-			return true;
+			return !(propertyValue >= Max);
 		}
 	}
 
@@ -217,11 +213,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			{
 				return false;
 			}
-			if (propertyValue > Min)
-			{
-				return true;
-			}
-			return false;
+			return propertyValue > Min;
 		}
 	}
 

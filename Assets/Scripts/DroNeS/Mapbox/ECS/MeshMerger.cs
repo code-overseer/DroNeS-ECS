@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using DroNeS.Systems;
 using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Unity.Rendering;
 using UnityEngine;
@@ -165,6 +166,7 @@ namespace DroNeS.Mapbox.ECS
 			    CityBuilderSystem.MakeBuilding(in pos, in renderMesh);
 		    }
 		    
+		    tile.VectorDataState = TilePropertyState.Loaded;
 		    _accumulation.Remove(tile);
 	    }
 	    

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
@@ -11,13 +13,12 @@ namespace DroNeS.MonoBehaviours
     {
         private void Start()
         {
-            var handle = new TestJob().Schedule();
-            handle.Complete();
+            
         }
-
-
     }
     
+    
+    [BurstCompile]
     public unsafe struct TestJob : IJob{
         public void Execute()
         {

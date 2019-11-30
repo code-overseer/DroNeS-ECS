@@ -115,7 +115,7 @@ namespace DroNeS.Mapbox.ECS
 
 		public void Clear()
 		{
-			UnityEngine.Object.DestroyImmediate(_dataFetcher);
+			Object.DestroyImmediate(_dataFetcher);
 			if (_layerBuilder == null) return;
 			_layerProgress.Clear();
 			TilesWaitingResponse.Clear();
@@ -175,14 +175,9 @@ namespace DroNeS.Mapbox.ECS
 			}
 		}
 
-		private void CreateFeatureWithBuilder(CustomTile tile, string layerName, BuildingMeshBuilder builder)
+		private static void CreateFeatureWithBuilder(CustomTile tile, string layerName, BuildingMeshBuilder builder)
 		{
-			builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
-		}
-
-		private void DecreaseProgressCounter(CustomTile tile, BuildingMeshBuilder builder)
-		{
-			tile.VectorDataState = TilePropertyState.Loaded;
+			builder.Create(tile.VectorData.Data.GetLayer(layerName), tile);
 		}
 
 		private void CreateLayerVisualizers()
@@ -193,7 +188,6 @@ namespace DroNeS.Mapbox.ECS
 			}
 		}
 
-		private void RemoveAllLayerVisualizers() => _layerBuilder.Clear();
 		#endregion
 
 	}

@@ -33,7 +33,8 @@ namespace Mapbox.Unity.Utilities
         /// <summary>
         /// Returns the Runnable instance.
         /// </summary>
-        public static Runnable Instance { get { return Singleton<Runnable>.Instance; } }
+        private static Runnable Instance => Singleton<Runnable>.Instance;
+
         #endregion
 
         #region Public Interface
@@ -44,7 +45,7 @@ namespace Mapbox.Unity.Utilities
         /// <returns>Returns a ID that can be passed into Stop() to halt the co-routine.</returns>
         public static int Run(IEnumerator routine)
         {
-            Routine r = new Routine(routine);
+            var r = new Routine(routine);
             return r.ID;
         }
 
@@ -54,8 +55,7 @@ namespace Mapbox.Unity.Utilities
         /// <param name="ID">THe ID of the co-routine to stop.</param>
         public static void Stop(int ID)
         {
-            Routine r = null;
-            if (Instance.m_Routines.TryGetValue(ID, out r))
+            if (Instance.m_Routines.TryGetValue(ID, out var r))
                 r.Stop = true;
         }
 
@@ -64,7 +64,7 @@ namespace Mapbox.Unity.Utilities
         /// </summary>
         /// <param name="id">The ID returned by Run().</param>
         /// <returns>Returns true if the routine is still active.</returns>
-        static public bool IsRunning(int id)
+        public static bool IsRunning(int id)
         {
             return Instance.m_Routines.ContainsKey(id);
         }
@@ -77,20 +77,18 @@ namespace Mapbox.Unity.Utilities
         /// </summary>
         public static void EnableRunnableInEditor()
         {
-            if (!sm_EditorRunnable)
-            {
-                sm_EditorRunnable = true;
-                UnityEditor.EditorApplication.update += UpdateRunnable;
-            }
+            if (sm_EditorRunnable) return;
+            sm_EditorRunnable = true;
+            UnityEditor.EditorApplication.update += UpdateRunnable;
         }
-        static void UpdateRunnable()
+
+        private static void UpdateRunnable()
         {
             if (!Application.isPlaying)
             {
                 Instance.UpdateRoutines();
             }
         }
-
 #endif
         #endregion
 
@@ -124,12 +122,12 @@ namespace Mapbox.Unity.Utilities
             }
 
             #region IEnumerator Interface
-            public object Current { get { return m_Enumerator.Current; } }
+            public object Current => m_Enumerator.Current;
+
             public bool MoveNext()
             {
                 m_bMoveNext = m_Enumerator.MoveNext();
-                if (m_bMoveNext && Stop)
-                    m_bMoveNext = false;
+                if (m_bMoveNext && Stop) m_bMoveNext = false;
 
                 if (!m_bMoveNext)
                 {
@@ -157,16 +155,14 @@ namespace Mapbox.Unity.Utilities
         /// </summary>
         public void UpdateRoutines()
         {
-            if (m_Routines.Count > 0)
-            {
-                // we are not in play mode, so we must manually update our co-routines ourselves
-                List<Routine> routines = new List<Routine>();
-                foreach (var kp in m_Routines)
-                    routines.Add(kp.Value);
+            if (m_Routines.Count <= 0) return;
+            // we are not in play mode, so we must manually update our co-routines ourselves
+            var routines = new List<Routine>();
+            foreach (var kp in m_Routines)
+                routines.Add(kp.Value);
 
-                foreach (var r in routines)
-                    r.MoveNext();
-            }
+            foreach (var r in routines)
+                r.MoveNext();
         }
     }
 }

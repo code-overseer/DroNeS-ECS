@@ -34,13 +34,7 @@ namespace Mapbox.Map
 
 		/// <summary> Gets the canonical tile identifier. </summary>
 		/// <value> The canonical tile identifier. </value>
-		public CanonicalTileId Canonical
-		{
-			get
-			{
-				return new CanonicalTileId(this);
-			}
-		}
+		public CanonicalTileId Canonical => new CanonicalTileId(this);
 
 		/// <summary>
 		///     Returns a <see cref="T:System.String"/> that represents the current

@@ -15,20 +15,13 @@ namespace DroNeS.Mapbox.ECS
 {
     public class DronesMap 
     {
-        #region Private Fields
         private readonly MapOptions _options = new MapOptions();
-        #endregion
-        
-        #region IMap Properties
         public Vector2d CenterMercator { get; private set; }
         public float WorldRelativeScale { get; private set; }
         public Vector2d CenterLatitudeLongitude { get; private set; }
         private float Zoom => _options.locationOptions.zoom;
         public int InitialZoom => 16;
-
         public int AbsoluteZoom => (int) Math.Floor(Zoom);
-        #endregion
-
         private ManhattanVisualizer Visualizer { get; set; }
 
         public static void Build()

@@ -6,23 +6,23 @@ namespace DroNeS.Mapbox.ECS
 {
     public class ManhattanVisualizer
     {
-        public BuildingMeshFactory MeshFactory;
-        public TerrainImageFactory ImageFactory;
+        private readonly TerrainImageFactory _imageFactory;
+        private readonly BuildingMeshFactory _meshFactory;
         private readonly DronesMap _map;
         private int _counter;
 
         public ManhattanVisualizer(DronesMap map)
         {
             _map = map;
-            MeshFactory = new BuildingMeshFactory();
-            ImageFactory = new TerrainImageFactory();
+            _imageFactory = new TerrainImageFactory();
+            _meshFactory = new BuildingMeshFactory();
         }
 
         public void LoadTile(UnwrappedTileId tileId)
         {
             var tile = new CustomTile(in _map, in tileId);
-            ImageFactory.Register(tile);
-            MeshFactory.Register(tile);
+            _imageFactory.Register(tile);
+            _meshFactory.Register(tile);
         }
         
     

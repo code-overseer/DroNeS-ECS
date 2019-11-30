@@ -9,7 +9,7 @@ using Unity.Transforms;
 
 namespace DroNeS.Systems
 {
-//    [DisableAutoCreation]
+    [DisableAutoCreation]
     public class CityBuilderSystem : ComponentSystem
     {
         private static EntityManager Manager => World.Active.EntityManager;

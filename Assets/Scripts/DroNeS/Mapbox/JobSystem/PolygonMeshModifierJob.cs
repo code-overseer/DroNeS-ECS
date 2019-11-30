@@ -33,12 +33,13 @@ namespace DroNeS.Mapbox.JobSystem
 
 		#endregion
 
-		public void SetProperties(UVModifierOptions properties, in VectorFeatureStruct feature, in MeshDataStruct md)
+		public PolygonMeshModifierJob SetProperties(UVModifierOptions properties, ref VectorFeatureStruct feature, ref MeshDataStruct md)
 		{
 			_textureType = properties.texturingType;
 			_currentFacade = properties.atlasInfo.Roofs[0];
 			_feature = feature;
 			_mesh = md;
+			return this;
 		}
 
 		private bool IsClockwise(in NativeMultiHashMap<int, float3> vertices, int idx)

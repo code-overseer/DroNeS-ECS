@@ -19,7 +19,7 @@
 		{
 			set
 			{
-				if (value == true)
+				if (value)
 				{
 					OnPropertyHasChanged(new VectorLayerUpdateArgs { property = this });
 				}
@@ -80,7 +80,7 @@
 		/// <param name="value">Value.</param>
 		public virtual ILayerFilter AddNumericFilterEquals(string key, float value)
 		{
-			LayerFilter layerFilter = new LayerFilter()
+			var layerFilter = new LayerFilter()
 			{
 				Key = key,
 				filterOperator = LayerFilterOperationType.IsEqual,
@@ -98,7 +98,7 @@
 		/// <param name="value">Value.</param>
 		public virtual ILayerFilter AddNumericFilterLessThan(string key, float value)
 		{
-			LayerFilter layerFilter = new LayerFilter()
+			var layerFilter = new LayerFilter()
 			{
 				Key = key,
 				filterOperator = LayerFilterOperationType.IsLess,
@@ -116,7 +116,7 @@
 		/// <param name="value">Value.</param>
 		public virtual ILayerFilter AddNumericFilterGreaterThan(string key, float value)
 		{
-			LayerFilter layerFilter = new LayerFilter()
+			var layerFilter = new LayerFilter()
 			{
 				Key = key,
 				filterOperator = LayerFilterOperationType.IsGreater,

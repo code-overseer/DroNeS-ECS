@@ -1,4 +1,5 @@
 ﻿using System;
+using DroNeS.Mapbox.ECS;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Utils;
 using Unity.Collections;
@@ -12,12 +13,30 @@ namespace DroNeS.Mapbox.JobSystem
 		public NativeMultiHashMap<int, float3> Points;
 		public NativeList<int> PointCount;
 
-		private double _rectSizeX;
-		private double _rectSizeY;
-		private int _geomCount;
-		private int _pointCount;
-		private NativeList<float3> _newPoints;
-		private NativeMultiHashMap<int, float2> _geom;
+		public static implicit operator VectorFeatureStruct(CustomFeatureUnity feature)
+		{
+			var output = new VectorFeatureStruct();
+			var points = feature.Points;
+			output.PointCount = new NativeList<int>(points.Count + 1, Allocator.TempJob);
+			var size = 0;
+			foreach (var list in points)
+			{
+				output.PointCount.Add(list.Count);
+				size += list.Count;
+			}
+			
+			output.Points = new NativeMultiHashMap<int, float3>(size + 1, Allocator.TempJob);
+			for (var i = 0; i < points.Count; ++i)
+			{
+				for (var j = points[i].Count - 1; j >= 0; --j)
+				{
+					output.Points.Add(i, points[i][j]);
+				}
+			}
+
+			return output;
+		}
+		
 	}
 	
 	public struct MathRect
@@ -44,11 +63,11 @@ namespace DroNeS.Mapbox.JobSystem
 		// ReSharper disable UnassignedField.Global
 		public MathRect TileRect;
 		public NativeList<int> Edges;
-		public NativeList<float3> Vertices;
-		public NativeList<float3> Normals;
-		public NativeList<float4> Tangents;
+		public NativeList<Vector3> Vertices;
+		public NativeList<Vector3> Normals;
+		public NativeList<Vector4> Tangents;
 		public NativeList<int> Triangles;
-		public NativeList<float2> UV;
+		public NativeList<Vector2> UV;
 
 		private readonly Allocator _allocator;
 		// ReSharper restore UnassignedField.Global
@@ -58,11 +77,11 @@ namespace DroNeS.Mapbox.JobSystem
 			TileRect = tileRect;
 			_allocator = allocator;
 			Edges = new NativeList<int>(allocator);
-			Vertices = new NativeList<float3>(allocator);
-			Normals = new NativeList<float3>(allocator);
-			Tangents = new NativeList<float4>(allocator);
+			Vertices = new NativeList<Vector3>(allocator);
+			Normals = new NativeList<Vector3>(allocator);
+			Tangents = new NativeList<Vector4>(allocator);
 			Triangles = new NativeList<int>(allocator);
-			UV = new NativeList<float2>(allocator);
+			UV = new NativeList<Vector2>(allocator);
 		}
 		
 		public MeshDataStruct(in MeshDataStruct other, Allocator allocator)
@@ -82,17 +101,28 @@ namespace DroNeS.Mapbox.JobSystem
 			{
 				Edges = new NativeList<int>(other.Edges.Capacity, allocator);
 				Edges.AddRange(other.Edges);
-				Vertices = new NativeList<float3>(other.Vertices.Capacity, allocator);
+				Vertices = new NativeList<Vector3>(other.Vertices.Capacity, allocator);
 				Vertices.AddRange(other.Vertices);
-				Normals = new NativeList<float3>(other.Normals.Capacity, allocator);
+				Normals = new NativeList<Vector3>(other.Normals.Capacity, allocator);
 				Normals.AddRange(other.Normals);
-				Tangents = new NativeList<float4>(other.Tangents.Capacity, allocator);
+				Tangents = new NativeList<Vector4>(other.Tangents.Capacity, allocator);
 				Tangents.AddRange(other.Tangents);
 				Triangles = new NativeList<int>(other.Triangles.Capacity, allocator);
 				Triangles.AddRange(other.Triangles);
-				UV = new NativeList<float2>(other.UV.Capacity, allocator);
+				UV = new NativeList<Vector2>(other.UV.Capacity, allocator);
 				UV.AddRange(other.UV);
 			}
+		}
+
+		public void CopyFrom(in MeshDataStruct other)
+		{
+			Clear();
+			Edges.AddRange(other.Edges);
+			Vertices.AddRange(other.Vertices);
+			Normals.AddRange(other.Normals);
+			Tangents.AddRange(other.Tangents);
+			Triangles.AddRange(other.Edges);
+			UV.AddRange(other.UV);
 		}
 
 		public void Dispose()
@@ -101,12 +131,22 @@ namespace DroNeS.Mapbox.JobSystem
 			    _allocator == Allocator.None ||
 			    _allocator == Allocator.Temp) return;
 			
-			Edges.Dispose();
-			Vertices.Dispose();
-			Normals.Dispose();
-			Tangents.Dispose();
-			Triangles.Dispose();
-			UV.Dispose();
+			if (Edges.IsCreated) Edges.Dispose();
+			if (Vertices.IsCreated) Vertices.Dispose();
+			if (Normals.IsCreated) Normals.Dispose();
+			if (Tangents.IsCreated) Tangents.Dispose();
+			if (Triangles.IsCreated) Triangles.Dispose();
+			if (UV.IsCreated) UV.Dispose();
+		}
+
+		private void Clear()
+		{
+			Edges.Clear();
+			Vertices.Clear();
+			Normals.Clear();
+			Tangents.Clear();
+			Triangles.Clear();
+			UV.Clear();
 		}
 	}
 

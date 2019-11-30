@@ -33,7 +33,7 @@ namespace Mapbox.Unity.Utilities {
 	/// <remarks>An instance of this class needs to be of type <c>UnityEngine.Object</c> As long as this is used with UnityEngine classes, this should work fine. This is to resolve issue #116 <see href="https://github.com/mapbox/mapbox-unity-sdk/issues/116"/>	</remarks>
 	public class Singleton<T> where T : UnityEngine.Object {
 		#region Private Data
-		static private T sm_Instance = null;
+		private static T sm_Instance;
 		#endregion
 
 		#region Public Properties
@@ -59,9 +59,9 @@ namespace Mapbox.Unity.Utilities {
 #else
 			if (typeof(MonoBehaviour).IsAssignableFrom(typeof(T))) {
 #endif
-				string singletonName = "_" + typeof(T).Name;
+				var singletonName = "_" + typeof(T).Name;
 
-				GameObject singletonObject = GameObject.Find(singletonName);
+				var singletonObject = GameObject.Find(singletonName);
 				if (singletonObject == null)
 					singletonObject = new GameObject(singletonName);
 #if SINGLETONS_VISIBLE

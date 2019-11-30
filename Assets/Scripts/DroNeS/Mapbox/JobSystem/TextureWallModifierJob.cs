@@ -1,4 +1,5 @@
 ﻿using System;
+using DroNeS.Mapbox.ECS;
 using DroNeS.Utils;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -22,6 +23,7 @@ namespace DroNeS.Mapbox.JobSystem
 
 		#endregion
 
+		#region Fields
 		private float _currentWallLength;
 		private float3 _start; //zero default
 		private float3 _wallDirection; //zero default
@@ -49,7 +51,7 @@ namespace DroNeS.Mapbox.JobSystem
 		private float _currentY2;
 		
 		private int _counter;
-		private float _height;// = 0.0f;
+		private float _height;
 		private float _minWallLength;
 		private float _singleFloorHeight;
 		private float _currentMidHeight;
@@ -58,12 +60,10 @@ namespace DroNeS.Mapbox.JobSystem
 		private float _leftOverColumnLength;
 		private float _maxHeight;
 		private float _minHeight;
-
 		private float _extrusionScaleFactor;
-		
+		#endregion
 		
 		private static readonly Bool CenterSegments = true;
-		private static readonly Bool SeparateSubmesh = true;
 		private const float WallSizeEpsilon = 0.99f;
 		private const float NarrowWallWidthDelta = 0.01f;
 		private const float ShortRowHeightDelta = 0.015f;
@@ -71,7 +71,7 @@ namespace DroNeS.Mapbox.JobSystem
 		private static readonly ExtrusionType ExtrusionType = ExtrusionType.PropertyHeight;
 		private static readonly ExtrusionGeometryType ExtrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 
-		public void SetProperties(UVModifierOptions properties, VectorFeatureUnity feature)
+		public TextureSideWallModifierJob SetProperties(UVModifierOptions properties, CustomFeatureUnity feature)
 		{
 			var options = properties.ToGeometryExtrusionWithAtlasOptions();
 			_currentFacade = options.atlasInfo.Textures[0];
@@ -79,14 +79,14 @@ namespace DroNeS.Mapbox.JobSystem
 			_extrusionScaleFactor = options.extrusionScaleFactor;
 			_minHeight = 0.0f;
 			_maxHeight = 0.0f;
-
-			if (!feature.Properties.ContainsKey("height")) return;
+			_height = 0.0f;
+			if (!feature.Properties.ContainsKey("height")) return this;
 			_maxHeight = Convert.ToSingle(feature.Properties["height"]);
 			if (feature.Properties.ContainsKey("min_height"))
 			{
 				_minHeight = Convert.ToSingle(feature.Properties["min_height"]);
 			}
-
+			return this;
 		}
 
 
@@ -150,7 +150,7 @@ namespace DroNeS.Mapbox.JobSystem
 				_start = v1;
 				_wallSegmentDirection = math.normalize(v2 - v1);
 
-				//half of leftover column (if _centerSegments ofc) at the begining
+				//half of leftover column (if _centerSegments ofc) at the beginning
 				if (CenterSegments && _currentWallLength > _singleColumnLength)
 				{
 					//save left,right vertices and wall length

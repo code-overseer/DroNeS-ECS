@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using DroNeS.Mapbox.JobSystem;
-using Mapbox.Map;
+using DroNeS.Mapbox.MonoBehaviour;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
@@ -29,14 +29,32 @@ namespace DroNeS.Mapbox.ECS
         public ILayerFeatureFilterComparer LayerFeatureFilterCombiner;
         public int FeatureCount;
     }
+	
+	internal class ProcessingState : IEnumerator
+	{
+		private int _index;
+		private readonly BuildingMeshBuilderProperties _properties;
+
+		public ProcessingState(BuildingMeshBuilderProperties properties)
+		{
+			_properties = properties;
+			_index = 0;
+		}
+		public bool MoveNext()
+		{
+			return ++_index < _properties.FeatureCount;
+		}
+		public void Reset()
+		{
+			_index = 0;
+		}
+		public object Current => this;
+	}
     
     public class BuildingMeshBuilder
     {
-	    public VectorSubLayerProperties SubLayerProperties { get; set; }
-	    public LayerPerformanceOptions PerformanceOptions;
-		public Dictionary<CustomTile, List<int>> ActiveCoroutines;
-		private int _entityInCurrentCoroutine;
-		private MeshMerger _defaultStack;
+	    public VectorSubLayerProperties SubLayerProperties { get; private set; }
+	    private MeshMerger _defaultStack;
 		private HashSet<ulong> _activeIds;
 		private string _key;
 		private HashSet<ModifierBase> _coreModifiers = new HashSet<ModifierBase>();
@@ -60,7 +78,6 @@ namespace DroNeS.Mapbox.ECS
 		{
 			_coreModifiers = new HashSet<ModifierBase>();
 			SubLayerProperties = properties;
-			PerformanceOptions = properties.performanceOptions;
 			_defaultStack = ScriptableObject.CreateInstance<MeshMerger>();
 			_defaultStack.MeshModifiers = new List<MeshModifier>();
 
@@ -110,17 +127,12 @@ namespace DroNeS.Mapbox.ECS
 		{
 			return layerProperties.BuildingsWithUniqueIds && _activeIds.Contains(featureId);
 		}
-		private bool IsCoroutineBucketFull()
-		{
-			return PerformanceOptions != null && PerformanceOptions.isEnabled &&
-			       _entityInCurrentCoroutine >= PerformanceOptions.entityPerCoroutine;
-		}
+
 		#endregion
+		
 		
 		public void Initialize()
 		{
-			_entityInCurrentCoroutine = 0;
-			ActiveCoroutines = new Dictionary<CustomTile, List<int>>();
 			_activeIds = new HashSet<ulong>();
 			InitializeStack();
 		}
@@ -130,14 +142,10 @@ namespace DroNeS.Mapbox.ECS
 			if (_defaultStack != null) _defaultStack.Initialize();
 		}
 		
-		public void Create(VectorTileLayer layer, CustomTile tile, Action<CustomTile, BuildingMeshBuilder> callback)
+		public void Create(VectorTileLayer layer, CustomTile tile)
 		{
 			if (tile == null || layer == null) return;
-			if (!ActiveCoroutines.ContainsKey(tile))
-				ActiveCoroutines.Add(tile, new List<int>());
-			
-			
-			ActiveCoroutines[tile].Add(Runnable.Run(ProcessLayer(MakeProperties(layer), tile, tile.UnwrappedTileId, callback)));
+			CoroutineManager.Run(ProcessLayer(MakeProperties(layer), tile));
 		}
 
 		private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)
@@ -169,24 +177,15 @@ namespace DroNeS.Mapbox.ECS
 			return output;
 		}
 
-		private IEnumerator ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile, UnwrappedTileId tileId, Action<CustomTile, BuildingMeshBuilder> callback = null)
+		private IEnumerator ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile)
 		{
-			#region PreProcess & Process.
-			
-			do
+			for (var i = 0; i < properties.FeatureCount; ++i)
 			{
-				for (var i = 0; i < properties.FeatureCount; i++)
-				{
-					ProcessFeature(i, tile, properties);
-					yield return null;
-				}
-				// move processing to next stage.
-				properties.FeatureProcessingStage++;
-			} while (properties.FeatureProcessingStage == FeatureProcessingStage.PreProcess || properties.FeatureProcessingStage == FeatureProcessingStage.Process);
-
-			#endregion
+				ProcessFeature(i, tile, properties);
+				yield return null;
+			}
+			
 			_defaultStack.Terminate(tile);
-			callback?.Invoke(tile, this);
 		}
 
 		private bool ProcessFeature(int index, CustomTile tile, BuildingMeshBuilderProperties layerProperties)
@@ -195,16 +194,13 @@ namespace DroNeS.Mapbox.ECS
 			var fe = layerProperties.VectorTileLayer.GetFeature(index);
 			List<List<Point2d<float>>> geom;
 			
-			if (layerProperties.BuildingsWithUniqueIds) //ids from building dataset is big ulongs
+			if (layerProperties.BuildingsWithUniqueIds)
 			{
-				geom = fe.Geometry<float>(); //and we're not clipping by passing no parameters
+				geom = fe.Geometry<float>(); 
 
-				if (geom[0][0].X < 0 || geom[0][0].X > layerExtent || geom[0][0].Y < 0 || geom[0][0].Y > layerExtent)
-				{
-					return false;
-				}
+				if (geom[0][0].X < 0 || geom[0][0].X > layerExtent || geom[0][0].Y < 0 || geom[0][0].Y > layerExtent) return false;
 			}
-			else //streets ids, will require clipping
+			else
 			{
 				geom = fe.Geometry<float>(0); //passing zero means clip at tile edge
 			}
@@ -219,41 +215,20 @@ namespace DroNeS.Mapbox.ECS
 
 			if (!IsFeatureEligibleAfterFiltering(feature, layerProperties)) return true;
 			if (tile == null || tile.VectorDataState == TilePropertyState.Cancelled) return true;
-
-			if (layerProperties.FeatureProcessingStage != FeatureProcessingStage.PostProcess)
-			{
-				if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, layerProperties))
-				{
-					return false;
-				}
+			if (layerProperties.FeatureProcessingStage == FeatureProcessingStage.PostProcess) return true;
+			if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, layerProperties)) return false;
 			
-				AddFeatureToTileObjectPool(feature);
-				Build(feature, tile);
-			}
-
-			_entityInCurrentCoroutine++;
+			AddFeatureToTileObjectPool(feature);
+			Build(feature, tile);
 			return true;
 		}
-		
-		private bool IsFeatureValid(CustomFeatureUnity feature)
-		{
-			if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
-				return false;
 
-			return feature.Points.Count >= 1;
-		}
 		private void Build(CustomFeatureUnity feature, CustomTile tile)
 		{
 			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"])) return;
-
 			if (feature.Points.Count < 1) return;
-			
 			var styleSelectorKey = SubLayerProperties.coreOptions.sublayerName;
-
-			if (_defaultStack != null)
-			{
-				_defaultStack.Execute(tile, feature, new MeshData {TileRect = tile.Rect}, styleSelectorKey);
-			}
+			_defaultStack.Execute(tile, feature, new MeshData {TileRect = tile.Rect}, styleSelectorKey);
 		}
     }
 }

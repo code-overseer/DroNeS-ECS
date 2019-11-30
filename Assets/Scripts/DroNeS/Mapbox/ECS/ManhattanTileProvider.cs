@@ -57,7 +57,7 @@ namespace DroNeS.Mapbox.ECS
             new float2(40.702f,-74.003f),
             new float2(40.699f,-74.003f)};
 
-        public static HashSet<UnwrappedTileId> GetTiles(DronesMap map)
+        public static IEnumerable<UnwrappedTileId> GetTiles(DronesMap map)
         {
             SetUpTiles(map);
             return Tiles;
