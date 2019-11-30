@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Mapbox.Map;
+using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.Map.Strategies;
@@ -160,6 +161,8 @@ namespace DroNeS.Mapbox.MonoBehaviour
 
         private IEnumerator TriggerTileRedrawForExtent(ExtentArgs extent, Stopwatch t)
         {
+            var access = MapboxAccess.Instance;
+            yield return new WaitUntil(() => MapboxAccess.Configured);
             // 286 tiles
             foreach (var tileId in extent.activeTiles)
             {
@@ -167,6 +170,16 @@ namespace DroNeS.Mapbox.MonoBehaviour
                 if (t.ElapsedMilliseconds <= 5) continue;
                 yield return null;
                 t.Restart();
+            }
+
+            BuildingCount();
+        }
+
+        private void BuildingCount()
+        {
+            foreach (Transform i in  transform)
+            {
+                if (i.childCount > 3) Debug.Log(i.name);
             }
         }
     }

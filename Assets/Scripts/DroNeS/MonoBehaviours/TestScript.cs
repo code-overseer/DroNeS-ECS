@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using DroNeS.Utils;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -11,12 +12,31 @@ namespace DroNeS.MonoBehaviours
 {
     public class TestScript : MonoBehaviour
     {
-        private void Start()
+        private unsafe void Start()
         {
-            
+            var integer = new NativePtr<int>(Allocator.TempJob);
+            var handle = new TestJob2 {Ptr = integer, Structs = null}.Schedule();
+            handle.Complete();
+            Debug.Log(integer.Value);
+            integer.Dispose();
+
         }
     }
-    
+
+    public unsafe struct TestJob2 : IJob
+    {
+        [NativeDisableUnsafePtrRestriction] 
+        public int* Structs;
+
+        public NativePtr<int> Ptr;
+        public void Execute()
+        {
+            Structs = (int*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), Allocator.Temp);
+            *Structs = 5;
+            Ptr.Value = *Structs * 8;
+            UnsafeUtility.Free(Structs, Allocator.Temp);
+        }
+    }
     
     [BurstCompile]
     public unsafe struct TestJob : IJob{
@@ -44,4 +64,5 @@ namespace DroNeS.MonoBehaviours
             points.Add(point);
         }
     }
+
 }

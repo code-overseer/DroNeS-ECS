@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using DroNeS.Mapbox.ECS;
 using DroNeS.Systems;
 using Mapbox.Unity.Map;
-using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Utils;
 using Unity.Collections;

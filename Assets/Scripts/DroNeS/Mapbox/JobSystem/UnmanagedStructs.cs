@@ -57,15 +57,24 @@ namespace DroNeS.Mapbox.JobSystem
 			};
 		}
 	}
+	
+	public unsafe struct MeshDataProxy
+	{
+		public Vector3* Vertices;
+		public Vector3* Normals;
+		public int* Triangles;
+		public Vector2* Uv;
+	}
 
 	public struct MeshDataStruct : IDisposable
 	{
 		// ReSharper disable UnassignedField.Global
+		public int Index;
 		public MathRect TileRect;
 		public NativeList<int> Edges;
+		public NativeList<Vector4> Tangents;
 		public NativeList<Vector3> Vertices;
 		public NativeList<Vector3> Normals;
-		public NativeList<Vector4> Tangents;
 		public NativeList<int> Triangles;
 		public NativeList<Vector2> UV;
 
@@ -74,6 +83,7 @@ namespace DroNeS.Mapbox.JobSystem
 
 		public MeshDataStruct(in RectD tileRect, Allocator allocator)
 		{
+			Index = 0;
 			TileRect = tileRect;
 			_allocator = allocator;
 			Edges = new NativeList<int>(allocator);
@@ -84,8 +94,9 @@ namespace DroNeS.Mapbox.JobSystem
 			UV = new NativeList<Vector2>(allocator);
 		}
 		
-		public MeshDataStruct(in MeshDataStruct other, Allocator allocator)
+		public MeshDataStruct(int index, in MeshDataStruct other, Allocator allocator)
 		{
+			Index = index;
 			_allocator = allocator;
 			TileRect = other.TileRect;
 			if (other._allocator == Allocator.None || other._allocator == Allocator.Invalid)
@@ -200,5 +211,13 @@ namespace DroNeS.Mapbox.JobSystem
 			WallToFloorRatio = (1 - TopSectionRatio - BottomSectionRatio) * (TextureRect.height / TextureRect.width);
 		}
 		
+	}
+
+	public unsafe struct MeshProxy
+	{
+		public Vector3* Vertices;
+		public Vector3* Normals;
+		public Vector2* Uv;
+		public int* Triangles;
 	}
 }
