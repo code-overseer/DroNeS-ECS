@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 
 // ReSharper disable InconsistentNaming
 
@@ -65,20 +66,56 @@ namespace DroNeS.Utils
 
         public unsafe bool IsCreated => (IntPtr) m_Buffer != IntPtr.Zero;
 
+        private unsafe void Deallocate()
+        {
+            UnsafeUtility.Free(m_Buffer, m_AllocatorLabel);
+            m_Buffer = null;
+        }
+
         [WriteAccessRequired]
-        public unsafe void Dispose()
+        public void Dispose()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             
             if (!UnsafeUtility.IsValidAllocator(m_AllocatorLabel))
                 throw new InvalidOperationException(
-                    "The NativePtr can not be Disposed because it was not allocated with a valid allocator.");
+                    "The NativePtr can not be disposed because it was not allocated with a valid allocator.");
             AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
             
             DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
 #endif            
-            UnsafeUtility.Free(m_Buffer, m_AllocatorLabel);
+            
+            Deallocate();
+        }
+        
+        public unsafe JobHandle Dispose(JobHandle inputDeps)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            
+            if (!UnsafeUtility.IsValidAllocator(m_AllocatorLabel))
+                throw new InvalidOperationException(
+                    "The NativePtr can not be disposed because it was not allocated with a valid allocator.");
+            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
+            
+            DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
+#endif
+            var handle = new DisposalJob
+            {
+                Container = this
+            }.Schedule(inputDeps);
+
             m_Buffer = null;
+            return handle;
+        }
+        
+        private struct DisposalJob : IJob
+        {
+            public NativePtr<T> Container;
+            public void Execute()
+            {
+                if (!Container.IsCreated) return;
+                Container.Deallocate();
+            }
         }
 
         [WriteAccessRequired]
@@ -118,6 +155,7 @@ namespace DroNeS.Utils
                 *(T*)m_Buffer = value;
             }
         }
+        
 
         public unsafe bool Equals(NativePtr<T> other)
         {

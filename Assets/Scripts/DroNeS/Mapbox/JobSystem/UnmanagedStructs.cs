@@ -1,8 +1,11 @@
 ﻿using System;
 using DroNeS.Mapbox.ECS;
+using DroNeS.Utils;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Utils;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -58,10 +61,20 @@ namespace DroNeS.Mapbox.JobSystem
 		}
 	}
 
+	public static class NativeMeshExtensions
+	{
+		public static void AddRange(this NativeMesh target, in MeshDataStruct meshData)
+		{
+			target.AddRangeVertices(meshData.Vertices);
+			target.AddRangeNormals(meshData.Normals);
+			target.AddRangeUV(meshData.UV);
+			target.AddRangeTriangles(meshData.Triangles);
+		}
+	}
+
 	public struct MeshDataStruct : IDisposable
 	{
 		// ReSharper disable UnassignedField.Global
-		public int Index;
 		public MathRect TileRect;
 		public NativeList<int> Edges;
 		public NativeList<Vector3> Vertices;
@@ -74,7 +87,6 @@ namespace DroNeS.Mapbox.JobSystem
 
 		public MeshDataStruct(in RectD tileRect, Allocator allocator)
 		{
-			Index = 0;
 			TileRect = tileRect;
 			_allocator = allocator;
 			Edges = new NativeList<int>(allocator);
@@ -86,7 +98,6 @@ namespace DroNeS.Mapbox.JobSystem
 		
 		public MeshDataStruct(int index, in MeshDataStruct other, Allocator allocator)
 		{
-			Index = index;
 			_allocator = allocator;
 			TileRect = other.TileRect;
 			if (other._allocator == Allocator.None || other._allocator == Allocator.Invalid)
@@ -133,6 +144,39 @@ namespace DroNeS.Mapbox.JobSystem
 			if (Normals.IsCreated) Normals.Dispose();
 			if (Triangles.IsCreated) Triangles.Dispose();
 			if (UV.IsCreated) UV.Dispose();
+		}
+		
+		public JobHandle Dispose(JobHandle inputDeps)
+		{
+			JobHandle handle = default;
+			if (_allocator == Allocator.Invalid || 
+			    _allocator == Allocator.None ||
+			    _allocator == Allocator.Temp) return handle;
+
+			if (Edges.IsCreated)
+			{
+				handle = JobHandle.CombineDependencies(Edges.Dispose(inputDeps), handle);
+			}
+
+			if (Vertices.IsCreated)
+			{
+				handle = JobHandle.CombineDependencies(Vertices.Dispose(inputDeps), handle);
+			}
+			if (Normals.IsCreated)
+			{
+				handle = JobHandle.CombineDependencies(Normals.Dispose(inputDeps), handle);
+			}
+
+			if (Triangles.IsCreated)
+			{
+				handle = JobHandle.CombineDependencies(Triangles.Dispose(inputDeps), handle);
+			}
+			if (UV.IsCreated)
+			{
+				handle = JobHandle.CombineDependencies(UV.Dispose(inputDeps), handle);
+			}
+
+			return handle;
 		}
 
 		private void Clear()

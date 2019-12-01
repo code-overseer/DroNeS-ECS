@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using DroNeS.Mapbox.ECS;
-using DroNeS.Systems;
+using DroNeS.Utils;
 using Mapbox.Unity.Map;
-using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Utils;
 using Unity.Collections;
 using Unity.Jobs;
-using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
 
@@ -25,11 +23,10 @@ namespace DroNeS.Mapbox.JobSystem
 			}
 		}
 
-		private readonly Dictionary<CustomTile, MeshDataStruct> _accumulation = new Dictionary<CustomTile, MeshDataStruct>();
+		private readonly Dictionary<CustomTile, NativeMeshList> _accumulation = new Dictionary<CustomTile, NativeMeshList>();
 		private readonly Dictionary<CustomTile, JobHandle> _jobs = new Dictionary<CustomTile, JobHandle>();
-		
-		private readonly Dictionary<CustomTile, List<RenderMesh>> _renderMeshes = new Dictionary<CustomTile, List<RenderMesh>>();
-		
+		private readonly Dictionary<CustomTile, NativePtr<int>> _currentIndex = new Dictionary<CustomTile, NativePtr<int>>();
+		private readonly Dictionary<CustomTile, RenderMesh[]> _renderMeshes = new Dictionary<CustomTile, RenderMesh[]>();
 		private readonly List<Vector3> _v3List = new List<Vector3>(65001);
 		private readonly List<Vector2> _v2List = new List<Vector2>(65001);
 
@@ -42,153 +39,155 @@ namespace DroNeS.Mapbox.JobSystem
 	    {
 		    if (!_accumulation.ContainsKey(tile))
 		    {
-			    _accumulation.Add(tile, new MeshDataStruct(new RectD(), Allocator.Persistent));
+			    _accumulation.Add(tile, new NativeMeshList(Allocator.Persistent));
+			    _currentIndex.Add(tile, new NativePtr<int>(0, Allocator.Persistent));
+			    _jobs[tile] = default;
 		    }
 		    
 		    var data = new MeshDataStruct(in tileRect, Allocator.TempJob);
-		    VectorFeatureStruct featureInput = feature; 
-		    var polygonJob = new PolygonMeshModifierJob().SetProperties(uvOptions, ref featureInput, ref data);
-		    var textureJob = new TextureSideWallModifierJob().SetProperties(uvOptions, feature);
+		    var polygonJob = new PolygonMeshModifierJob().SetProperties(uvOptions, feature, ref data);
+		    var textureJob = new TextureSideWallModifierJob().SetProperties(uvOptions, feature, ref data);
+		    var routeJob = new RouteSelectionJob
+		    {
+			    Data = data,
+			    Accumulation = _accumulation[tile],
+			    Index = _currentIndex[tile],
+			    VertCount = new NativePtr<int>(0, Allocator.TempJob),
+			    Skip = new NativePtr<Bool>(false, Allocator.TempJob)
+		    };
+		    var trianglePlusJob = new TriangleUpdateJob
+		    {
+			    Triangles = data.Triangles,
+			    VertCount = routeJob.VertCount,
+			    Skip = routeJob.Skip,
+		    };
+		    // Dispose VertCount
 		    var appendJob = new MeshAppendJob
 		    {
 			    Data = data,
 			    Accumulation = _accumulation[tile],
-			    UpperLowerLimitHit = new NativeArray<bool2>(1, Allocator.TempJob)
+			    Index = _currentIndex[tile],
+			    Skip = trianglePlusJob.Skip
 		    };
-		    
-		    if (_jobs.ContainsKey(tile))
-		    {
-			    _jobs[tile] = appendJob.Schedule(textureJob.Schedule(polygonJob.Schedule(_jobs[tile])));    
-		    }
-		    else
-		    {
-			    _jobs[tile] = appendJob.Schedule(textureJob.Schedule(polygonJob.Schedule()));
-		    }
+		    //Dispose Skip
+
+		    _jobs[tile] = polygonJob.Schedule(_jobs[tile]);
+		    _jobs[tile] = textureJob.Schedule(_jobs[tile]);
+		    _jobs[tile] = routeJob.Schedule(_jobs[tile]);
+		    _jobs[tile] = trianglePlusJob.Schedule(trianglePlusJob.Triangles.Length, 256, _jobs[tile]);
+		    _jobs[tile] = JobHandle.CombineDependencies(trianglePlusJob.VertCount.Dispose(_jobs[tile]), appendJob.Schedule(_jobs[tile]));
+		    _jobs[tile] = JobHandle.CombineDependencies(appendJob.Skip.Dispose(_jobs[tile]), appendJob.Data.Dispose(_jobs[tile]));
 	    }
 
-		private struct MeshAppendJob : IJob
+		public JobHandle CombineAllDependencies()
+		{
+			JobHandle handle = default;
+			foreach (var job in _jobs.Values)
+			{
+				handle = JobHandle.CombineDependencies(job, handle);
+			}
+
+			return handle;
+		}
+		
+		public unsafe void Terminate() // assume completed
+		{
+			foreach (var pair in _accumulation)
+			{
+				var count = pair.Value.Length;
+				_renderMeshes.Add(pair.Key, new RenderMesh[count]);
+				for (var i = 0; i < count; ++i)
+				{
+					_renderMeshes[pair.Key][i] = new RenderMesh
+					{
+						mesh = new Mesh
+						{
+							subMeshCount = 1,
+							vertices = new Vector3[pair.Value[i].VerticesCount],
+							normals = new Vector3[pair.Value[i].NormalsCount],
+							uv = new Vector2[pair.Value[i].UVCount],
+							triangles = new int[pair.Value[i].TrianglesCount]
+						},
+						material = BuildingMaterial,
+					};
+					
+				}
+			}
+
+		}
+
+		private struct RouteSelectionJob : IJob
 		{
 			public MeshDataStruct Data;
-			public MeshDataStruct Accumulation;
-			public NativeArray<bool2> UpperLowerLimitHit;
+			public NativeMeshList Accumulation;
+			public NativePtr<int> Index;
+			public NativePtr<int> VertCount;
+			public NativePtr<Bool> Skip;
 			public void Execute()
 			{
-				if (Accumulation.Vertices.Length + Data.Vertices.Length > 65000)
+				var target = Accumulation[Index.Value];
+				
+				if (target.VerticesCount + Data.Vertices.Length > 65000)
 				{
-					UpperLowerLimitHit[0] = new bool2(true, false);
+					Index.Value += 1;
+					target = Accumulation[Index.Value];
 				}
-				if (Data.Vertices.Length <= 3)
-				{
-					UpperLowerLimitHit[0] = new bool2(false, true);
-					return;
-				}
+				VertCount.Value = target.VerticesCount;
 
-				var st = Accumulation.Vertices.Length;
-				Accumulation.Vertices.AddRange(Data.Vertices);
-				Accumulation.Normals.AddRange(Data.Normals);
-				Accumulation.UV.AddRange(Data.UV);
-				for (var j = 0; j < Data.Triangles.Length; j++)
-				{
-					Accumulation.Triangles.Add(Data.Triangles[j] + st);
-				}
+				if (Data.Vertices.Length > 3) return;
+				Skip.Value = true;
 			}
 		}
 
-	    private void Append(CustomTile tile, in MeshDataStruct data)
-	    {
-		    if (data.Vertices.Length <= 3) return;
-		    _accumulation.TryGetValue(tile, out var value);
-			    
-		    var st = value.Vertices.Length;
-		    value.Vertices.AddRange(data.Vertices);
-		    value.Normals.AddRange(data.Normals);
-		    value.UV.AddRange(data.UV);
+		private struct TriangleUpdateJob : IJobParallelFor
+		{
+			public NativeArray<int> Triangles;
+			[ReadOnly, NativeDisableParallelForRestriction]
+			public NativePtr<int> VertCount;
+			[ReadOnly, NativeDisableParallelForRestriction]
+			public NativePtr<Bool> Skip;
+			public void Execute(int index)
+			{
+				if (Skip.Value) return;
+				var count = VertCount.Value;
+				Triangles[index] = Triangles[index] + count;
+			}
+		}
 
-		    for (var j = 0; j < data.Triangles.Length; j++)
-		    {
-			    value.Triangles.Add(data.Triangles[j] + st);
-		    }
-	    }
+		private struct MeshAppendJob : IJob
+		{
+			[ReadOnly]
+			public MeshDataStruct Data;
+			public NativeMeshList Accumulation;
+			[ReadOnly]
+			public NativePtr<int> Index;
+			[ReadOnly]
+			public NativePtr<Bool> Skip;
+			public void Execute()
+			{
+				if (Skip.Value) return;
+				var target = Accumulation[Index.Value];
+				target.AddRange(in Data);
+			}
+		}
 
-	    private void Terminate(CustomTile tile, MeshDataStruct data) // must be main thread
-	    {
-		    if (!_accumulation.TryGetValue(tile, out var value) || value.Vertices.Length <= 3) return;
-		    
-		    var renderMesh = new RenderMesh
-		    {
-			    mesh = new Mesh(),
-			    material = BuildingMaterial
-		    };
-		    
-		    renderMesh.mesh.subMeshCount = 1;
-		    
-		    _v3List.Clear();
-		    _v3List.AddRange(value.Vertices);
-		    renderMesh.mesh.SetVertices(_v3List);
-		    
-		    _v3List.Clear();
-		    _v3List.AddRange(value.Normals);
-		    renderMesh.mesh.SetNormals(_v3List);
-		    
-		    renderMesh.mesh.SetTriangles(value.Triangles.ToArray(), 0);
-
-		    _v2List.Clear();
-		    _v2List.AddRange(value.UV);
-		    renderMesh.mesh.SetUVs(0, _v2List);
-		    renderMesh.layer = LayerMask.NameToLayer("Buildings");
-
-		    var pos = tile.Position;
-		    CityBuilderSystem.MakeBuilding(in pos, in renderMesh);
-		    
-		    _accumulation[tile].CopyFrom(in data);
-	    }
-	    
-	    public void Terminate(CustomTile tile)
-	    {
-		    if (_accumulation.TryGetValue(tile, out var value) && value.Vertices.Length > 3)
-		    {
-			    var renderMesh = new RenderMesh
-			    {
-				    mesh = new Mesh(),
-				    material = BuildingMaterial
-			    };
-			    renderMesh.mesh.subMeshCount = 1;
-			    
-			    _v3List.Clear();
-			    _v3List.AddRange(value.Vertices);
-			    renderMesh.mesh.SetVertices(_v3List);
-		    
-			    _v3List.Clear();
-			    _v3List.AddRange(value.Normals);
-			    renderMesh.mesh.SetNormals(_v3List);
-		    
-			    renderMesh.mesh.SetTriangles(value.Triangles.ToArray(), 0);
-
-			    _v2List.Clear();
-			    _v2List.AddRange(value.UV);
-			    renderMesh.mesh.SetUVs(0, _v2List);
-			    renderMesh.layer = LayerMask.NameToLayer("Buildings");
-
-			    var pos = tile.Position;
-			
-			    CityBuilderSystem.MakeBuilding(in pos, in renderMesh);
-		    }
-		    
-		    _accumulation[tile].Dispose();
-		    _accumulation.Remove(tile);
-		    tile.VectorDataState = TilePropertyState.Loaded;
-	    }
-
-	    public void Dispose()
+		public void Dispose()
 	    {
 		    foreach (var job in _jobs.Values)
 		    {
 			    job.Complete();
 		    }
-
+			var handles = new JobHandle[_accumulation.Count];
+			var i = 0;
 		    foreach (var dataSet in _accumulation.Values)
 		    {
-			    dataSet.Dispose();
+			    handles[i] = dataSet.Dispose(default);
+			    ++i;
+		    }
+
+		    foreach (var handle in handles)
+		    {
+			    handle.Complete();
 		    }
 	    }
     }

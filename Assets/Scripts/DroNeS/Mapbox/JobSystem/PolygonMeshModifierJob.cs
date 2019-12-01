@@ -1,4 +1,5 @@
-﻿using Mapbox.Unity.Map;
+﻿using DroNeS.Mapbox.ECS;
+using Mapbox.Unity.Map;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -12,9 +13,7 @@ namespace DroNeS.Mapbox.JobSystem
 	    #region Atlas Fields
 	    private NativeList<Node> _linkedList;
 	    private float3 _v1, _v2;
-	    private UvMapType _textureType;
 		private float3 _vert;
-		private AtlasEntityStruct _currentFacade;
 		private quaternion _textureDirection;
 		private NativeArray<float2> _textureUvCoordinates;
 		private float3 _vertexRelativePos;
@@ -27,13 +26,15 @@ namespace DroNeS.Mapbox.JobSystem
 		#endregion
 
 		#region Inputs
-
+		
+		private UvMapType _textureType;
+		private AtlasEntityStruct _currentFacade;
 		private VectorFeatureStruct _feature;
 		private MeshDataStruct _mesh;
 
 		#endregion
 
-		public PolygonMeshModifierJob SetProperties(UVModifierOptions properties, ref VectorFeatureStruct feature, ref MeshDataStruct md)
+		public PolygonMeshModifierJob SetProperties(UVModifierOptions properties, CustomFeatureUnity feature, ref MeshDataStruct md)
 		{
 			_textureType = properties.texturingType;
 			_currentFacade = properties.atlasInfo.Roofs[0];

@@ -14,11 +14,15 @@ namespace DroNeS.MonoBehaviours
     {
         private unsafe void Start()
         {
-            var integer = new NativePtr<int>(Allocator.TempJob);
-            var handle = new TestJob2 {Ptr = integer, Structs = null}.Schedule();
+            var array = new int[1];
+            array[0] = 123123;
+            
+            var job = new TestJob2();
+            job.Integer = (int*)UnsafeUtility.PinGCArrayAndGetDataAddress(array, out job.GcHandle);
+            var handle = job.Schedule();
             handle.Complete();
-            Debug.Log(integer.Value);
-            integer.Dispose();
+            
+            Debug.Log(array[0]);
 
         }
     }
@@ -26,20 +30,19 @@ namespace DroNeS.MonoBehaviours
     public unsafe struct TestJob2 : IJob
     {
         [NativeDisableUnsafePtrRestriction] 
-        public int* Structs;
-
-        public NativePtr<int> Ptr;
+        public int* Integer;
+        
+        public ulong GcHandle;
         public void Execute()
         {
-            Structs = (int*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), Allocator.Temp);
-            *Structs = 5;
-            Ptr.Value = *Structs * 8;
-            UnsafeUtility.Free(Structs, Allocator.Temp);
+            *Integer = 5;
+            UnsafeUtility.ReleaseGCObject(GcHandle);
         }
     }
     
     [BurstCompile]
-    public unsafe struct TestJob : IJob{
+    public unsafe struct TestJob : IJob
+    {
         public void Execute()
         {
             var points = new NativeList<float3>(12, Allocator.Temp)
@@ -56,7 +59,7 @@ namespace DroNeS.MonoBehaviours
             var tmp = *zeroth;
             *zeroth = *fourth;
             *fourth = tmp;
-
+            
         }
 
         private static void Add(float3 point, ref NativeList<float3> points)

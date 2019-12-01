@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using DroNeS.Mapbox.JobSystem;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -330,6 +331,74 @@ namespace DroNeS.Utils
             };
         }
         
+    }
+
+    public static unsafe class NativeMeshUnsafeUtility
+    {
+        public static void* GetVerticesUnsafePtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_Safety);
+#endif
+            return list.m_vertices->Ptr;
+        }
+        
+        public static void* GetVerticesUnsafeReadOnlyPtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_Safety);
+#endif
+            return list.m_vertices->Ptr;
+        }
+        
+        public static void* GetNormalsUnsafePtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_Safety);
+#endif
+            return list.m_normals->Ptr;
+        }
+        
+        public static void* GetNormalsUnsafeReadOnlyPtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_Safety);
+#endif
+            return list.m_normals->Ptr;
+        }
+        
+        public static void* GetTrianglesUnsafePtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_Safety);
+#endif
+            return list.m_triangles->Ptr;
+        }
+        
+        public static void* GetTrianglesUnsafeReadOnlyPtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_Safety);
+#endif
+            return list.m_triangles->Ptr;
+        }
+        
+        public static void* GetUVUnsafePtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_Safety);
+#endif
+            return list.m_uv->Ptr;
+        }
+        
+        public static void* GetUVUnsafeReadOnlyPtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_Safety);
+#endif
+            return list.m_uv->Ptr;
+        }
+
     }
 
     internal struct NativeMeshDebugView

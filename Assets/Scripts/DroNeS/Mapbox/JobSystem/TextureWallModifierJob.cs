@@ -32,8 +32,6 @@ namespace DroNeS.Mapbox.JobSystem
 		private float3 _wallSegmentSecondVertex;
 		private float3 _wallSegmentDirection;
 		private float _wallSegmentLength;
-
-		private AtlasEntityStruct _currentFacade;
 		private Rect _currentTextureRect;
 
 		private float _finalFirstHeight;
@@ -46,21 +44,16 @@ namespace DroNeS.Mapbox.JobSystem
 		private NativeList<int> _wallTriangles;
 		private float _columnScaleRatio;
 		private float _rightOfEdgeUv;
-
 		private float _currentY1;
 		private float _currentY2;
-		
 		private int _counter;
-		private float _height;
 		private float _minWallLength;
 		private float _singleFloorHeight;
 		private float _currentMidHeight;
 		private float _midUvInCurrentStep;
 		private float _singleColumnLength;
 		private float _leftOverColumnLength;
-		private float _maxHeight;
-		private float _minHeight;
-		private float _extrusionScaleFactor;
+		
 		#endregion
 		
 		private static readonly Bool CenterSegments = true;
@@ -70,8 +63,20 @@ namespace DroNeS.Mapbox.JobSystem
 		private const float Scale = 0.7571877f;
 		private static readonly ExtrusionType ExtrusionType = ExtrusionType.PropertyHeight;
 		private static readonly ExtrusionGeometryType ExtrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
+		
+		#region Inputs
 
-		public TextureSideWallModifierJob SetProperties(UVModifierOptions properties, CustomFeatureUnity feature)
+		private VectorFeatureStruct _feature;
+		private MeshDataStruct _mesh;
+		private AtlasEntityStruct _currentFacade;
+		private float _height;
+		private float _maxHeight;
+		private float _minHeight;
+		private float _extrusionScaleFactor;
+
+		#endregion
+
+		public TextureSideWallModifierJob SetProperties(UVModifierOptions properties, CustomFeatureUnity feature, ref MeshDataStruct md)
 		{
 			var options = properties.ToGeometryExtrusionWithAtlasOptions();
 			_currentFacade = options.atlasInfo.Textures[0];
@@ -86,13 +91,16 @@ namespace DroNeS.Mapbox.JobSystem
 			{
 				_minHeight = Convert.ToSingle(feature.Properties["min_height"]);
 			}
+
+			_feature = feature;
+			_mesh = md;
 			return this;
 		}
 
 
-		public void Run(VectorFeatureStruct feature, MeshDataStruct md)
+		public void Execute()
 		{
-			if (md.Vertices.Length == 0 || feature.PointCount.Length < 1) return;
+			if (_mesh.Vertices.Length == 0 || _feature.PointCount.Length < 1) return;
 			
 			//rect is a struct so we're caching this
 			_currentTextureRect = _currentFacade.TextureRect;
@@ -105,23 +113,17 @@ namespace DroNeS.Mapbox.JobSystem
 			_scaledFloorHeight = _scaledPreferredWallLength * _currentFacade.WallToFloorRatio;
 			_singleColumnLength = _scaledPreferredWallLength / _currentFacade.ColumnCount;
 
-			//read or force height
-
-			//query height and push polygon up to create roof
-			//can we do this vice versa and create roof at last?
-
 			_maxHeight = _maxHeight * _extrusionScaleFactor * Scale;
 			_minHeight = _minHeight * _extrusionScaleFactor * Scale;
 			_height = _maxHeight - _minHeight;
 			
-			GenerateRoofMesh(md);
+			GenerateRoofMesh(_mesh);
 			
 			_finalFirstHeight = Mathf.Min(_height, _scaledFirstFloorHeight);
 			_finalTopHeight = (_height - _finalFirstHeight) < _scaledTopFloorHeight ? 0 : _scaledTopFloorHeight;
 			_finalMidHeight = Mathf.Max(0, _height - (_finalFirstHeight + _finalTopHeight));
 			_wallTriangles = new NativeList<int>(32, Allocator.Temp);
-
-
+			
 			_currentWallLength = 0;
 			_start = float3.zero;
 			_wallSegmentDirection = float3.zero;
@@ -138,10 +140,10 @@ namespace DroNeS.Mapbox.JobSystem
 				_finalLeftOverRowHeight = _finalTopHeight;
 			}
 
-			for (var i = 0; i < md.Edges.Length; i += 2)
+			for (var i = 0; i < _mesh.Edges.Length; i += 2)
 			{
-				var v1 = md.Vertices[md.Edges[i]];
-				var v2 = md.Vertices[md.Edges[i + 1]];
+				var v1 = _mesh.Vertices[_mesh.Edges[i]];
+				var v2 = _mesh.Vertices[_mesh.Edges[i + 1]];
 
 				_wallDirection = v2 - v1;
 
@@ -160,7 +162,7 @@ namespace DroNeS.Mapbox.JobSystem
 					_wallSegmentSecondVertex = _start;
 
 					_leftOverColumnLength /= 2;
-					CreateWall(md);
+					CreateWall(_mesh);
 				}
 
 				while (_currentWallLength > _singleColumnLength)
@@ -175,7 +177,7 @@ namespace DroNeS.Mapbox.JobSystem
 					_wallSegmentSecondVertex = _start;
 
 					_currentWallLength -= (stepRatio * _scaledPreferredWallLength);
-					CreateWall(md);
+					CreateWall(_mesh);
 				}
 
 				//left over column at the end
@@ -183,12 +185,12 @@ namespace DroNeS.Mapbox.JobSystem
 				_wallSegmentFirstVertex = _start;
 				_wallSegmentSecondVertex = v2;
 				_wallSegmentLength = _leftOverColumnLength;
-				CreateWall(md);
+				CreateWall(_mesh);
 			}
 			
-			var newCap = md.Triangles.Length + _wallTriangles.Length;
-			if (md.Triangles.Capacity < newCap) md.Triangles.Capacity = 2 * newCap; 
-			md.Triangles.AddRange(_wallTriangles);
+			var newCap = _mesh.Triangles.Length + _wallTriangles.Length;
+			if (_mesh.Triangles.Capacity < newCap) _mesh.Triangles.Capacity = 2 * newCap; 
+			_mesh.Triangles.AddRange(_wallTriangles);
 		}
 
 		private void CreateWall(MeshDataStruct md)
@@ -427,11 +429,6 @@ namespace DroNeS.Mapbox.JobSystem
 			{
 				md.Vertices[i] = new float3(md.Vertices[i].x, md.Vertices[i].y + _maxHeight, md.Vertices[i].z);
 			}
-		}
-
-		public void Execute()
-		{
-			throw new NotImplementedException();
 		}
 	}
 }
