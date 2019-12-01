@@ -1,4 +1,5 @@
 ﻿using System;
+using DroNeS.Mapbox.Custom;
 using DroNeS.Mapbox.ECS;
 using DroNeS.Utils;
 using Mapbox.Unity.Map;
@@ -76,9 +77,8 @@ namespace DroNeS.Mapbox.JobSystem
 
 		#endregion
 
-		public TextureSideWallModifierJob SetProperties(UVModifierOptions properties, CustomFeatureUnity feature, ref MeshDataStruct md)
+		public TextureSideWallModifierJob SetProperties(GeometryExtrusionWithAtlasOptions options, CustomFeatureUnity feature, ref MeshDataStruct md)
 		{
-			var options = properties.ToGeometryExtrusionWithAtlasOptions();
 			_currentFacade = options.atlasInfo.Textures[0];
 			_currentFacade.CalculateParameters();
 			_extrusionScaleFactor = options.extrusionScaleFactor;
@@ -100,7 +100,7 @@ namespace DroNeS.Mapbox.JobSystem
 
 		public void Execute()
 		{
-			if (_mesh.Vertices.Length == 0 || _feature.PointCount.Length < 1) return;
+			if (_mesh.Vertices.Length == 0 || _feature.Points.Length < 1) return;
 			
 			//rect is a struct so we're caching this
 			_currentTextureRect = _currentFacade.TextureRect;
@@ -202,7 +202,7 @@ namespace DroNeS.Mapbox.JobSystem
 			//if texture has 3 columns, 33% (of preferred edge length) wide walls will get 1 window.
 			//0-33% gets 1 window, 33-66 gets 2, 66-100 gets all three
 			//we're not wrapping/repeating texture as it won't work with atlases
-			_columnScaleRatio = Math.Min(1, _wallSegmentLength / _scaledPreferredWallLength);
+			_columnScaleRatio = math.min(1, _wallSegmentLength / _scaledPreferredWallLength);
 			_rightOfEdgeUv =
 				_currentTextureRect.xMin +
 				_currentTextureRect.size.x *

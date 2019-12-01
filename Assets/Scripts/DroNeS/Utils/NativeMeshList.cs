@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using DroNeS.Mapbox.JobSystem;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -230,7 +231,7 @@ namespace DroNeS.Utils
 #endif
             m_meshes->Add(new NativeMeshElement(element, m_allocator));
         }
-        
+
         public void RemoveAtSwapBack(int index)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -404,6 +405,40 @@ namespace DroNeS.Utils
                 return output;
             }
             
+        }
+    }
+
+    public static class NativeMeshListUtilities
+    {
+        private static unsafe NativeMeshList.NativeMeshElement Convert(in MeshDataStruct data, Allocator allocator)
+        {
+            var output = new NativeMeshList.NativeMeshElement();
+            var length = data.Vertices.Length;
+            output.m_vertices = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), length, allocator);
+            UnsafeUtility.MemCpy(output.m_vertices, data.Vertices.GetUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * length);
+
+            length = data.Normals.Length;
+            output.m_normals = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), length, allocator);
+            UnsafeUtility.MemCpy(output.m_normals, data.Normals.GetUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * length);
+                
+            length = data.Triangles.Length;
+            output.m_triangles = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), length, allocator);
+            UnsafeUtility.MemCpy(output.m_triangles, data.Triangles.GetUnsafeReadOnlyPtr(), (long)sizeof(int) * length);
+                
+            length = data.UV.Length;
+            output.m_uv = UnsafeList.Create(UnsafeUtility.SizeOf<Vector2>(), UnsafeUtility.AlignOf<Vector2>(), length, allocator);
+            UnsafeUtility.MemCpy(output.m_uv, data.UV.GetUnsafeReadOnlyPtr(), (long)sizeof(Vector2) * length);
+
+            return output;
+
+        }
+        
+        public static unsafe void Add(this NativeMeshList list, MeshDataStruct data)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(list.m_Safety);
+#endif
+            list.m_meshes->Add(Convert(data, list.m_allocator));
         }
     }
 }

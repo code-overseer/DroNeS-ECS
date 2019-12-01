@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using DroNeS.Mapbox.ECS;
+using DroNeS.Mapbox.Custom;
 using DroNeS.Utils;
 using Mapbox.Unity.Map;
 using Mapbox.Utils;
@@ -28,15 +28,13 @@ namespace DroNeS.Mapbox.JobSystem
 		private readonly Dictionary<CustomTile, JobHandle> _jobs = new Dictionary<CustomTile, JobHandle>();
 		private readonly Dictionary<CustomTile, NativePtr<int>> _currentIndex = new Dictionary<CustomTile, NativePtr<int>>();
 		private readonly Dictionary<CustomTile, RenderMesh[]> _renderMeshes = new Dictionary<CustomTile, RenderMesh[]>();
-		private readonly List<Vector3> _v3List = new List<Vector3>(65001);
-		private readonly List<Vector2> _v2List = new List<Vector2>(65001);
 
 		public MeshProcessor()
 		{
 			Application.quitting += Dispose;
 		}
 
-		public void Execute(in RectD tileRect, CustomTile tile, CustomFeatureUnity feature, UVModifierOptions uvOptions, GeometryExtrusionOptions extrudeOptions)
+		public void Execute(CustomTile tile, CustomFeatureUnity feature, UVModifierOptions uvOptions, GeometryExtrusionWithAtlasOptions atlasOptions)
 	    {
 		    if (!_accumulation.ContainsKey(tile))
 		    {
@@ -45,9 +43,9 @@ namespace DroNeS.Mapbox.JobSystem
 			    _jobs[tile] = default;
 		    }
 		    
-		    var data = new MeshDataStruct(in tileRect, Allocator.TempJob);
+		    var data = new MeshDataStruct(tile.Rect, Allocator.TempJob);
 		    var polygonJob = new PolygonMeshModifierJob().SetProperties(uvOptions, feature, ref data);
-		    var textureJob = new TextureSideWallModifierJob().SetProperties(uvOptions, feature, ref data);
+		    var textureJob = new TextureSideWallModifierJob().SetProperties(atlasOptions, feature, ref data);
 		    var routeJob = new BranchingJob
 		    {
 			    Data = data,
@@ -62,70 +60,84 @@ namespace DroNeS.Mapbox.JobSystem
 			    VertCount = routeJob.VertCount,
 			    Skip = routeJob.Skip,
 		    };
-		    // Dispose VertCount
 		    var appendJob = new MeshAppendJob
 		    {
 			    Data = data,
+			    VertCount = trianglePlusJob.VertCount,
 			    Accumulation = _accumulation[tile],
 			    Index = _currentIndex[tile],
 			    Skip = trianglePlusJob.Skip
 		    };
-		    //Dispose Skip
+		    //Dispose Skip & data & VertCount
 
 		    _jobs[tile] = polygonJob.Schedule(_jobs[tile]);
 		    _jobs[tile] = textureJob.Schedule(_jobs[tile]);
 		    _jobs[tile] = routeJob.Schedule(_jobs[tile]);
 		    _jobs[tile] = trianglePlusJob.Schedule(trianglePlusJob.Triangles.Length, 256, _jobs[tile]);
-		    _jobs[tile] = JobHandle.CombineDependencies(trianglePlusJob.VertCount.Dispose(_jobs[tile]), appendJob.Schedule(_jobs[tile]));
-		    _jobs[tile] = JobHandle.CombineDependencies(appendJob.Skip.Dispose(_jobs[tile]), appendJob.Data.Dispose(_jobs[tile]));
+		    _jobs[tile] = appendJob.Schedule(_jobs[tile]);
+		    _jobs[tile] = JobHandle.CombineDependencies(appendJob.Skip.Dispose(_jobs[tile]), data.Dispose(_jobs[tile]), trianglePlusJob.VertCount.Dispose(_jobs[tile]));
 	    }
 
-		public JobHandle CombineAllDependencies()
+		public JobHandle Terminate() // assume completed
 		{
-			JobHandle handle = default;
-			foreach (var job in _jobs.Values)
-			{
-				handle = JobHandle.CombineDependencies(job, handle);
-			}
-
-			return handle;
-		}
-		
-		public unsafe void Terminate() // assume completed
-		{
+			JobHandle output = default;
 			foreach (var pair in _accumulation)
 			{
+				var tile = pair.Key;
+				_jobs[tile] = _currentIndex[tile].Dispose(_jobs[tile]);
 				var count = pair.Value.Length;
-				_renderMeshes.Add(pair.Key, new RenderMesh[count]);
+				_renderMeshes.Add(tile, new RenderMesh[count]);
 				var gcHandles = new NativeArray<GCHandle>(count, Allocator.TempJob);
 				for (var i = 0; i < count; ++i)
 				{
-					var rm = new RenderMesh
+					_renderMeshes[tile][i] = new RenderMesh
 					{
 						mesh = new Mesh(),
 						material = BuildingMaterial,
 						layer = LayerMask.NameToLayer("Buildings")
 					};
-					_renderMeshes[pair.Key][i] = rm; 
-					gcHandles[i] = GCHandle.Alloc(new MeshAllocationTask
+					
+					gcHandles[i] = new MeshAllocationTask
 					{
-						Mesh = rm.mesh,
+						Mesh = _renderMeshes[tile][i].mesh,
 						Native = pair.Value[i]
-					});
+					}.Handle;
 				}
-				_jobs[pair.Key] = new MeshAllocationJob
+				_jobs[tile] = new MeshAllocationJob
 				{
 					GcHandles = gcHandles
-				}.Schedule(count, 2, _jobs[pair.Key]);
+				}.Schedule(count, 2, _jobs[tile]);
+				_jobs[tile] = MeshProxyArrayUtilities.GenerateArray(_renderMeshes[tile], Allocator.TempJob, _jobs[tile],
+					out var meshProxies);
 
+				_jobs[tile] = new NativeToManageJob
+				{
+					Managed = meshProxies,
+					Native = pair.Value.AsParallel(),
+				}.Schedule(meshProxies.Length, 64, _jobs[tile]);
 
+				_jobs[tile] = pair.Value.Dispose(_jobs[tile]);
+				output = JobHandle.CombineDependencies(_jobs[tile], output);
 			}
+
+			return output;
 		}
 
 		private class MeshAllocationTask : ITask
 		{
+			private GCHandle _handle;
 			public Mesh Mesh;
 			public NativeMesh Native;
+			public GCHandle Handle 
+			{
+				get
+				{
+					if (_handle == default) _handle = GCHandle.Alloc(this, GCHandleType.Pinned);
+					return _handle;
+				}
+                
+			}
+
 			public void Execute()
 			{
 				Mesh.subMeshCount = 1;
@@ -135,9 +147,10 @@ namespace DroNeS.Mapbox.JobSystem
 				Mesh.triangles = new int[Native.TriangleCount];
 			}
 		}
-		
+
 		private struct MeshAllocationJob : IJobParallelFor
 		{
+			[DeallocateOnJobCompletion]
 			public NativeArray<GCHandle> GcHandles;
 			public void Execute(int index)
 			{
@@ -150,23 +163,28 @@ namespace DroNeS.Mapbox.JobSystem
 		private struct BranchingJob : IJob
 		{
 			public MeshDataStruct Data;
+			[ReadOnly]
 			public NativeMeshList Accumulation;
 			public NativePtr<int> Index;
 			public NativePtr<int> VertCount;
 			public NativePtr<Bool> Skip;
 			public void Execute()
 			{
+				if (Data.Vertices.Length <= 3)
+				{
+					Skip.Value = true;
+					return;
+				}
 				var target = Accumulation[Index.Value];
-				
 				if (target.VertexCount + Data.Vertices.Length > 65000)
 				{
 					Index.Value += 1;
-					target = Accumulation[Index.Value];
+					VertCount.Value = 0;
 				}
-				VertCount.Value = target.VertexCount;
-
-				if (Data.Vertices.Length > 3) return;
-				Skip.Value = true;
+				else
+				{
+					VertCount.Value = target.VertexCount;	
+				}
 			}
 		}
 
@@ -179,7 +197,7 @@ namespace DroNeS.Mapbox.JobSystem
 			public NativePtr<Bool> Skip;
 			public void Execute(int index)
 			{
-				if (Skip.Value) return;
+				if (Skip.Value || VertCount.Value == 0) return;
 				var count = VertCount.Value;
 				Triangles[index] = Triangles[index] + count;
 			}
@@ -194,32 +212,44 @@ namespace DroNeS.Mapbox.JobSystem
 			public NativePtr<int> Index;
 			[ReadOnly]
 			public NativePtr<Bool> Skip;
+			[ReadOnly]
+			public NativePtr<int> VertCount;
 			public void Execute()
 			{
 				if (Skip.Value) return;
-				var target = Accumulation[Index.Value];
-				target.AddRange(in Data);
+				if (VertCount.Value > 0)
+				{
+					var target = Accumulation[Index.Value];
+					target.AddRange(in Data);
+				}
+				else
+				{
+					Accumulation.Add(Data);
+				}
+				
+			}
+		}
+		
+		private struct NativeToManageJob : IJobParallelFor
+		{
+			[ReadOnly]
+			public NativeMeshList.Parallel Native;
+			public MeshProxyArray Managed;
+			
+			public void Execute(int index)
+			{
+				Managed[index].CopyFrom(Native[index]);
 			}
 		}
 
 		public void Dispose()
 	    {
-		    foreach (var job in _jobs.Values)
+		    JobHandle handles = default;
+		    foreach (var tile in _jobs.Keys)
 		    {
-			    job.Complete();
+			    handles = JobHandle.CombineDependencies(_accumulation[tile].Dispose(_jobs[tile]), _currentIndex[tile].Dispose(_jobs[tile]), handles);
 		    }
-			var handles = new JobHandle[_accumulation.Count];
-			var i = 0;
-		    foreach (var dataSet in _accumulation.Values)
-		    {
-			    handles[i] = dataSet.Dispose(default);
-			    ++i;
-		    }
-
-		    foreach (var handle in handles)
-		    {
-			    handle.Complete();
-		    }
+		    handles.Complete();
 	    }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
-using DroNeS.Mapbox.ECS;
-using DroNeS.Utils;
+using System.Runtime.InteropServices;
+using DroNeS.Mapbox.Custom;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Utils;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
@@ -12,30 +13,27 @@ namespace DroNeS.Mapbox.JobSystem
 {
 	public struct VectorFeatureStruct
 	{
-		public NativeMultiHashMap<int, float3> Points;
-		public NativeList<int> PointCount;
+		public NativeList<UnsafeListContainer> Points;
 
 		public static implicit operator VectorFeatureStruct(CustomFeatureUnity feature)
 		{
 			var output = new VectorFeatureStruct();
 			var points = feature.Points;
-			output.PointCount = new NativeList<int>(points.Count + 1, Allocator.TempJob);
-			var size = 0;
+
+			var listOfList = new NativeList<UnsafeListContainer>(points.Count, Allocator.TempJob);
+			var idx = 0;
 			foreach (var list in points)
 			{
-				output.PointCount.Add(list.Count);
-				size += list.Count;
-			}
-			
-			output.Points = new NativeMultiHashMap<int, float3>(size + 1, Allocator.TempJob);
-			for (var i = 0; i < points.Count; ++i)
-			{
-				for (var j = points[i].Count - 1; j >= 0; --j)
+				listOfList.Add(new UnsafeListContainer(list.Count, 
+					UnsafeUtility.SizeOf<Vector3>(), 
+					UnsafeUtility.AlignOf<Vector3>(), 
+					Allocator.TempJob));
+				foreach (var value in list)
 				{
-					output.Points.Add(i, points[i][j]);
+					listOfList[idx].Add(value);
 				}
+				++idx;
 			}
-
 			return output;
 		}
 		
@@ -60,17 +58,6 @@ namespace DroNeS.Mapbox.JobSystem
 		}
 	}
 
-	public static class NativeMeshExtensions
-	{
-		public static void AddRange(this NativeMesh target, in MeshDataStruct meshData)
-		{
-			target.AddRangeVertices(meshData.Vertices);
-			target.AddRangeNormals(meshData.Normals);
-			target.AddRangeUV(meshData.UV);
-			target.AddRangeTriangles(meshData.Triangles);
-		}
-	}
-
 	public struct MeshDataStruct : IDisposable
 	{
 		// ReSharper disable UnassignedField.Global
@@ -84,7 +71,7 @@ namespace DroNeS.Mapbox.JobSystem
 		private readonly Allocator _allocator;
 		// ReSharper restore UnassignedField.Global
 
-		public MeshDataStruct(in RectD tileRect, Allocator allocator)
+		public MeshDataStruct(RectD tileRect, Allocator allocator)
 		{
 			TileRect = tileRect;
 			_allocator = allocator;
@@ -238,5 +225,90 @@ namespace DroNeS.Mapbox.JobSystem
 			WallToFloorRatio = (1 - TopSectionRatio - BottomSectionRatio) * (TextureRect.height / TextureRect.width);
 		}
 		
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public unsafe struct UnsafeListContainer
+	{
+		[NativeDisableUnsafePtrRestriction]
+		internal UnsafeList* m_ListData;
+		internal Allocator m_Allocator;
+		
+		public UnsafeListContainer(int sizeOf, int alignOf, Allocator allocator)
+            : this(1, sizeOf, alignOf, allocator)
+        {
+        }
+
+		public UnsafeListContainer(int initialCapacity, int sizeOf, int alignOf, Allocator allocator)
+        {
+	        m_ListData = UnsafeList.Create(sizeOf, alignOf, initialCapacity, allocator);
+            m_Allocator = allocator;
+        }
+        
+        public T Get<T>(int index)
+        {
+	        return UnsafeUtility.ReadArrayElement<T>(m_ListData->Ptr, index);
+        }
+
+        public void Set<T>(int index, T value)
+        {
+	        UnsafeUtility.WriteArrayElement(m_ListData->Ptr, index, value);
+        }
+        
+        public int Length => m_ListData->Length;
+        
+        public int Capacity => m_ListData->Capacity;
+
+        public void SetCapacity<T>(int value) where T : unmanaged
+        {
+	        m_ListData->SetCapacity<T>(value);
+        }
+        
+        public void Add<T>(T element) where T : unmanaged => m_ListData->Add(element);
+        
+        public void AddRange<T>(NativeArray<T> elements) where T : unmanaged
+        {
+	        AddRange<T>(elements.GetUnsafeReadOnlyPtr(), elements.Length);
+        }
+        
+        public void AddRange<T>(void* elements, int count) where T : unmanaged
+        {
+	        m_ListData->AddRange<T>(elements, count);
+        }
+        
+        public void RemoveAtSwapBack<T>(int index) where T : unmanaged
+        {
+	        m_ListData->RemoveAtSwapBack<T>(index);
+        }
+        
+        public void RemoveAt<T>(int index, int length = 1) where T : unmanaged
+        {
+	        var shift = m_ListData->Length - index - length;
+
+	        var size = sizeof(T);
+	        UnsafeUtility.MemMove((void*)((IntPtr) m_ListData->Ptr + index * size),
+		        (void*)((IntPtr) m_ListData->Ptr + (index + length) * size),
+		        shift * size);
+	        m_ListData->Length -= length;
+        }
+        
+        public bool IsCreated => m_ListData != null;
+
+        private void Deallocate()
+        {
+	        UnsafeList.Destroy(m_ListData);
+	        m_ListData = null;
+        }
+
+        
+        public NativeArray<T> AsArray<T>() where T : unmanaged
+        {
+	        var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(m_ListData->Ptr, m_ListData->Length, Allocator.Invalid);
+
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+	        NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, AtomicSafetyHandle.GetTempMemoryHandle());
+#endif
+	        return array;
+        }
 	}
 }

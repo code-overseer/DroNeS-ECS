@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using DroNeS.Mapbox.Custom;
 using DroNeS.Mapbox.JobSystem;
 using DroNeS.Mapbox.MonoBehaviour;
 using Mapbox.Unity.Map;
@@ -81,9 +82,9 @@ namespace DroNeS.Mapbox.ECS
 			_defaultStack = ScriptableObject.CreateInstance<MeshMerger>();
 			_defaultStack.MeshModifiers = new List<MeshModifier>();
 
-			SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
 			var poly = AddOrCreateMeshModifier<PolygonMeshModifier>();
-			//This may cause problems
+			SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
+			
 			var uvModOptions = new UVModifierOptions
 			{
 				texturingType = UvMapType.Atlas,
@@ -93,6 +94,7 @@ namespace DroNeS.Mapbox.ECS
 			poly.SetProperties(uvModOptions);
 			
 			var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
+			
 			SubLayerProperties.extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
 			SubLayerProperties.extrusionOptions.extrusionScaleFactor = 1.3203f;
 			SubLayerProperties.extrusionOptions.propertyName = "height";

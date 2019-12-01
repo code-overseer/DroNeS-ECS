@@ -4,6 +4,7 @@ using DroNeS.Utils;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
+using UnityEngine;
 
 // ReSharper disable CompareOfFloatsByEqualityOperator
 
@@ -659,33 +660,39 @@ namespace DroNeS.Mapbox.JobSystem
 
             return ptr;
         }
-
-        public static Data Flatten(NativeMultiHashMap<int, float3> data, NativeList<int> counts)
+        
+        public static Data Flatten(NativeList<UnsafeListContainer> data)
         {
-            var dataCount = counts.Length;
+            var dataCount = data.Length;
             var totalVertCount = 0;
-            foreach (var count in counts) totalVertCount += count;
+            for (var i = 0; i < dataCount; i++)
+            {
+                totalVertCount += data[i].Length;
+            }
 
-            var result = Data.Get();
-            result.Vertices = new NativeList<float>(totalVertCount * 2, Allocator.Temp);
+            var result = new Data
+            {
+                Dim = 2, 
+                Vertices = new NativeList<float>(totalVertCount * 2, Allocator.Temp)
+            };
             var holeIndex = 0;
 
             for (var i = 0; i < dataCount; i++)
             {
-                data.TryGetFirstValue(i, out var num, out var iterator);
-                do
+                var subCount = data[i].Length;
+                for (var j = 0; j < subCount; j++)
                 {
-                    result.Vertices.Add(num[0]);
-                    result.Vertices.Add(num[2]);
-                } while (data.TryGetNextValue(out num, ref iterator));
+                    result.Vertices.Add(data[i].Get<Vector3>(j)[0]);
+                    result.Vertices.Add(data[i].Get<Vector3>(j)[2]);
+                }
 
                 if (i <= 0) continue;
-                holeIndex += counts[i - 1];
+                holeIndex += data[i - 1].Length;
                 result.Holes.Add(holeIndex);
             }
-
             return result;
         }
+        
     }
 
     public struct Data

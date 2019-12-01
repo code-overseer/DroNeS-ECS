@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using DroNeS.Mapbox.JobSystem;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -576,5 +577,16 @@ namespace DroNeS.Utils
         public Vector3[] Normals => m_Mesh.NormalsArray();
         public Vector3[] Vertices => m_Mesh.VerticesArray();
         public Vector2[] UV => m_Mesh.UVArray();
+    }
+    
+    public static class NativeMeshUtilities
+    {
+        public static void AddRange(this NativeMesh target, in MeshDataStruct meshData)
+        {
+            target.AddRangeVertices(meshData.Vertices);
+            target.AddRangeNormals(meshData.Normals);
+            target.AddRangeUV(meshData.UV);
+            target.AddRangeTriangles(meshData.Triangles);
+        }
     }
 }

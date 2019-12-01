@@ -1,8 +1,7 @@
-﻿using Mapbox.Map;
-using Mapbox.Unity.Map;
-using Mapbox.Unity.Map.Interfaces;
+﻿using DroNeS.Mapbox.ECS;
+using Mapbox.Map;
 
-namespace DroNeS.Mapbox.ECS
+namespace DroNeS.Mapbox.Custom
 {
     public class ManhattanVisualizer
     {
@@ -24,7 +23,5 @@ namespace DroNeS.Mapbox.ECS
             _imageFactory.Register(tile);
             _meshFactory.Register(tile);
         }
-        
-    
     }
 }

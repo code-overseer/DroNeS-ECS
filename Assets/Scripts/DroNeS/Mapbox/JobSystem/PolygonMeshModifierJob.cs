@@ -1,4 +1,5 @@
-﻿using DroNeS.Mapbox.ECS;
+﻿using DroNeS.Mapbox.Custom;
+using DroNeS.Mapbox.ECS;
 using Mapbox.Unity.Map;
 using Unity.Collections;
 using Unity.Jobs;
@@ -7,24 +8,28 @@ using UnityEngine;
 
 namespace DroNeS.Mapbox.JobSystem
 {
+
+	public struct Cont<T> where T : unmanaged
+	{
+		
+	}
     public struct PolygonMeshModifierJob : IJob
     {
 	    
 	    #region Atlas Fields
 	    private NativeList<Node> _linkedList;
-	    private float3 _v1, _v2;
-		private float3 _vert;
-		private quaternion _textureDirection;
-		private NativeArray<float2> _textureUvCoordinates;
-		private float3 _vertexRelativePos;
-		private float3 _firstVert;
+	    private Vector3 _v1, _v2;
+		private Vector3 _vert;
+		private Quaternion _textureDirection;
+		private NativeArray<Vector2> _textureUvCoordinates;
+		private Vector3 _vertexRelativePos;
+		private Vector3 _firstVert;
 
-		private float minx;
-		private float miny;
-		private float maxx;
-		private float maxy;
+		private float _minx;
+		private float _miny;
+		private float _maxx;
+		private float _maxy;
 		#endregion
-
 		#region Inputs
 		
 		private UvMapType _textureType;
@@ -43,25 +48,23 @@ namespace DroNeS.Mapbox.JobSystem
 			return this;
 		}
 
-		private bool IsClockwise(in NativeMultiHashMap<int, float3> vertices, int idx)
+		private bool IsClockwise(UnsafeListContainer vertices)
 		{
 			var sum = 0.0;
-			if (!vertices.TryGetFirstValue(idx, out var head, out var iterator)) return sum > 0.0;
-			_v1 = head;
-			
-			while (!vertices.TryGetNextValue(out _v2, ref iterator))
+			var counter = vertices.Length;
+			for (var i = 0; i < counter; i++)
 			{
+				_v1 = vertices.Get<Vector3>(i);
+				_v2 = vertices.Get<Vector3>((i + 1) % counter);
 				sum += (_v2.x - _v1.x) * (_v2.z + _v1.z);
-				_v1 = _v2;
 			}
-			_v2 = head;
-			sum += (_v2.x - _v1.x) * (_v2.z + _v1.z);
+
 			return sum > 0.0;
 		}
 
 		public void Execute()
 		{
-			var subset = new NativeMultiHashMap<int, float3>(128, Allocator.Temp);
+			var subset = new NativeList<UnsafeListContainer>(128, Allocator.Temp);
 			var lengths = new NativeList<int>(128, Allocator.Temp);
 			Data flatData;
 			NativeList<int> result;
@@ -69,14 +72,16 @@ namespace DroNeS.Mapbox.JobSystem
 			var polygonVertexCount = 0;
 			NativeList<int> triList = default;
 			
-			var counter = _feature.PointCount.Length;
+			var counter = _feature.Points.Length;
 			
 			for (var i = 0; i < counter; i++)
 			{
+				var sub = _feature.Points[i];
 				var vertCount = _mesh.Vertices.Length;
-				if (IsClockwise(_feature.Points, i) && vertCount > 0)
+				if (IsClockwise(sub) && vertCount > 0)
 				{
-					flatData = EarcutLibrary.Flatten(subset, lengths);
+					flatData = EarcutLibrary.Flatten(subset);
+					
 					result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim, ref _linkedList);
 					polygonVertexCount = result.Length;
 					if (!triList.IsCreated)
@@ -96,83 +101,67 @@ namespace DroNeS.Mapbox.JobSystem
 					currentIndex = vertCount;
 					subset.Clear();
 				}
-				if (_feature.Points.TryGetFirstValue(i, out var val, out var iterator))
-				{
-					do
-					{
-						subset.Add(lengths.Length, val);
-					} while (_feature.Points.TryGetNextValue(out val, ref iterator));
-					
-				}
-				lengths.Add(_feature.PointCount[i]);
-				
-				polygonVertexCount = _feature.PointCount[i];
+				subset.Add(sub);
+
+				polygonVertexCount = sub.Length;
 				_mesh.Vertices.Capacity = _mesh.Vertices.Length + polygonVertexCount;
 				_mesh.Normals.Capacity = _mesh.Normals.Length + polygonVertexCount;
 				_mesh.Edges.Capacity = _mesh.Edges.Length + polygonVertexCount * 2;
-				var size = new double2(_mesh.TileRect.Size.x, _mesh.TileRect.Size.y);
+				var size = _mesh.TileRect.Size;
 
-				if (!_feature.Points.TryGetFirstValue(i, out val, out iterator)) continue;
+				for (var j = 0; j < polygonVertexCount; j++)
 				{
-					var j = 0;
-					do
-					{
-						_mesh.Edges.Add(vertCount + ((j + 1) % polygonVertexCount));
-						_mesh.Edges.Add(vertCount + j);
-						_mesh.Vertices.Add(val);
-						_mesh.Normals.Add(math.up());
-						
-						if (_textureType == UvMapType.Tiled)
-						{
-							_mesh.UV.Add(new float2(val.x, val.z));
-						}
-						
-						++j;
-					} while (_feature.Points.TryGetNextValue(out val, ref iterator));
+					_mesh.Edges.Add(vertCount + (j + 1) % polygonVertexCount);
+					_mesh.Edges.Add(vertCount + j);
+					_mesh.Vertices.Add(sub.Get<Vector3>(j));
+					_mesh.Normals.Add(Vector3.up);
+
+					if (_textureType != UvMapType.Tiled) continue;
+					var val = sub.Get<Vector3>(j);
+					_mesh.UV.Add(new Vector2(val.x, val.z));
 				}
 
 			}
 
-			flatData = EarcutLibrary.Flatten(subset, lengths);
+			flatData = EarcutLibrary.Flatten(subset);
 			result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim, ref _linkedList);
 			polygonVertexCount = result.Length;
 
 			if (_textureType == UvMapType.Atlas || _textureType == UvMapType.AtlasWithColorPalette)
 			{
-				minx = float.MaxValue;
-				miny = float.MaxValue;
-				maxx = float.MinValue;
-				maxy = float.MinValue;
+				_minx = float.MaxValue;
+				_miny = float.MaxValue;
+				_maxx = float.MinValue;
+				_maxy = float.MinValue;
 
-				_textureUvCoordinates = new NativeArray<float2>(_mesh.Vertices.Length, Allocator.Temp);
-				var q = Quaternion.FromToRotation(_mesh.Vertices[0] - _mesh.Vertices[1], new float3(1,0,0));
-				_textureDirection = new quaternion(q.x,q.y,q.z,q.w);
-				_textureUvCoordinates[0] = float2.zero;
+				_textureUvCoordinates = new NativeArray<Vector2>(_mesh.Vertices.Length, Allocator.Temp);
+				_textureDirection = Quaternion.FromToRotation(_mesh.Vertices[0] - _mesh.Vertices[1], new Vector3(1,0,0));
+				_textureUvCoordinates[0] = Vector2.zero;
 				_firstVert = _mesh.Vertices[0];
 				for (var i = 1; i < _mesh.Vertices.Length; i++)
 				{
 					_vert = _mesh.Vertices[i];
 					_vertexRelativePos = _vert - _firstVert;
-					_vertexRelativePos = math.mul(_textureDirection, _vertexRelativePos);
+					_vertexRelativePos = _textureDirection * _vertexRelativePos;
 					_textureUvCoordinates[i] = new Vector2(_vertexRelativePos.x, _vertexRelativePos.z);
-					if (_vertexRelativePos.x < minx)
-						minx = _vertexRelativePos.x;
-					if (_vertexRelativePos.x > maxx)
-						maxx = _vertexRelativePos.x;
-					if (_vertexRelativePos.z < miny)
-						miny = _vertexRelativePos.z;
-					if (_vertexRelativePos.z > maxy)
-						maxy = _vertexRelativePos.z;
+					if (_vertexRelativePos.x < _minx)
+						_minx = _vertexRelativePos.x;
+					if (_vertexRelativePos.x > _maxx)
+						_maxx = _vertexRelativePos.x;
+					if (_vertexRelativePos.z < _miny)
+						_miny = _vertexRelativePos.z;
+					if (_vertexRelativePos.z > _maxy)
+						_maxy = _vertexRelativePos.z;
 				}
 
-				var width = maxx - minx;
-				var height = maxy - miny;
+				var width = _maxx - _minx;
+				var height = _maxy - _miny;
 
 				for (var i = 0; i < _mesh.Vertices.Length; i++)
 				{
-					_mesh.UV.Add(new float2(
-						(((_textureUvCoordinates[i].x - minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
-						(((_textureUvCoordinates[i].y - miny) / height) * _currentFacade.TextureRect.height) + _currentFacade.TextureRect.y));
+					_mesh.UV.Add(new Vector2(
+						(((_textureUvCoordinates[i].x - _minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
+						(((_textureUvCoordinates[i].y - _miny) / height) * _currentFacade.TextureRect.height) + _currentFacade.TextureRect.y));
 				}
 			}
 

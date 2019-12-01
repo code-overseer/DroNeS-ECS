@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DroNeS.Mapbox.ECS
+namespace DroNeS.Mapbox.Custom
 {
 	public abstract class CustomTileFactory 
 	{

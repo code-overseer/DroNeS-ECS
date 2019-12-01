@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DroNeS.Mapbox.Custom;
 using DroNeS.Systems;
 using DroNeS.Utils;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -11,8 +12,7 @@ namespace DroNeS.Mapbox.ECS
 {
 	public class MeshMerger : ModifierStackBase
     {
-	    private readonly Dictionary<CustomTile, int> _buildingCount = new Dictionary<CustomTile, int>();
-		private readonly Dictionary<CustomTile, MeshData> _accumulation = new Dictionary<CustomTile, MeshData>();
+	    private readonly Dictionary<CustomTile, MeshData> _accumulation = new Dictionary<CustomTile, MeshData>();
 		
 		private static Material _buildingMaterial;
 
@@ -23,7 +23,6 @@ namespace DroNeS.Mapbox.ECS
 
 	    public override void Initialize()
 	    {
-		    _buildingCount.Clear();
 		    foreach (var modifier in MeshModifiers)
 		    {
 			    modifier.Initialize();
@@ -34,7 +33,6 @@ namespace DroNeS.Mapbox.ECS
 	    {
 		    if (!_accumulation.ContainsKey(tile))
 		    {
-			    _buildingCount.Add(tile, 0);
 			    _accumulation.Add(tile, new MeshData
 			    {
 					Edges = new List<int>(),
@@ -45,8 +43,6 @@ namespace DroNeS.Mapbox.ECS
 					Vertices = new List<Vector3>()
 			    });
 		    }
-		    
-		    _buildingCount[tile]++;
 
 		    foreach (var modifier in MeshModifiers)
 		    {

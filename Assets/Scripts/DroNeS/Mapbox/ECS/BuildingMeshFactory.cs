@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using DroNeS.Mapbox.Custom;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Enums;
@@ -13,14 +14,16 @@ namespace DroNeS.Mapbox.ECS
 	{
 		#region Private/Protected Fields
 		private readonly Dictionary<string, List<BuildingMeshBuilder>> _layerBuilder;
-		private readonly Dictionary<CustomTile, HashSet<BuildingMeshBuilder>> _layerProgress;
 		private readonly BuildingMeshFetcher _dataFetcher;
 		#endregion
 
 		#region Properties
+		private string TilesetId => Properties.sourceOptions.Id;
+		private VectorLayerProperties Properties { get; }
+		#endregion
+		
 		public BuildingMeshFactory()
 		{
-			_layerProgress = new Dictionary<CustomTile, HashSet<BuildingMeshBuilder>>();
 			_layerBuilder = new Dictionary<string, List<BuildingMeshBuilder>>();
 
 			_dataFetcher = ScriptableObject.CreateInstance<BuildingMeshFetcher>();
@@ -51,13 +54,7 @@ namespace DroNeS.Mapbox.ECS
             Properties.vectorSubLayers.Add(vslp);
             CreateLayerVisualizers();
 		}
-
-		private string TilesetId => Properties.sourceOptions.Id;
-
-		private VectorLayerProperties Properties { get; }
-		#endregion
-
-		#region Public Layer
+		
 		private void AddVectorLayerVisualizer(VectorSubLayerProperties subLayer)
 		{
 			//if its of type prefab item options then separate the visualizer type
@@ -79,16 +76,6 @@ namespace DroNeS.Mapbox.ECS
 				_layerBuilder.Add(visualizer.Key, new List<BuildingMeshBuilder> { visualizer });
 			}
 		}
-
-		public BuildingMeshBuilder FindVectorLayerVisualizer(VectorSubLayerProperties subLayer)
-		{
-			if (!_layerBuilder.ContainsKey(subLayer.Key)) return null;
-			var visualizer = _layerBuilder[subLayer.Key].Find((obj) => obj.SubLayerProperties == subLayer);
-			return visualizer;
-		}
-		#endregion
-
-		#region AbstractFactoryOverrides
 
 		protected override void OnRegistered(CustomTile tile)
 		{
@@ -117,12 +104,9 @@ namespace DroNeS.Mapbox.ECS
 		{
 			Object.DestroyImmediate(_dataFetcher);
 			if (_layerBuilder == null) return;
-			_layerProgress.Clear();
 			TilesWaitingResponse.Clear();
 			TilesWaitingProcessing.Clear();
 		}
-
-		#endregion
 
 		private void OnVectorDataReceived(CustomTile tile, VectorTile vectorTile)
 		{
@@ -131,7 +115,6 @@ namespace DroNeS.Mapbox.ECS
 			tile.SetVectorData(vectorTile);
 			
 			CreateMeshes(tile);
-			
 		}
 		
 		#region Private Methods
@@ -154,25 +137,7 @@ namespace DroNeS.Mapbox.ECS
 			{
 				CreateFeatureWithBuilder(tile, nameList[i], builderList[i]);
 			}
-
-			if (!_layerProgress.ContainsKey(tile)) tile.VectorDataState = TilePropertyState.Loaded;
 			
-		}
-
-		private void TrackFeatureWithBuilder(CustomTile tile, string layerName, BuildingMeshBuilder builder)
-		{
-			if (_layerProgress.ContainsKey(tile))
-			{
-				_layerProgress[tile].Add(builder);
-			}
-			else
-			{
-				_layerProgress.Add(tile, new HashSet<BuildingMeshBuilder> {builder});
-				if (!TilesWaitingProcessing.Contains(tile))
-				{
-					TilesWaitingProcessing.Add(tile);
-				}
-			}
 		}
 
 		private static void CreateFeatureWithBuilder(CustomTile tile, string layerName, BuildingMeshBuilder builder)

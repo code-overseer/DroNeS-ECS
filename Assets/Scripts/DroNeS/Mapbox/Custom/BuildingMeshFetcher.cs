@@ -2,7 +2,7 @@
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 
-namespace DroNeS.Mapbox.ECS
+namespace DroNeS.Mapbox.Custom
 {
     public class BuildingMeshFetcherParameters : DataFetcherParameters
     {
@@ -14,9 +14,7 @@ namespace DroNeS.Mapbox.ECS
     public class BuildingMeshFetcher : DataFetcher
     {
         public Action<CustomTile, VectorTile> dataReceived = (t, s) => { };
-//        public Action<UnityTile, VectorTile, TileErrorEventArgs> fetchingError = (t, r, s) => { };
 
-        //tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
         public override void FetchData(DataFetcherParameters parameters)
         {
             if(!(parameters is BuildingMeshFetcherParameters fetcherParameters)) return;

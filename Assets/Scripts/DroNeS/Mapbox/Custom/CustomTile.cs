@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using DroNeS.Mapbox.ECS;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
-using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
@@ -9,7 +9,7 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
 
-namespace DroNeS.Mapbox.ECS
+namespace DroNeS.Mapbox.Custom
 {
 	public class CustomTile
 	{
