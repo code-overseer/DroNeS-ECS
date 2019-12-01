@@ -6,8 +6,6 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using UnityEngine;
-using Vector2 = System.Numerics.Vector2;
-using Vector3 = System.Numerics.Vector3;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -17,7 +15,7 @@ namespace DroNeS.Utils
 {
     [StructLayout(LayoutKind.Sequential)]
     [NativeContainer]
-    [DebuggerDisplay("Length = {Length}")]
+    [DebuggerDisplay("Length = {" + nameof(Length) + "}")]
     [DebuggerTypeProxy(typeof(NativeMeshListDebugView))]
     public unsafe struct NativeMeshList : IDisposable
     {
@@ -29,25 +27,24 @@ namespace DroNeS.Utils
         [NativeSetClassTypeToNullOnSchedule] 
         private DisposeSentinel m_DisposeSentinel;
 #endif
-
         [NativeDisableUnsafePtrRestriction]
         internal UnsafeList* m_meshes;
 
         internal Allocator m_allocator;
 
-
-        internal struct NativeMeshElement
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NativeMeshElement
         {
             [NativeDisableUnsafePtrRestriction]
-            public UnsafeList* m_vertices;
+            internal UnsafeList* m_vertices;
             [NativeDisableUnsafePtrRestriction]
-            public UnsafeList* m_normals;
+            internal UnsafeList* m_normals;
             [NativeDisableUnsafePtrRestriction]
-            public UnsafeList* m_triangles;
+            internal UnsafeList* m_triangles;
             [NativeDisableUnsafePtrRestriction]
-            public UnsafeList* m_uv;
+            internal UnsafeList* m_uv;
 
-            public NativeMeshElement(NativeMesh mesh, Allocator allocator)
+            internal NativeMeshElement(NativeMesh mesh, Allocator allocator)
             {
                 var length = mesh.m_vertices->Length;
                 m_vertices = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), length, allocator);
@@ -55,16 +52,87 @@ namespace DroNeS.Utils
 
                 length = mesh.m_normals->Length;
                 m_normals = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), length, allocator);
-                UnsafeUtility.MemCpy(m_normals, mesh.m_vertices, (long)sizeof(Vector3) * length);
+                UnsafeUtility.MemCpy(m_normals, mesh.m_normals, (long)sizeof(Vector3) * length);
                 
                 length = mesh.m_triangles->Length;
                 m_triangles = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), length, allocator);
-                UnsafeUtility.MemCpy(m_triangles, mesh.m_vertices, (long)sizeof(int) * length);
+                UnsafeUtility.MemCpy(m_triangles, mesh.m_triangles, (long)sizeof(int) * length);
                 
                 length = mesh.m_uv->Length;
                 m_uv = UnsafeList.Create(UnsafeUtility.SizeOf<Vector2>(), UnsafeUtility.AlignOf<Vector2>(), length, allocator);
-                UnsafeUtility.MemCpy(m_uv, mesh.m_vertices, (long)sizeof(Vector2) * length);
+                UnsafeUtility.MemCpy(m_uv, mesh.m_uv, (long)sizeof(Vector2) * length);
             }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        [NativeContainer]
+        [NativeContainerSupportsMinMaxWriteRestriction]
+        public struct Parallel
+        {
+            
+            internal void* m_meshes;
+            public int Length { get; }
+            private Allocator m_allocator;
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            internal AtomicSafetyHandle m_Safety;
+            private int m_MinIndex;
+            private int m_MaxIndex;
+
+            internal Parallel(in UnsafeList* list, in AtomicSafetyHandle safety, in Allocator allocator)
+            {
+                m_meshes = list->Ptr;
+                Length = list->Length;
+                m_allocator = allocator;
+                m_Safety = safety;
+                m_MinIndex = 0;
+                m_MaxIndex = Length - 1;
+            }
+#else
+            internal Parallel(in UnsafeList* list, in Allocator allocator)
+            {
+                m_meshes = list->Ptr;
+                Length = list->Length;
+                m_allocator = allocator;
+            }
+#endif
+            public NativeMesh this[int index]
+            {
+                get
+                {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+                    AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
+                    if (index < m_MinIndex || index > m_MaxIndex)
+                        FailOutOfRangeError(index);
+#endif
+                    var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_meshes, index);
+                    return AsNativeMesh(element, m_Safety);
+                }
+                
+                [WriteAccessRequired]
+                set
+                {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+                    AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
+                    if (index < m_MinIndex || index > m_MaxIndex)
+                        FailOutOfRangeError(index);
+#endif
+                    UnsafeUtility.WriteArrayElement(m_meshes, index, new NativeMeshElement(value, m_allocator));
+                }
+            }
+            
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            private void FailOutOfRangeError(int index)
+            {
+                if (index < Length && (m_MinIndex != 0 || m_MaxIndex != Length - 1))
+                    throw new IndexOutOfRangeException(
+                        $"Index {index} is out of restricted IJobParallelFor range [{m_MinIndex}...{m_MaxIndex}] in ReadWriteBuffer.\n" +
+                        "ReadWriteBuffers are restricted to only read & write the element at the job index. " +
+                        "You can use double buffering strategies to avoid race conditions due to " +
+                        "reading & writing in parallel to the same elements from a job.");
+
+                throw new IndexOutOfRangeException($"Index {index} is out of range of '{Length}' Length.");
+            }
+#endif
         }
 
         public NativeMeshList(Allocator allocator)
@@ -106,17 +174,17 @@ namespace DroNeS.Utils
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
-                if ((uint)index >= (uint)m_meshes->Length)
+                if ((uint)index >= (uint)m_meshes->Length || index < 0)
                     throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{m_meshes->Length}' Length.");
 #endif
                 var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_meshes->Ptr, index);
-                return AsNativeMesh(element);
+                return AsNativeMesh(element, m_Safety);
             }
             set
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-                if ((uint)index >= (uint)m_meshes->Length)
+                if ((uint)index >= (uint)m_meshes->Length || index < 0)
                     throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{m_meshes->Length}' Length.");
 #endif
                 UnsafeUtility.WriteArrayElement(m_meshes->Ptr, index, new NativeMeshElement(value, m_allocator));
@@ -172,6 +240,18 @@ namespace DroNeS.Utils
                 throw new ArgumentOutOfRangeException(index.ToString());
 #endif
             m_meshes->RemoveAtSwapBack<NativeMeshElement>(index);
+        }
+
+        public Parallel AsParallel()
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(m_Safety);
+            var arraySafety = m_Safety;
+            AtomicSafetyHandle.UseSecondaryVersion(ref arraySafety);
+            return new Parallel(m_meshes, arraySafety, m_allocator);
+#else
+            return new Parallel(m_meshes, allocator);
+#endif       
         }
         
         public bool IsCreated => m_meshes != null;
@@ -272,14 +352,11 @@ namespace DroNeS.Utils
             element.m_uv->Clear();
         }
 
-        private NativeMesh AsNativeMesh(NativeMeshElement element)
+        private static NativeMesh AsNativeMesh(NativeMeshElement element, in AtomicSafetyHandle instanceSafety)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(m_Safety);
-            var safety = m_Safety;
-            AtomicSafetyHandle.UseSecondaryVersion(ref safety);
+            AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(instanceSafety);
 #endif
-
             return new NativeMesh
             {
                 m_allocator = Allocator.Invalid,
@@ -288,7 +365,10 @@ namespace DroNeS.Utils
                 m_vertices = element.m_vertices,
                 m_uv = element.m_uv,
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                m_Safety = safety
+                m_vertexSafety = default,
+                m_normalSafety = default,
+                m_triangleSafety = default,
+                m_uvSafety = default
 #endif
             };
         }
@@ -303,6 +383,27 @@ namespace DroNeS.Utils
         public NativeMeshListDebugView(NativeMeshList meshList)
         {
             m_List = meshList;
+        }
+        
+        public Mesh[] Items 
+        {
+            get
+            {
+                var output = new Mesh[m_List.Length];
+                for (var i = 0; i < output.Length; ++i)
+                {
+                    output[i] = new Mesh
+                    {
+                        vertices = m_List[i].VerticesArray(),
+                        normals = m_List[i].NormalsArray(),
+                        triangles = m_List[i].TriangleArray(),
+                        uv = m_List[i].UVArray()
+                    };
+                }
+
+                return output;
+            }
+            
         }
     }
 }

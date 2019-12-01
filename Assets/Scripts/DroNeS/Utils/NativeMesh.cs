@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using DroNeS.Mapbox.JobSystem;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -14,13 +13,16 @@ namespace DroNeS.Utils
 {
     [StructLayout(LayoutKind.Sequential)]
     [NativeContainer]
-    [DebuggerDisplay("Vertices Count = {VerticesCount}, Triangles Count = {TrianglesCount}," +
-                     "UV Count = {UVCount}, Normals Count = {NormalsCount}")]
+    [DebuggerDisplay("Vertices Count = {VertexCount}, Triangles Count = {TriangleCount}," +
+                     "UV Count = {UVCount}, Normals Count = {NormalCount}")]
     [DebuggerTypeProxy(typeof(NativeMeshDebugView))]
     public unsafe struct NativeMesh : IDisposable
     {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        internal AtomicSafetyHandle m_Safety;
+        internal AtomicSafetyHandle m_vertexSafety;
+        internal AtomicSafetyHandle m_normalSafety;
+        internal AtomicSafetyHandle m_triangleSafety;
+        internal AtomicSafetyHandle m_uvSafety;
 
         [NativeSetClassTypeToNullOnSchedule] 
         private DisposeSentinel m_DisposeSentinel;
@@ -66,7 +68,20 @@ namespace DroNeS.Utils
             if (totalSize > int.MaxValue)
                 throw new ArgumentOutOfRangeException(nameof(initialCapacity), $"Capacity * sizeof(T) cannot exceed {int.MaxValue} bytes");
 
-            DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, disposeSentinelStackDepth, allocator);
+            DisposeSentinel.Create(out m_vertexSafety, out m_DisposeSentinel, disposeSentinelStackDepth, allocator);
+            if (allocator != Allocator.Temp)
+            {
+                m_normalSafety = AtomicSafetyHandle.Create();
+                m_triangleSafety = AtomicSafetyHandle.Create();
+                m_uvSafety = AtomicSafetyHandle.Create();
+            }
+            else
+            {
+                m_normalSafety = AtomicSafetyHandle.GetTempMemoryHandle();
+                m_triangleSafety = AtomicSafetyHandle.GetTempMemoryHandle();
+                m_uvSafety = AtomicSafetyHandle.GetTempMemoryHandle();
+            }
+            
 #endif
             m_vertices = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), initialCapacity, allocator);
             m_normals = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), initialCapacity, allocator);
@@ -98,7 +113,19 @@ namespace DroNeS.Utils
             if (totalSize > int.MaxValue)
                 throw new ArgumentOutOfRangeException($"Capacity has exceeded {int.MaxValue} bytes");
 
-            DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, disposeSentinelStackDepth, allocator);
+            DisposeSentinel.Create(out m_vertexSafety, out m_DisposeSentinel, disposeSentinelStackDepth, allocator);
+            if (allocator != Allocator.Temp)
+            {
+                m_normalSafety = AtomicSafetyHandle.Create();
+                m_triangleSafety = AtomicSafetyHandle.Create();
+                m_uvSafety = AtomicSafetyHandle.Create();
+            }
+            else
+            {
+                m_normalSafety = AtomicSafetyHandle.GetTempMemoryHandle();
+                m_triangleSafety = AtomicSafetyHandle.GetTempMemoryHandle();
+                m_uvSafety = AtomicSafetyHandle.GetTempMemoryHandle();
+            }
 #endif
             m_vertices = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), vertices, allocator);
             m_normals = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), normals, allocator);
@@ -111,12 +138,161 @@ namespace DroNeS.Utils
 #endif
             
         }
+        
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
 
+        public Vector3 GetVertex(int index) => ReadValue<Vector3>(m_vertices, m_vertexSafety, index);
+
+        public Vector3 GetNormal(int index) => ReadValue<Vector3>(m_normals, m_normalSafety, index);
+        
+        public Vector2 GetUV(int index) => ReadValue<Vector2>(m_uv, m_uvSafety,index);
+
+        public int GetTriangle(int index) => ReadValue<int>(m_triangles, m_triangleSafety, index);
+
+        public void SetVertex(int index, in Vector3 value)=> SetValue(m_vertices, m_vertexSafety, index, in value);
+
+        public void SetNormal(int index, in Vector3 value) => SetValue(m_normals, m_normalSafety, index, in value);
+
+        public void SetTriangle(int index, in int value) => SetValue(m_triangles, m_triangleSafety, index, in value);
+        public void SetUV(int index, in Vector2 value) => SetValue(m_uv, m_uvSafety, index, in value);
+
+
+        public int VertexCount => GetCount(m_vertices, m_vertexSafety);
+        public int NormalCount => GetCount(m_normals, m_normalSafety);
+        public int TriangleCount => GetCount(m_triangles, m_triangleSafety);
+        public int UVCount => GetCount(m_uv, m_uvSafety);
+        
+        public int VerticesCapacity
+        {
+            get => GetCapacity(m_vertices, m_vertexSafety);
+            set => SetCapacity<Vector3>(m_vertices, m_vertexSafety, value);
+        }
+        public int NormalsCapacity
+        {
+            get => GetCapacity(m_normals, m_normalSafety);
+            set => SetCapacity<Vector3>(m_normals, m_normalSafety, value);
+        }
+        public int TrianglesCapacity
+        {
+            get => GetCapacity(m_triangles, m_triangleSafety);
+            set => SetCapacity<int>(m_triangles, m_triangleSafety, value);
+        }
+        public int UVCapacity
+        {
+            get => GetCapacity(m_uv, m_uvSafety);
+            set => SetCapacity<Vector2>(m_uv, m_uvSafety, value);
+        }
+
+        public void AddVertex(in Vector3 element) => Add(m_vertices, m_vertexSafety, element);
+        public void AddNormal(in Vector3 element) => Add(m_normals, m_normalSafety, element);
+        public void AddTriangleValue(in int element) => Add(m_triangles, m_triangleSafety, element);
+        public void AddUV(in Vector2 element) => Add(m_uv, m_uvSafety, element);
+
+        public void AddRangeVertices(in NativeArray<Vector3> elements) => AddRange(m_vertices, m_vertexSafety, elements);
+        public void AddRangeNormals(in NativeArray<Vector3> elements) => AddRange(m_normals, m_normalSafety, elements);
+        public void AddRangeTriangles(in NativeArray<int> elements) => AddRange(m_triangles, m_triangleSafety, elements);
+        public void AddRangeUV(in NativeArray<Vector2> elements) => AddRange(m_uv, m_uvSafety, elements);
+
+        public void RemoveVertexAt(int index) => RemoveAt<Vector3>(m_vertices, m_vertexSafety, index, 1);
+        public void RemoveNormalAt(int index) => RemoveAt<Vector3>(m_normals, m_normalSafety, index, 1);
+        public void RemoveTriangleAt(int index) => RemoveAt<int>(m_triangles, m_triangleSafety, index, 1);
+        public void RemoveUVAt(int index) => RemoveAt<Vector2>(m_uv, m_uvSafety, index, 1);
+        
+        public void RemoveVertexRangeAt(int index, int length) => RemoveAt<Vector3>(m_vertices, m_vertexSafety, index, length);
+        public void RemoveNormalRangeAt(int index, int length) => RemoveAt<Vector3>(m_normals, m_normalSafety, index, length);
+        public void RemoveTriangleRangeAt(int index, int length) => RemoveAt<int>(m_triangles, m_triangleSafety, index, length);
+        public void RemoveUVRangeAt(int index, int length) => RemoveAt<Vector2>(m_uv, m_uvSafety, index, length);
+        
+        public bool IsCreated => m_vertices != null && m_normals != null && m_triangles != null && m_uv != null;
+        
+        private static void AddRange<T>(in UnsafeList* list, in AtomicSafetyHandle handle, NativeArray<T> elements) where T : unmanaged
+        {
+            AddRange<T>(list, handle, elements.GetUnsafeReadOnlyPtr(), elements.Length);
+        }
+        
+        private static void AddRange<T>(in UnsafeList* list, in AtomicSafetyHandle handle, void* elements, int count) where T : unmanaged
+        {
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(handle);
+            list->AddRange<T>(elements, count);
+        }
+        
+        private static void RemoveAt<T>(in UnsafeList* list,in AtomicSafetyHandle handle, int index, int length) where T : unmanaged
+        {
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(handle);
+            var shift = list->Length - index - length;
+            if (index < 0 || index + shift >= list->Length || shift < 0)
+                throw new ArgumentOutOfRangeException(index.ToString());
+
+            var size = sizeof(T);
+            UnsafeUtility.MemMove((void*)((IntPtr) list->Ptr + index * size),
+                (void*)((IntPtr) list->Ptr + (index + length) * size),
+                shift * size);
+            list->Length -= length;
+        }
+
+        private static int GetCount(in UnsafeList* list, in AtomicSafetyHandle handle)
+        {
+            AtomicSafetyHandle.CheckReadAndThrow(handle);
+            return list->Length;
+        }
+        private static int GetCapacity(in UnsafeList* list, in AtomicSafetyHandle handle)
+        {
+            AtomicSafetyHandle.CheckReadAndThrow(handle);
+            return list->Capacity;
+        }
+        
+        private static void SetCapacity<T>(in UnsafeList* list, in AtomicSafetyHandle handle, in int value) where T : unmanaged
+        {
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(handle);
+            if (value < list->Length)
+                throw new ArgumentException("Capacity must be larger than the length of the NativeList.");
+            list->SetCapacity<T>(value);
+        }
+
+        private static void SetValue<T>(in UnsafeList* list, in AtomicSafetyHandle handle, int index, in T value) where T : unmanaged
+        {
+            AtomicSafetyHandle.CheckWriteAndThrow(handle);
+            if ((uint)index >= (uint)list->Length || index < 0)
+                throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{list->Length}' Length.");
+            UnsafeUtility.WriteArrayElement(list->Ptr, index, value);
+        }
+
+        private T ReadValue<T>(in UnsafeList* list, in AtomicSafetyHandle handle, int index) where T : unmanaged
+        {
+            AtomicSafetyHandle.CheckReadAndThrow(handle);
+            if ((uint)index >= (uint)list->Length || index < 0)
+                throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{list->Length}' Length.");
+            return UnsafeUtility.ReadArrayElement<T>(list->Ptr, index);
+        }
+        
+        public void Add<T>(in UnsafeList* list, in AtomicSafetyHandle handle, T element) where T : unmanaged
+        {
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(handle);
+            list->Add(element);
+        }
+
+        public Vector3[] VerticesArray() => AsArray<Vector3>(m_vertices, m_vertexSafety).ToArray();
+        public Vector3[] NormalsArray() => AsArray<Vector3>(m_normals, m_normalSafety).ToArray();
+        public int[] TriangleArray() => AsArray<int>(m_triangles, m_triangleSafety).ToArray();
+        public Vector2[] UVArray() => AsArray<Vector2>(m_uv, m_uvSafety).ToArray();
+
+
+        private static NativeArray<T> AsArray<T>(in UnsafeList* list, in AtomicSafetyHandle handle) where T : unmanaged
+        {
+            AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(handle);
+            var arraySafety = handle;
+            AtomicSafetyHandle.UseSecondaryVersion(ref arraySafety);
+            var array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(list->Ptr, list->Length, Allocator.Invalid);
+            NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref array, arraySafety);
+
+            return array;
+        }
+#else
         public Vector3 GetVertex(int index) => ReadValue<Vector3>(m_vertices, index);
 
         public Vector3 GetNormal(int index) => ReadValue<Vector3>(m_normals, index);
         
-        public Vector2 GetUV(int index) => ReadValue<Vector2>(m_uv, index);
+        public Vector2 GetUV(int index) => ReadValue<Vector2>(m_uv,index);
 
         public int GetTriangle(int index) => ReadValue<int>(m_triangles, index);
 
@@ -124,14 +300,14 @@ namespace DroNeS.Utils
 
         public void SetNormal(int index, in Vector3 value) => SetValue(m_normals, index, in value);
 
+        public void SetTriangle(int index, in int value) => SetValue(m_triangles, index, in value);
         public void SetUV(int index, in Vector2 value) => SetValue(m_uv, index, in value);
 
-        public void SetTriangle(int index, in int value) => SetValue(m_triangles, index, in value);
 
-        public int VerticesCount => GetCount(m_vertices);
-        public int NormalsCount => GetCount(m_normals);
+        public int VertexCount => GetCount(m_vertices);
+        public int NormalCount => GetCount(m_normals);
+        public int TriangleCount => GetCount(m_triangles);
         public int UVCount => GetCount(m_uv);
-        public int TrianglesCount => GetCount(m_triangles);
         
         public int VerticesCapacity
         {
@@ -164,36 +340,76 @@ namespace DroNeS.Utils
         public void AddRangeTriangles(in NativeArray<int> elements) => AddRange(m_triangles, elements);
         public void AddRangeUV(in NativeArray<Vector2> elements) => AddRange(m_uv, elements);
 
-        public void RemoveAtSwapBackVertex(int index) => RemoveAtSwapBack<Vector3>(m_vertices, index);
-        public void RemoveAtSwapBackNormal(int index) => RemoveAtSwapBack<Vector3>(m_normals, index);
-        public void RemoveAtSwapBackTriangle(int index) => RemoveAtSwapBack<int>(m_triangles, index);
-        public void RemoveAtSwapBackUV(int index) => RemoveAtSwapBack<Vector2>(m_uv, index);
+        public void RemoveVertexAt(int index) => RemoveAt<Vector3>(m_vertices, index, 1);
+        public void RemoveNormalAt(int index) => RemoveAt<Vector3>(m_normals, index, 1);
+        public void RemoveTriangleAt(int index) => RemoveAt<int>(m_triangles, index, 1);
+        public void RemoveUVAt(int index) => RemoveAt<Vector2>(m_uv, index, 1);
+        
+        public void RemoveVertexRangeAt(int index, int length) => RemoveAt<Vector3>(m_vertices, index, length);
+        public void RemoveNormalRangeAt(int index, int length) => RemoveAt<Vector3>(m_normals, index, length);
+        public void RemoveTriangleRangeAt(int index, int length) => RemoveAt<int>(m_triangles, index, length);
+        public void RemoveUVRangeAt(int index, int length) => RemoveAt<Vector2>(m_uv, index, length);
         
         public bool IsCreated => m_vertices != null && m_normals != null && m_triangles != null && m_uv != null;
         
-        private void AddRange<T>(in UnsafeList* list, NativeArray<T> elements) where T : unmanaged
+        private static void AddRange<T>(in UnsafeList* list, in AtomicSafetyHandle handle, NativeArray<T> elements) where T : unmanaged
         {
-            AddRange<T>(list, elements.GetUnsafeReadOnlyPtr(), elements.Length);
+            AddRange<T>(list, handle, elements.GetUnsafeReadOnlyPtr(), elements.Length);
         }
         
-        private void AddRange<T>(in UnsafeList* list, void* elements, int count) where T : unmanaged
+        private static void AddRange<T>(in UnsafeList* list, in AtomicSafetyHandle handle, void* elements, int count) where T : unmanaged
         {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_Safety);
-#endif
             list->AddRange<T>(elements, count);
         }
         
-        private void RemoveAtSwapBack<T>(in UnsafeList* list, int index) where T : unmanaged
+        private static void RemoveAt<T>(in UnsafeList* list,in AtomicSafetyHandle handle, int index, int length) where T : unmanaged
         {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_Safety);
-
-            if (index < 0 || index >= list->Length)
-                throw new ArgumentOutOfRangeException(index.ToString());
-#endif
-            list->RemoveAtSwapBack<T>(index);
+            var size = sizeof(T);
+            UnsafeUtility.MemMove((void*)((IntPtr) list->Ptr + index * size),
+                (void*)((IntPtr) list->Ptr + (index + length) * size),
+                (list->Length - index - length) * size);
+            list->Length -= length;
         }
+
+        private static int GetCount(in UnsafeList* list)
+        {
+            return list->Length;
+        }
+        private static int GetCapacity(in UnsafeList* list)
+        {
+            return list->Capacity;
+        }
+        private static void SetCapacity<T>(in UnsafeList* list, in int value) where T : unmanaged
+        {
+            list->SetCapacity<T>(value);
+        }
+
+        private static void SetValue<T>(in UnsafeList* list, int index, in T value) where T : unmanaged
+        {
+            UnsafeUtility.WriteArrayElement(list->Ptr, index, value);
+        }
+
+        private T ReadValue<T>(in UnsafeList* list, int index) where T : unmanaged
+        {
+            return UnsafeUtility.ReadArrayElement<T>(list->Ptr, index);
+        }
+        
+        public void Add<T>(in UnsafeList* list, T element) where T : unmanaged
+        {
+            list->Add(element);
+        }
+        
+        public Vector3[] VerticesArray() => AsArray<Vector3>(m_vertices).ToArray();
+        public Vector3[] NormalsArray() => AsArray<Vector3>(m_normals).ToArray();
+        public int[] TriangleArray() => AsArray<int>(m_triangles).ToArray();
+        public Vector2[] UVArray() => AsArray<Vector2>(m_uv).ToArray();
+
+
+        private static NativeArray<T> AsArray<T>(in UnsafeList* list) where T : unmanaged
+        {
+            return NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(list->Ptr, list->Length, Allocator.Invalid);
+        }
+#endif
 
         private void Deallocate()
         {
@@ -209,25 +425,33 @@ namespace DroNeS.Utils
         
         public void Dispose()
         {
+            if (m_allocator < Allocator.None) return;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
+            DisposeSentinel.Dispose(ref m_vertexSafety, ref m_DisposeSentinel);
+            AtomicSafetyHandle.Release(m_normalSafety);
+            AtomicSafetyHandle.Release(m_triangleSafety);
+            AtomicSafetyHandle.Release(m_uvSafety);
 #endif
             Deallocate();
         }
         
         public JobHandle Dispose(JobHandle inputDeps)
         {
+            if (m_allocator < Allocator.None) return default;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Clear(ref m_DisposeSentinel);
 #endif
             var jobHandle = new DisposeJob { Container = this }.Schedule(inputDeps);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.Release(m_Safety);
+            AtomicSafetyHandle.Release(m_vertexSafety);
+            AtomicSafetyHandle.Release(m_normalSafety);
+            AtomicSafetyHandle.Release(m_triangleSafety);
+            AtomicSafetyHandle.Release(m_uvSafety);
 #endif
-            m_triangles = null;
             m_vertices = null;
             m_normals = null;
+            m_triangles = null;
             m_uv = null;
 
             return jobHandle;
@@ -247,87 +471,25 @@ namespace DroNeS.Utils
         public void Clear()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_Safety);
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_vertexSafety);
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_normalSafety);
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_triangleSafety);
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_uvSafety);
 #endif
-            m_triangles->Clear();
             m_vertices->Clear();
             m_normals->Clear();
+            m_triangles->Clear();
             m_uv->Clear();
-        }
-        
-        
-        private int GetCount(in UnsafeList* list)
-        {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
-#endif
-            return list->Length;
-        }
-
-        private int GetCapacity(in UnsafeList* list)
-        {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
-#endif
-            return list->Capacity;
-        }
-        
-        private void SetCapacity<T>(in UnsafeList* list, in int value) where T : unmanaged
-        {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_Safety);
-            if (value < list->Length)
-                throw new ArgumentException("Capacity must be larger than the length of the NativeList.");
-#endif
-            list->SetCapacity<T>(value);
-        }
-        
-        private void SetValue<T>(in UnsafeList* list, int index, in T value) where T : unmanaged
-        {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-            if ((uint)index >= (uint)list->Length)
-                throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{list->Length}' Length.");
-#endif
-            UnsafeUtility.WriteArrayElement(list->Ptr, index, value);
-        }
-
-        private T ReadValue<T>(in UnsafeList* list, int index) where T : unmanaged
-        {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
-            if ((uint)index >= (uint)list->Length)
-                throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{list->Length}' Length.");
-#endif
-            return UnsafeUtility.ReadArrayElement<T>(list->Ptr, index);
-        }
-        
-        public void Add<T>(in UnsafeList* list, T element) where T : unmanaged
-        {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_Safety);
-#endif
-            list->Add(element);
-        }
-
-        public int[] TriangleAsArray() => AsArray<int>(m_triangles).ToArray();
-        public Vector3[] VerticesAsArray() => AsArray<Vector3>(m_vertices).ToArray();
-        public Vector3[] NormalsAsArray() => AsArray<Vector3>(m_normals).ToArray();
-        public Vector2[] UVAsArray() => AsArray<Vector2>(m_uv).ToArray();
-
-        private static NativeArray<T> AsArray<T>(in UnsafeList* list) where T : unmanaged
-        {
-            return NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T>(list->Ptr, list->Length, Allocator.Invalid);
         }
 
         public Mesh AsMesh()
         {
             return new Mesh
             {
-                normals = NormalsAsArray(),
-                triangles = TriangleAsArray(),
-                vertices = VerticesAsArray(),
-                uv = UVAsArray()
+                normals = NormalsArray(),
+                triangles = TriangleArray(),
+                vertices = VerticesArray(),
+                uv = UVArray()
             };
         }
         
@@ -338,7 +500,7 @@ namespace DroNeS.Utils
         public static void* GetVerticesUnsafePtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(list.m_Safety);
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_vertexSafety);
 #endif
             return list.m_vertices->Ptr;
         }
@@ -346,7 +508,7 @@ namespace DroNeS.Utils
         public static void* GetVerticesUnsafeReadOnlyPtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(list.m_Safety);
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_vertexSafety);
 #endif
             return list.m_vertices->Ptr;
         }
@@ -354,7 +516,7 @@ namespace DroNeS.Utils
         public static void* GetNormalsUnsafePtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(list.m_Safety);
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_vertexSafety);
 #endif
             return list.m_normals->Ptr;
         }
@@ -362,7 +524,7 @@ namespace DroNeS.Utils
         public static void* GetNormalsUnsafeReadOnlyPtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(list.m_Safety);
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_vertexSafety);
 #endif
             return list.m_normals->Ptr;
         }
@@ -370,7 +532,7 @@ namespace DroNeS.Utils
         public static void* GetTrianglesUnsafePtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(list.m_Safety);
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_vertexSafety);
 #endif
             return list.m_triangles->Ptr;
         }
@@ -378,7 +540,7 @@ namespace DroNeS.Utils
         public static void* GetTrianglesUnsafeReadOnlyPtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(list.m_Safety);
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_vertexSafety);
 #endif
             return list.m_triangles->Ptr;
         }
@@ -386,7 +548,7 @@ namespace DroNeS.Utils
         public static void* GetUVUnsafePtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(list.m_Safety);
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_vertexSafety);
 #endif
             return list.m_uv->Ptr;
         }
@@ -394,7 +556,7 @@ namespace DroNeS.Utils
         public static void* GetUVUnsafeReadOnlyPtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(list.m_Safety);
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_vertexSafety);
 #endif
             return list.m_uv->Ptr;
         }
@@ -410,9 +572,9 @@ namespace DroNeS.Utils
             m_Mesh = mesh;
         }
 
-        public int[] Triangles => m_Mesh.TriangleAsArray();
-        public Vector3[] Normals => m_Mesh.NormalsAsArray();
-        public Vector3[] Vertices => m_Mesh.VerticesAsArray();
-        public Vector2[] UV => m_Mesh.UVAsArray();
+        public int[] Triangles => m_Mesh.TriangleArray();
+        public Vector3[] Normals => m_Mesh.NormalsArray();
+        public Vector3[] Vertices => m_Mesh.VerticesArray();
+        public Vector2[] UV => m_Mesh.UVArray();
     }
 }

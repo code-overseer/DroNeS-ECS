@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using DroNeS.Mapbox.ECS;
 using DroNeS.Utils;
 using Mapbox.Unity.Map;
@@ -47,7 +48,7 @@ namespace DroNeS.Mapbox.JobSystem
 		    var data = new MeshDataStruct(in tileRect, Allocator.TempJob);
 		    var polygonJob = new PolygonMeshModifierJob().SetProperties(uvOptions, feature, ref data);
 		    var textureJob = new TextureSideWallModifierJob().SetProperties(uvOptions, feature, ref data);
-		    var routeJob = new RouteSelectionJob
+		    var routeJob = new BranchingJob
 		    {
 			    Data = data,
 			    Accumulation = _accumulation[tile],
@@ -96,27 +97,57 @@ namespace DroNeS.Mapbox.JobSystem
 			{
 				var count = pair.Value.Length;
 				_renderMeshes.Add(pair.Key, new RenderMesh[count]);
+				var gcHandles = new NativeArray<GCHandle>(count, Allocator.TempJob);
 				for (var i = 0; i < count; ++i)
 				{
-					_renderMeshes[pair.Key][i] = new RenderMesh
+					var rm = new RenderMesh
 					{
-						mesh = new Mesh
-						{
-							subMeshCount = 1,
-							vertices = new Vector3[pair.Value[i].VerticesCount],
-							normals = new Vector3[pair.Value[i].NormalsCount],
-							uv = new Vector2[pair.Value[i].UVCount],
-							triangles = new int[pair.Value[i].TrianglesCount]
-						},
+						mesh = new Mesh(),
 						material = BuildingMaterial,
+						layer = LayerMask.NameToLayer("Buildings")
 					};
-					
+					_renderMeshes[pair.Key][i] = rm; 
+					gcHandles[i] = GCHandle.Alloc(new MeshAllocationTask
+					{
+						Mesh = rm.mesh,
+						Native = pair.Value[i]
+					});
 				}
-			}
+				_jobs[pair.Key] = new MeshAllocationJob
+				{
+					GcHandles = gcHandles
+				}.Schedule(count, 2, _jobs[pair.Key]);
 
+
+			}
 		}
 
-		private struct RouteSelectionJob : IJob
+		private class MeshAllocationTask : ITask
+		{
+			public Mesh Mesh;
+			public NativeMesh Native;
+			public void Execute()
+			{
+				Mesh.subMeshCount = 1;
+				Mesh.vertices = new Vector3[Native.VertexCount];
+				Mesh.normals = new Vector3[Native.NormalCount];
+				Mesh.uv = new Vector2[Native.UVCount];
+				Mesh.triangles = new int[Native.TriangleCount];
+			}
+		}
+		
+		private struct MeshAllocationJob : IJobParallelFor
+		{
+			public NativeArray<GCHandle> GcHandles;
+			public void Execute(int index)
+			{
+				var task = (ITask) GcHandles[index].Target;
+				task.Execute();
+				GcHandles[index].Free();
+			}
+		}
+
+		private struct BranchingJob : IJob
 		{
 			public MeshDataStruct Data;
 			public NativeMeshList Accumulation;
@@ -127,12 +158,12 @@ namespace DroNeS.Mapbox.JobSystem
 			{
 				var target = Accumulation[Index.Value];
 				
-				if (target.VerticesCount + Data.Vertices.Length > 65000)
+				if (target.VertexCount + Data.Vertices.Length > 65000)
 				{
 					Index.Value += 1;
 					target = Accumulation[Index.Value];
 				}
-				VertCount.Value = target.VerticesCount;
+				VertCount.Value = target.VertexCount;
 
 				if (Data.Vertices.Length > 3) return;
 				Skip.Value = true;

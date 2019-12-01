@@ -646,7 +646,9 @@
             <e p="Utils" t="Include">
               <e p="Bool.cs" t="Include" />
               <e p="Bootstrap.cs" t="Include" />
+              <e p="ITask.cs" t="Include" />
               <e p="MeshProxy.cs" t="Include" />
+              <e p="MeshProxyList.cs" t="Include" />
               <e p="NativeMesh.cs" t="Include" />
               <e p="NativeMeshList.cs" t="Include" />
               <e p="NativePtr.cs" t="Include" />
