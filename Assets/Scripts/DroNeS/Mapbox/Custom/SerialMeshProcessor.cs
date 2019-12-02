@@ -14,8 +14,8 @@ namespace DroNeS.Mapbox.Custom
 	    private readonly Dictionary<CustomTile, MeshData> _accumulation = new Dictionary<CustomTile, MeshData>();
 	    private readonly MeshModifier[] _modifiers;
 	    public Dictionary<CustomTile, IEnumerable<RenderMesh>> RenderMeshes { get; }
+	    private Dictionary<CustomTile, int> _indices = new Dictionary<CustomTile, int>();
 	    private readonly Material _buildingMaterial;
-	    
 
 	    public SerialMeshProcessor()
 		{
@@ -25,7 +25,6 @@ namespace DroNeS.Mapbox.Custom
 				(MeshModifier)ScriptableObject.CreateInstance<PolygonMeshModifier>(),
 				ScriptableObject.CreateInstance<TextureSideWallModifier>(),
 			};
-
 			RenderMeshes = new Dictionary<CustomTile, IEnumerable<RenderMesh>>();
 		}
 
@@ -33,11 +32,13 @@ namespace DroNeS.Mapbox.Custom
 	    {
 		    _modifiers[0].SetProperties(uvOptions);
 		    _modifiers[1].SetProperties(extrusionOptions);
+		    _modifiers[0].Initialize();
+		    _modifiers[1].Initialize();
 	    }
 
 		public void Execute(CustomTile tile, CustomFeatureUnity feature)
-	    {
-		    var meshData = new MeshData{TileRect = tile.Rect};
+		{
+			var meshData = new MeshData{TileRect = tile.Rect};
 		    if (!_accumulation.ContainsKey(tile))
 		    {
 			    _accumulation.Add(tile, new MeshData
@@ -50,13 +51,14 @@ namespace DroNeS.Mapbox.Custom
 					Vertices = new List<Vector3>()
 			    });
 			    RenderMeshes.Add(tile, new List<RenderMesh>());
+			    _indices.Add(tile, 0);
 		    }
 
 		    foreach (var modifier in _modifiers)
 		    {
 			    modifier.Run((VectorFeatureUnity)feature, meshData);
 		    }
-		    
+
 		    if (_accumulation[tile].Vertices.Count + meshData.Vertices.Count < 65000)
 		    {
 			    Append(tile, meshData);
@@ -108,61 +110,47 @@ namespace DroNeS.Mapbox.Custom
 		    }
 		    
 	    }
-
-	    private void Terminate(CustomTile tile, MeshData data)
+	    private void MakeEntity(CustomTile tile, MeshData value)
 	    {
-		    if (!_accumulation.TryGetValue(tile, out var value) || value.Vertices.Count <= 3) return;
-		    var renderMesh = new RenderMesh
-		    {
-			    mesh = new Mesh(),
-			    material = _buildingMaterial
-		    };
-		    renderMesh.mesh.subMeshCount = value.Triangles.Count;
-		    renderMesh.mesh.SetVertices(value.Vertices);
-		    renderMesh.mesh.SetNormals(value.Normals);
+		    var go = new GameObject($"Building {_indices[tile]++.ToString()}");
+		    go.transform.position = tile.Position;
+		    go.transform.SetParent(tile.Transform, true);
 		    
+		    var filter = go.AddComponent<MeshFilter>();
+		    filter.sharedMesh = new Mesh();
+		    go.AddComponent<MeshRenderer>().sharedMaterial = _buildingMaterial;
 		    
+		    filter.sharedMesh.subMeshCount = value.Triangles.Count;
+		    filter.sharedMesh.SetVertices(value.Vertices);
+		    filter.sharedMesh.SetNormals(value.Normals);
+
 		    for (var i = 0; i < value.Triangles.Count; i++)
 		    {
-			    renderMesh.mesh.SetTriangles(value.Triangles[i], i);
+			    filter.sharedMesh.SetTriangles(value.Triangles[i], i);
 		    }
 
 		    for (var i = 0; i < value.UV.Count; i++)
 		    {
-			    renderMesh.mesh.SetUVs(i, value.UV[i]);
+			    filter.sharedMesh.SetUVs(i, value.UV[i]);
 		    }
-		    renderMesh.layer = LayerMask.NameToLayer("Buildings");
-		    
-			((List<RenderMesh>)RenderMeshes[tile]).Add(renderMesh);
+		    go.layer = LayerMask.NameToLayer("Buildings");
+	    }
 
-		    _accumulation[tile] = data;
+	    private void Terminate(CustomTile tile, MeshData data)
+	    {
+		    if (!_accumulation.TryGetValue(tile, out var value) || value.Vertices.Count <= 3) return;
+		    
+		    MakeEntity(tile, value);
+//			((List<RenderMesh>)RenderMeshes[tile]).Add(renderMesh);
+			_accumulation[tile] = data;
 	    }
 	    
 	    public void Terminate(CustomTile tile)
 	    {
 		    if (_accumulation.TryGetValue(tile, out var value) && value.Vertices.Count > 3)
 		    {
-			    var renderMesh = new RenderMesh
-			    {
-				    mesh = new Mesh(),
-				    material = _buildingMaterial
-			    };
-			    renderMesh.mesh.subMeshCount = value.Triangles.Count;
-			    renderMesh.mesh.SetVertices(value.Vertices);
-			    renderMesh.mesh.SetNormals(value.Normals);
-		    
-			    for (var i = 0; i < value.Triangles.Count; i++)
-			    {
-				    renderMesh.mesh.SetTriangles(value.Triangles[i], i);
-			    }
-
-			    for (var i = 0; i < value.UV.Count; i++)
-			    {
-				    renderMesh.mesh.SetUVs(i, value.UV[i]);
-			    }
-			    renderMesh.layer = LayerMask.NameToLayer("Buildings");
-
-			    ((List<RenderMesh>)RenderMeshes[tile]).Add(renderMesh);
+			    MakeEntity(tile, value);
+//			    ((List<RenderMesh>)RenderMeshes[tile]).Add(renderMesh);
 		    }
 		    
 		    tile.VectorDataState = TilePropertyState.Loaded;

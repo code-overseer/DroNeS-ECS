@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using DroNeS.Mapbox.Interfaces;
 using Mapbox.Unity.Map;
@@ -57,7 +58,6 @@ namespace DroNeS.Mapbox.Custom
 		    _processor = processor as SerialMeshProcessor ?? throw new ArgumentException($"Expected {_processor.GetType().Name}");
 
 		    SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
-
 		    SubLayerProperties.extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
 		    SubLayerProperties.extrusionOptions.extrusionScaleFactor = 1.3203f;
 		    SubLayerProperties.extrusionOptions.propertyName = "height";
@@ -79,9 +79,10 @@ namespace DroNeS.Mapbox.Custom
 		public void Create(VectorTileLayer layer, CustomTile tile)
         {
             if (tile == null || layer == null) return;
-
-            ProcessLayer(MakeProperties(layer), tile);
+            
+            CoroutineManager.Run(ProcessLayer(MakeProperties(layer), tile));
         }
+		
         private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)
         {
             var output = new BuildingMeshBuilderProperties
@@ -110,13 +111,15 @@ namespace DroNeS.Mapbox.Custom
             output.BuildingsWithUniqueIds = SubLayerProperties.honorBuildingIdSetting && SubLayerProperties.buildingsWithUniqueIds;
             return output;
         }
-
-        private void ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile)
+        
+        private IEnumerator ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile)
         {
-            for (var i = 0; i < properties.FeatureCount; ++i)
+	        for (var i = 0; i < properties.FeatureCount; ++i)
             {
                 ProcessFeature(i, tile, properties);
+                yield return null;
             }
+	        _processor.Terminate(tile);
         }
         
         private void ProcessFeature(int index, CustomTile tile, BuildingMeshBuilderProperties layerProperties)

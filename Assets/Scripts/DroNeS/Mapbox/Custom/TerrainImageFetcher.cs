@@ -19,8 +19,6 @@ namespace DroNeS.Mapbox.Custom
             
             var rasterTile = imageDataParameters.useRetina ? new RetinaRasterTile() : new RasterTile();
 
-            imageDataParameters.cTile.AddTile(rasterTile);
-
             rasterTile.Initialize(_fileSource, imageDataParameters.cTile.CanonicalTileId, imageDataParameters.tilesetId, () =>
             {
                 if (imageDataParameters.cTile.CanonicalTileId != rasterTile.Id) return;

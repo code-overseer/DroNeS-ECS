@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace DroNeS.Mapbox.Custom
 {
-    public class CoroutineManager : UnityEngine.MonoBehaviour
+    public class CoroutineManager : MonoBehaviour
     {
         private static CoroutineManager Instance => Singleton<CoroutineManager>.Instance;
         private readonly Dictionary<int, Routine> _routines = new Dictionary<int, Routine>();

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine.Scripting;
 
 namespace DroNeS.Systems.FixedUpdates
@@ -30,7 +31,7 @@ namespace DroNeS.Systems.FixedUpdates
         public override void SortSystemUpdateList()
         {
             // Extract list of systems to sort (excluding built-in systems that are inserted at fixed points)
-            var toSort = new List<ComponentSystemBase>(m_systemsToUpdate.Count - 3);
+            var toSort = new List<ComponentSystemBase>(math.max(m_systemsToUpdate.Count - 3, 1));
             foreach (var s in m_systemsToUpdate)
             {
                 if (s is BeginFixedUpdateEntityCommandBufferSystem ||

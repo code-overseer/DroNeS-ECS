@@ -10,7 +10,8 @@ namespace DroNeS.Mapbox.Custom
 {
     public static class ManhattanTileProvider
     {
-        private static readonly HashSet<UnwrappedTileId> Tiles = new HashSet<UnwrappedTileId>();
+        public static HashSet<UnwrappedTileId> Tiles { get; } = new HashSet<UnwrappedTileId>();
+        
         private static readonly float2[] West = {
             new float2(40.83f,-73.958f),
             new float2(40.814f,-73.963f),
@@ -56,7 +57,7 @@ namespace DroNeS.Mapbox.Custom
             new float2(40.702f,-74.003f),
             new float2(40.699f,-74.003f)};
 
-        public static IEnumerable<UnwrappedTileId> GetTiles(IMap map)
+        public static HashSet<UnwrappedTileId> GetTiles(IMap map)
         {
             var n = West.Length;
             for (var i = 0; i < n; i++)

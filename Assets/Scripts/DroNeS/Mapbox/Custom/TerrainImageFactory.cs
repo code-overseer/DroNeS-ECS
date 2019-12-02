@@ -1,4 +1,5 @@
-﻿using Mapbox.Map;
+﻿using Boo.Lang;
+using Mapbox.Map;
 using Mapbox.Unity.Map;
 using UnityEngine;
 
@@ -10,7 +11,11 @@ namespace DroNeS.Mapbox.Custom
 	    private ImageryLayerProperties Properties { get; }
 	    private string TilesetId => Properties.sourceOptions.Id;
 
-		public TerrainImageFactory()
+	    private int _counter = 0;
+	    private Texture2D[] Textures { get; set; }
+	    public Texture2DArray TextureArray { get; private set; }
+
+	    public TerrainImageFactory()
 		{
 			_dataFetcher = ScriptableObject.CreateInstance<TerrainImageFetcher>();
 			_dataFetcher.dataReceived += OnImageReceived;
@@ -28,22 +33,33 @@ namespace DroNeS.Mapbox.Custom
 					useCompression = true
 				}
 			};
+			Textures = new Texture2D[ManhattanTileProvider.Tiles.Count];
 		}
 		
-		#region DataFetcherEvents
 		private void OnImageReceived(CustomTile tile, RasterTile rasterTile)
 		{
 			if (tile == null) return;
 			TilesWaitingResponse.Remove(tile);
-			var rm = tile.SetRasterData(rasterTile.Data);
-			var tileObj = new GameObject(tile.ToString()) {layer = LayerMask.NameToLayer("Terrain")};
-			tileObj.transform.position = tile.Position;
-			var filter = tileObj.AddComponent<MeshFilter>();
-			filter.sharedMesh = rm.mesh;
-			var renderer = tileObj.AddComponent<MeshRenderer>();
-			renderer.sharedMaterial = rm.material;
+			var raster = new Texture2D(512, 512, TextureFormat.RGB24, false) {wrapMode = TextureWrapMode.Clamp};
+			raster.LoadImage(rasterTile.Data);
+			raster.Compress(true);
+			Textures[tile.TextureIndex] = raster;
+			if (++_counter == ManhattanTileProvider.Tiles.Count)
+			{
+				OnComplete();
+			}
 		}
-		#endregion
+
+		private void OnComplete()
+		{
+			TextureArray = new Texture2DArray(512,512, Textures.Length, TextureFormat.RGB24, false);
+			for (var i = 0; i < Textures.Length; ++i)
+			{
+				TextureArray.SetPixels(Textures[i].GetPixels(), i);
+			}
+			Textures = null;
+			TextureArray.Apply();
+		}
 
 		protected override void OnRegistered(CustomTile tile)
 		{

@@ -621,7 +621,6 @@
             </e>
             <e p="Systems" t="Include">
               <e p="BuildingColliderInitializer.cs" t="Include" />
-              <e p="CityBuilderSystem.cs" t="Include" />
               <e p="DroneMovementSystem.cs" t="Include" />
               <e p="DroneRotationSystem.cs" t="Include" />
               <e p="EventSystem" t="Include">

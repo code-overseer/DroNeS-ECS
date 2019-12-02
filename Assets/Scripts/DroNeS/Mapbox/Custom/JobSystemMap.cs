@@ -28,16 +28,10 @@ namespace DroNeS.Mapbox.Custom
 
         private void InitializeMap()
         {
-            var tiles = new List<CustomTile>(16);
             foreach (var tileId in _map.Tiles)
             {
                 var tile = new CustomTile(_map, in tileId);
                 _imageFactory.Register(tile);
-                if (tiles.Count < 2) tiles.Add(tile);
-            }
-            
-            foreach (var tile in tiles)
-            {
                 _meshFactory.Register(tile);
             }
         }

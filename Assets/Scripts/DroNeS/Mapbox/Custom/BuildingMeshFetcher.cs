@@ -20,9 +20,7 @@ namespace DroNeS.Mapbox.Custom
             if(!(parameters is BuildingMeshFetcherParameters fetcherParameters)) return;
             
             var vectorTile = new VectorTile();
-            
-            fetcherParameters.cTile.AddTile(vectorTile); //This needs to be here for cancellation 
-            
+
             vectorTile.Initialize(_fileSource, fetcherParameters.canonicalTileId, fetcherParameters.tilesetId, () =>
             {
                 if (fetcherParameters.canonicalTileId != vectorTile.Id) return;

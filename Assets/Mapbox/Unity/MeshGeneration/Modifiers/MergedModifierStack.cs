@@ -96,7 +96,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void Initialize()
 		{
 			base.Initialize();
-			//init is also used for reloading map/ location change, so reseting everything here
+			//init is also used for reloading map/ location change, so resetting everything here
 			_cacheVertexCount.Clear();
 			_cached.Clear();
 			_buildingCount.Clear();
