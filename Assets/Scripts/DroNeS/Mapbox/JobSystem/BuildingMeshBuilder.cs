@@ -18,14 +18,13 @@ namespace DroNeS.Mapbox.JobSystem
         private VectorSubLayerProperties SubLayerProperties { get; }
         private readonly GeometryExtrusionWithAtlasOptions _atlasOptions;
         private readonly UVModifierOptions _uvOptions;
-        public MeshProcessor Processor { get; }
+        private readonly MeshProcessor _processor;
 
-        public BuildingMeshBuilder(VectorSubLayerProperties subLayerProperties)
+        public BuildingMeshBuilder(VectorSubLayerProperties subLayerProperties, MeshProcessor processor)
         {
             SubLayerProperties = subLayerProperties;
-            Processor = new MeshProcessor();
-            
-            
+            _processor = processor;
+
             SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
 			
             _uvOptions = new UVModifierOptions
@@ -119,7 +118,7 @@ namespace DroNeS.Mapbox.JobSystem
             if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"])) return;
             if (feature.Points.Count < 1) return;
             
-            Processor.Execute(tile, feature, _uvOptions, _atlasOptions);
+            _processor.Execute(tile, feature, _uvOptions, _atlasOptions);
             
         }
         

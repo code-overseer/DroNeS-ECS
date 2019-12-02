@@ -1,10 +1,7 @@
 ﻿using System;
 using DroNeS.Mapbox.Custom;
-using DroNeS.Mapbox.ECS;
 using DroNeS.Utils;
 using Mapbox.Unity.Map;
-using Mapbox.Unity.MeshGeneration.Data;
-using Mapbox.Unity.MeshGeneration.Modifiers;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -42,7 +39,6 @@ namespace DroNeS.Mapbox.JobSystem
 		private float _scaledFloorHeight;
 		private int _triIndex;
 		private float3 _wallNormal;
-		private NativeList<int> _wallTriangles;
 		private float _columnScaleRatio;
 		private float _rightOfEdgeUv;
 		private float _currentY1;
@@ -67,7 +63,7 @@ namespace DroNeS.Mapbox.JobSystem
 		
 		#region Inputs
 
-		private VectorFeatureStruct _feature;
+		private Bool _pointsEmpty;
 		private MeshDataStruct _mesh;
 		private AtlasEntityStruct _currentFacade;
 		private float _height;
@@ -77,7 +73,10 @@ namespace DroNeS.Mapbox.JobSystem
 
 		#endregion
 
-		public TextureSideWallModifierJob SetProperties(GeometryExtrusionWithAtlasOptions options, CustomFeatureUnity feature, ref MeshDataStruct md)
+		public TextureSideWallModifierJob(GeometryExtrusionWithAtlasOptions options, 
+			CustomFeatureUnity feature,
+			NativeList<UnsafeListContainer> points, 
+			ref MeshDataStruct md)
 		{
 			_currentFacade = options.atlasInfo.Textures[0];
 			_currentFacade.CalculateParameters();
@@ -85,22 +84,49 @@ namespace DroNeS.Mapbox.JobSystem
 			_minHeight = 0.0f;
 			_maxHeight = 0.0f;
 			_height = 0.0f;
-			if (!feature.Properties.ContainsKey("height")) return this;
+			
 			_maxHeight = Convert.ToSingle(feature.Properties["height"]);
 			if (feature.Properties.ContainsKey("min_height"))
 			{
 				_minHeight = Convert.ToSingle(feature.Properties["min_height"]);
 			}
 
-			_feature = feature;
+			_pointsEmpty = points.Length < 1;
 			_mesh = md;
-			return this;
+			_scaledFirstFloorHeight = default;
+			_scaledTopFloorHeight = default;
+			_scaledPreferredWallLength = default;
+			_currentWallLength = default;
+			_start = default;
+			_wallDirection = default;
+			_wallSegmentFirstVertex = default;
+			_wallSegmentSecondVertex = default;
+			_wallSegmentDirection = default;
+			_wallSegmentLength = default;
+			_currentTextureRect = default;
+			_finalFirstHeight = default;
+			_finalTopHeight = default;
+			_finalMidHeight = default;
+			_finalLeftOverRowHeight = default;
+			_scaledFloorHeight = default;
+			_triIndex = default;
+			_wallNormal = default;
+			_columnScaleRatio = default;
+			_rightOfEdgeUv = default;
+			_currentY1 = default;
+			_currentY2 = default;
+			_counter = default;
+			_minWallLength = default;
+			_singleFloorHeight = default;
+			_currentMidHeight = default;
+			_midUvInCurrentStep = default;
+			_singleColumnLength = default;
+			_leftOverColumnLength = default;
 		}
-
 
 		public void Execute()
 		{
-			if (_mesh.Vertices.Length == 0 || _feature.Points.Length < 1) return;
+			if (_mesh.Vertices.Length == 0 || _pointsEmpty) return;
 			
 			//rect is a struct so we're caching this
 			_currentTextureRect = _currentFacade.TextureRect;
@@ -122,7 +148,7 @@ namespace DroNeS.Mapbox.JobSystem
 			_finalFirstHeight = Mathf.Min(_height, _scaledFirstFloorHeight);
 			_finalTopHeight = (_height - _finalFirstHeight) < _scaledTopFloorHeight ? 0 : _scaledTopFloorHeight;
 			_finalMidHeight = Mathf.Max(0, _height - (_finalFirstHeight + _finalTopHeight));
-			_wallTriangles = new NativeList<int>(32, Allocator.Temp);
+			var wallTriangles = new NativeList<int>(32, Allocator.Temp);
 			
 			_currentWallLength = 0;
 			_start = float3.zero;
@@ -162,7 +188,7 @@ namespace DroNeS.Mapbox.JobSystem
 					_wallSegmentSecondVertex = _start;
 
 					_leftOverColumnLength /= 2;
-					CreateWall(_mesh);
+					CreateWall(_mesh, ref wallTriangles);
 				}
 
 				while (_currentWallLength > _singleColumnLength)
@@ -177,7 +203,7 @@ namespace DroNeS.Mapbox.JobSystem
 					_wallSegmentSecondVertex = _start;
 
 					_currentWallLength -= (stepRatio * _scaledPreferredWallLength);
-					CreateWall(_mesh);
+					CreateWall(_mesh, ref wallTriangles);
 				}
 
 				//left over column at the end
@@ -185,15 +211,15 @@ namespace DroNeS.Mapbox.JobSystem
 				_wallSegmentFirstVertex = _start;
 				_wallSegmentSecondVertex = v2;
 				_wallSegmentLength = _leftOverColumnLength;
-				CreateWall(_mesh);
+				CreateWall(_mesh, ref wallTriangles);
 			}
 			
-			var newCap = _mesh.Triangles.Length + _wallTriangles.Length;
+			var newCap = _mesh.Triangles.Length + wallTriangles.Length;
 			if (_mesh.Triangles.Capacity < newCap) _mesh.Triangles.Capacity = 2 * newCap; 
-			_mesh.Triangles.AddRange(_wallTriangles);
+			_mesh.Triangles.AddRange(wallTriangles);
 		}
 
-		private void CreateWall(MeshDataStruct md)
+		private void CreateWall(MeshDataStruct md, ref NativeList<int> wallTriangles)
 		{
 			//need to keep track of this for triangulation indices
 			_triIndex = md.Vertices.Length;
@@ -217,14 +243,14 @@ namespace DroNeS.Mapbox.JobSystem
 			_currentY2 = _wallSegmentSecondVertex.y;
 
 			//moving leftover row to top
-			LeftOverRow(md, _finalLeftOverRowHeight);
+			LeftOverRow(md, _finalLeftOverRowHeight, ref wallTriangles);
 
-			FirstFloor(md, _height);
-			TopFloor(md, _finalLeftOverRowHeight);
-			MidFloors(md);
+			FirstFloor(md, _height, ref wallTriangles);
+			TopFloor(md, _finalLeftOverRowHeight, ref wallTriangles);
+			MidFloors(md, ref wallTriangles);
 		}
 
-		private void LeftOverRow(MeshDataStruct md, float leftOver)
+		private void LeftOverRow(MeshDataStruct md, float leftOver, ref NativeList<int> wallTriangles)
 		{
 			//leftover. we're moving small leftover row to top of the building
 			if (!(leftOver > 0)) return;
@@ -261,18 +287,18 @@ namespace DroNeS.Mapbox.JobSystem
 			md.Normals.Add(_wallNormal);
 			md.Normals.Add(_wallNormal);
 
-			_wallTriangles.Add(_triIndex);
-			_wallTriangles.Add(_triIndex + 1);
-			_wallTriangles.Add(_triIndex + 2);
+			wallTriangles.Add(_triIndex);
+			wallTriangles.Add(_triIndex + 1);
+			wallTriangles.Add(_triIndex + 2);
 
-			_wallTriangles.Add(_triIndex + 1);
-			_wallTriangles.Add(_triIndex + 3);
-			_wallTriangles.Add(_triIndex + 2);
+			wallTriangles.Add(_triIndex + 1);
+			wallTriangles.Add(_triIndex + 3);
+			wallTriangles.Add(_triIndex + 2);
 
 			_triIndex += 4;
 		}
 
-		private void MidFloors(MeshDataStruct md)
+		private void MidFloors(MeshDataStruct md, ref NativeList<int> wallTriangles)
 		{
 			_currentMidHeight = _finalMidHeight;
 			while (_currentMidHeight >= _singleFloorHeight - 0.01f)
@@ -319,20 +345,20 @@ namespace DroNeS.Mapbox.JobSystem
 				md.Normals.Add(_wallNormal);
 				md.Normals.Add(_wallNormal);
 
-				_wallTriangles.Add(_triIndex);
-				_wallTriangles.Add(_triIndex + 1);
-				_wallTriangles.Add(_triIndex + 2);
+				wallTriangles.Add(_triIndex);
+				wallTriangles.Add(_triIndex + 1);
+				wallTriangles.Add(_triIndex + 2);
 
-				_wallTriangles.Add(_triIndex + 1);
-				_wallTriangles.Add(_triIndex + 3);
-				_wallTriangles.Add(_triIndex + 2);
+				wallTriangles.Add(_triIndex + 1);
+				wallTriangles.Add(_triIndex + 3);
+				wallTriangles.Add(_triIndex + 2);
 
 				_triIndex += 4;
 				_currentMidHeight -= Math.Max(0.1f, (_scaledFloorHeight * _midUvInCurrentStep));
 			}
 		}
 
-		private void TopFloor(MeshDataStruct md, float leftOver)
+		private void TopFloor(MeshDataStruct md, float leftOver, ref NativeList<int> wallTriangles)
 		{
 			//top floor start
 			_currentY1 -= _finalTopHeight;
@@ -367,18 +393,18 @@ namespace DroNeS.Mapbox.JobSystem
 			md.Normals.Add(_wallNormal);
 			md.Normals.Add(_wallNormal);
 
-			_wallTriangles.Add(_triIndex);
-			_wallTriangles.Add(_triIndex + 1);
-			_wallTriangles.Add(_triIndex + 2);
+			wallTriangles.Add(_triIndex);
+			wallTriangles.Add(_triIndex + 1);
+			wallTriangles.Add(_triIndex + 2);
 
-			_wallTriangles.Add(_triIndex + 1);
-			_wallTriangles.Add(_triIndex + 3);
-			_wallTriangles.Add(_triIndex + 2);
+			wallTriangles.Add(_triIndex + 1);
+			wallTriangles.Add(_triIndex + 3);
+			wallTriangles.Add(_triIndex + 2);
 
 			_triIndex += 4;
 		}
 
-		private void FirstFloor(MeshDataStruct md, float hf)
+		private void FirstFloor(MeshDataStruct md, float hf, ref NativeList<int> wallTriangles)
 		{
 			md.Vertices.Add(new float3(_wallSegmentFirstVertex.x, _wallSegmentFirstVertex.y - hf + _finalFirstHeight,
 				_wallSegmentFirstVertex.z));
@@ -411,13 +437,13 @@ namespace DroNeS.Mapbox.JobSystem
 				md.UV.Add(new float2(_currentTextureRect.xMin + NarrowWallWidthDelta, _currentTextureRect.yMin));
 			}
 
-			_wallTriangles.Add(_triIndex);
-			_wallTriangles.Add(_triIndex + 1);
-			_wallTriangles.Add(_triIndex + 2);
+			wallTriangles.Add(_triIndex);
+			wallTriangles.Add(_triIndex + 1);
+			wallTriangles.Add(_triIndex + 2);
 
-			_wallTriangles.Add(_triIndex + 1);
-			_wallTriangles.Add(_triIndex + 3);
-			_wallTriangles.Add(_triIndex + 2);
+			wallTriangles.Add(_triIndex + 1);
+			wallTriangles.Add(_triIndex + 3);
+			wallTriangles.Add(_triIndex + 2);
 
 			_triIndex += 4;
 		}

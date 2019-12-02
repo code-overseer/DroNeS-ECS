@@ -15,9 +15,7 @@ namespace DroNeS.Mapbox.JobSystem
         private string TilesetId => _sourceOptions.Id;
         private const string LayerName = "building";
 
-        public MeshProcessor Processor => _builder.Processor;
-
-        public BuildingMeshFactory()
+        public BuildingMeshFactory(MeshProcessor processor)
         {
             _sourceOptions = new LayerSourceOptions
             {
@@ -51,7 +49,7 @@ namespace DroNeS.Mapbox.JobSystem
             properties.coreOptions.geometryType = VectorPrimitiveType.Polygon;
             properties.honorBuildingIdSetting = true;
             
-            _builder = new BuildingMeshBuilder(properties);
+            _builder = new BuildingMeshBuilder(properties, processor);
         }
         
         private void OnVectorDataReceived(CustomTile tile, VectorTile vectorTile)

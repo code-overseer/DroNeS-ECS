@@ -8,12 +8,11 @@ using Mapbox.Unity.Map;
 using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.Map.Strategies;
 using Mapbox.Unity.Map.TileProviders;
-using Mapbox.Unity.MeshGeneration.Data;
-using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+
 
 namespace DroNeS.Mapbox.MonoBehaviour
 {

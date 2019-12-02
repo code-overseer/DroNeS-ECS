@@ -70,23 +70,23 @@ namespace DroNeS.Utils
         [NativeContainerSupportsMinMaxWriteRestriction]
         public struct Parallel
         {
-            
-            internal void* m_meshes;
-            public int Length { get; }
-            private Allocator m_allocator;
+
+            [NativeDisableUnsafePtrRestriction]
+            internal void* m_Buffer;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
+            internal int m_Length;
+            internal int m_MinIndex;
+            internal int m_MaxIndex;
             internal AtomicSafetyHandle m_Safety;
-            private int m_MinIndex;
-            private int m_MaxIndex;
 
             internal Parallel(in UnsafeList* list, in AtomicSafetyHandle safety, in Allocator allocator)
             {
-                m_meshes = list->Ptr;
-                Length = list->Length;
-                m_allocator = allocator;
+                m_Buffer = list->Ptr;
+                m_Length = list->Length;
+                m_Allocator = allocator;
                 m_Safety = safety;
                 m_MinIndex = 0;
-                m_MaxIndex = Length - 1;
+                m_MaxIndex = m_Length - 1;
             }
 #else
             internal Parallel(in UnsafeList* list, in Allocator allocator)
@@ -96,6 +96,8 @@ namespace DroNeS.Utils
                 m_allocator = allocator;
             }
 #endif
+            private Allocator m_Allocator;
+            public int Length => m_Length;
             public NativeMesh this[int index]
             {
                 get
@@ -105,7 +107,7 @@ namespace DroNeS.Utils
                     if (index < m_MinIndex || index > m_MaxIndex)
                         FailOutOfRangeError(index);
 #endif
-                    var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_meshes, index);
+                    var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_Buffer, index);
                     return AsNativeMesh(element, m_Safety);
                 }
                 
@@ -117,8 +119,31 @@ namespace DroNeS.Utils
                     if (index < m_MinIndex || index > m_MaxIndex)
                         FailOutOfRangeError(index);
 #endif
-                    UnsafeUtility.WriteArrayElement(m_meshes, index, new NativeMeshElement(value, m_allocator));
+                    UnsafeUtility.WriteArrayElement(m_Buffer, index, new NativeMeshElement(value, m_Allocator));
                 }
+            }
+            
+            public void Deallocate(int index)
+            {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+                AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
+                if (index < m_MinIndex || index > m_MaxIndex)
+                    FailOutOfRangeError(index);
+                
+#endif
+                var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_Buffer, index);
+                UnsafeList.Destroy(element.m_normals);
+                UnsafeList.Destroy(element.m_triangles);
+                UnsafeList.Destroy(element.m_vertices);
+                UnsafeList.Destroy(element.m_uv);
+                
+                element.m_triangles = null;
+                element.m_vertices = null;
+                element.m_normals = null;
+                element.m_uv = null;
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+                AtomicSafetyHandle.Release(m_Safety);
+#endif
             }
             
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -297,7 +322,7 @@ namespace DroNeS.Utils
             DisposeSentinel.Clear(ref m_DisposeSentinel);
 #endif
             var jobHandle = new DisposeJob { Container = this }.Schedule(
-                new DisposeElementsJob{Container = this}.Schedule(Length, 2, inputDeps));
+                new DisposeElementsJob{Container = AsParallel()}.Schedule(Length, 2, inputDeps));
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.Release(m_Safety);
@@ -310,8 +335,7 @@ namespace DroNeS.Utils
         [BurstCompile]
         private struct DisposeElementsJob : IJobParallelFor
         {
-            public NativeMeshList Container;
-
+            public Parallel Container;
             public void Execute(int index)
             {
                 Container.Deallocate(index);

@@ -11,34 +11,7 @@ using UnityEngine;
 
 namespace DroNeS.Mapbox.JobSystem
 {
-	public struct VectorFeatureStruct
-	{
-		public NativeList<UnsafeListContainer> Points;
 
-		public static implicit operator VectorFeatureStruct(CustomFeatureUnity feature)
-		{
-			var output = new VectorFeatureStruct();
-			var points = feature.Points;
-
-			var listOfList = new NativeList<UnsafeListContainer>(points.Count, Allocator.TempJob);
-			var idx = 0;
-			foreach (var list in points)
-			{
-				listOfList.Add(new UnsafeListContainer(list.Count, 
-					UnsafeUtility.SizeOf<Vector3>(), 
-					UnsafeUtility.AlignOf<Vector3>(), 
-					Allocator.TempJob));
-				foreach (var value in list)
-				{
-					listOfList[idx].Add(value);
-				}
-				++idx;
-			}
-			return output;
-		}
-		
-	}
-	
 	public struct MathRect
 	{
 		public double2 Min;
@@ -294,7 +267,7 @@ namespace DroNeS.Mapbox.JobSystem
         
         public bool IsCreated => m_ListData != null;
 
-        private void Deallocate()
+        public void Deallocate()
         {
 	        UnsafeList.Destroy(m_ListData);
 	        m_ListData = null;

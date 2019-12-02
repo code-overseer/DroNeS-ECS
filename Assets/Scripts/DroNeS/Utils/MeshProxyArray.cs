@@ -17,17 +17,16 @@ namespace DroNeS.Utils
     [DebuggerTypeProxy(typeof(MeshProxyArrayDebugView))]
     public unsafe struct MeshProxyArray : IDisposable
     {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-        internal AtomicSafetyHandle m_Safety;
-
-        [NativeSetClassTypeToNullOnSchedule] 
-        private DisposeSentinel m_DisposeSentinel;
-        private int m_MinIndex;
-        private int m_MaxIndex;
-#endif
         [NativeDisableUnsafePtrRestriction]
         internal void* m_Meshes;
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+        [NativeSetClassTypeToNullOnSchedule] 
+        private DisposeSentinel m_DisposeSentinel;
         internal int m_Length;
+        internal int m_MinIndex;
+        internal int m_MaxIndex;
+        internal AtomicSafetyHandle m_Safety;
+#endif
         internal Allocator m_allocator;
 
         [StructLayout(LayoutKind.Sequential)]
@@ -108,9 +107,9 @@ namespace DroNeS.Utils
             {
                 m_Meshes = UnsafeUtility.Malloc(size, UnsafeUtility.AlignOf<MeshProxyElement>(), allocator),
                 m_Length = length,
-                m_allocator = allocator,
                 m_MinIndex = 0,
-                m_MaxIndex = length - 1
+                m_MaxIndex = length - 1,
+                m_allocator = allocator
             };
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Create(out array.m_Safety, out array.m_DisposeSentinel, 1, allocator);

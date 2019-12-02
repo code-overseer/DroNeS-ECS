@@ -64,7 +64,7 @@ namespace DroNeS.Utils
 #endif
         }
 
-        public unsafe bool IsCreated => (IntPtr) m_Buffer != IntPtr.Zero;
+        public unsafe bool IsCreated => m_Buffer != null;
 
         private unsafe void Deallocate()
         {
@@ -90,6 +90,7 @@ namespace DroNeS.Utils
         
         public unsafe JobHandle Dispose(JobHandle inputDeps)
         {
+            if (!IsCreated) return default;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             
             if (!UnsafeUtility.IsValidAllocator(m_AllocatorLabel))

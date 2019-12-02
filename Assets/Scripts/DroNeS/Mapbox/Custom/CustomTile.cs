@@ -2,6 +2,7 @@
 using DroNeS.Mapbox.ECS;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
+using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
@@ -29,9 +30,8 @@ namespace DroNeS.Mapbox.Custom
 		public CanonicalTileId CanonicalTileId => UnwrappedTileId.Canonical;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
 		private readonly List<Tile> _tiles = new List<Tile>();
-    
 
-		public CustomTile(in DronesMap map, in UnwrappedTileId tileId)
+		public CustomTile(in IMap map, in UnwrappedTileId tileId)
 		{
 			CurrentZoom = map.AbsoluteZoom;
 			ElevationType = TileTerrainType.None;

@@ -579,8 +579,10 @@
                 <e p="CustomFeatureUnity.cs" t="Include" />
                 <e p="CustomTile.cs" t="Include" />
                 <e p="CustomTileFactory.cs" t="Include" />
+                <e p="IMap.cs" t="Include" />
                 <e p="ManhattanTileProvider.cs" t="Include" />
-                <e p="ManhattanVisualizer.cs" t="Include" />
+                <e p="TerrainImageFactory.cs" t="Include" />
+                <e p="TerrainImageFetcher.cs" t="Include" />
               </e>
               <e p="ECS" t="Include">
                 <e p="BuildingMeshBuilder.cs" t="Include" />
@@ -588,12 +590,11 @@
                 <e p="DronesMap.cs" t="Include" />
                 <e p="MeshMerger.cs" t="Include" />
                 <e p="MeshRendererModifier.cs" t="Include" />
-                <e p="TerrainImageFactory.cs" t="Include" />
-                <e p="TerrainImageFetcher.cs" t="Include" />
               </e>
               <e p="JobSystem" t="Include">
                 <e p="BuildingMeshBuilder.cs" t="Include" />
                 <e p="BuildingMeshFactory.cs" t="Include" />
+                <e p="DronesMap.cs" t="Include" />
                 <e p="EarcutLibrary.cs" t="Include" />
                 <e p="MeshProcessor.cs" t="Include" />
                 <e p="PolygonMeshModifierJob.cs" t="Include" />

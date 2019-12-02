@@ -1,19 +1,20 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using DroNeS.Mapbox.Custom;
+using DroNeS.Mapbox.ECS;
+using DroNeS.Mapbox.MonoBehaviour;
 using Mapbox.Map;
-using Mapbox.Unity;
 using Mapbox.Unity.Map;
-using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.Map.Strategies;
-using Mapbox.Unity.Map.TileProviders;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
+using Unity.Jobs;
+using Unity.Rendering;
 using UnityEngine;
-using IMap = DroNeS.Mapbox.Custom.IMap;
+using ManhattanTileProvider = DroNeS.Mapbox.Custom.ManhattanTileProvider;
 
-namespace DroNeS.Mapbox.ECS
+namespace DroNeS.Mapbox.JobSystem
 {
     public class DronesMap : IMap
     {
@@ -24,23 +25,24 @@ namespace DroNeS.Mapbox.ECS
         private float Zoom => _options.locationOptions.zoom;
         public int InitialZoom => 16;
         public int AbsoluteZoom => (int) Math.Floor(Zoom);
-        
-        private readonly TerrainImageFactory _imageFactory = new TerrainImageFactory();
-        private readonly BuildingMeshFactory _meshFactory = new BuildingMeshFactory();
 
-        public static void Build()
-        {
-            var c = new DronesMap();
-        }
+        private readonly TerrainImageFactory _imageFactory;
+        private readonly BuildingMeshFactory _meshFactory;
+        public JobHandle Termination { get; }
+        private readonly MeshProcessor _processor;
+        public Dictionary<CustomTile, RenderMesh[]> RenderMeshes => _processor.RenderMeshes;
 
-        private DronesMap()
+        public DronesMap()
         {
             _options.locationOptions.zoom = 16;
             if (!Application.isPlaying) return;
             _options.scalingOptions.scalingStrategy = new MapScalingAtWorldScaleStrategy();
             _options.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
-            
+            _processor = new MeshProcessor();
+            _imageFactory = new TerrainImageFactory();
+            _meshFactory = new BuildingMeshFactory(_processor);
             InitializeMap();
+            Termination = _processor.Terminate();
         }
 
         private void SetCenterMercator(Vector2d centerMercator)
@@ -58,12 +60,19 @@ namespace DroNeS.Mapbox.ECS
             CenterLatitudeLongitude = Conversions.StringToLatLon("40.764170691358686, -73.97670925665614");
             SetWorldRelativeScale(Mathf.Pow(2, AbsoluteZoom - InitialZoom) * Mathf.Cos(Mathf.Deg2Rad * (float)CenterLatitudeLongitude.x));
             SetCenterMercator(Conversions.TileBounds(TileCover.CoordinateToTileId(CenterLatitudeLongitude, AbsoluteZoom)).Center);
+            
 
             var currentExtent = ManhattanTileProvider.GetTiles(this);
+            var tiles = new List<CustomTile>(16);
             foreach (var tileId in currentExtent)
             {
                 var tile = new CustomTile(this, in tileId);
                 _imageFactory.Register(tile);
+                if (tiles.Count < 2) tiles.Add(tile);
+            }
+            
+            foreach (var tile in tiles)
+            {
                 _meshFactory.Register(tile);
             }
         }

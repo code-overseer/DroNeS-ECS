@@ -56,13 +56,7 @@ namespace DroNeS.Mapbox.Custom
             new float2(40.702f,-74.003f),
             new float2(40.699f,-74.003f)};
 
-        public static IEnumerable<UnwrappedTileId> GetTiles(DronesMap map)
-        {
-            SetUpTiles(map);
-            return Tiles;
-        }
-
-        private static void SetUpTiles(DronesMap map)
+        public static IEnumerable<UnwrappedTileId> GetTiles(IMap map)
         {
             var n = West.Length;
             for (var i = 0; i < n; i++)
@@ -80,6 +74,7 @@ namespace DroNeS.Mapbox.Custom
                     }
                 }
             }
+            return Tiles;
         }
 
         private static UnwrappedTileId TileId(float2 coord, int zoom)

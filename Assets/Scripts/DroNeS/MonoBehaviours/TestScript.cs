@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using DroNeS.Mapbox.JobSystem;
+using DroNeS.Systems;
 using DroNeS.Utils;
 using Unity.Burst;
 using Unity.Collections;
@@ -12,18 +14,21 @@ namespace DroNeS.MonoBehaviours
 {
     public class TestScript : MonoBehaviour
     {
+        private DronesMap _map;
         private unsafe void Start()
         {
-            var array = new int[1];
-            array[0] = 123123;
-            
-            var job = new TestJob2();
-            job.Integer = (int*)UnsafeUtility.PinGCArrayAndGetDataAddress(array, out job.GcHandle);
-            var handle = job.Schedule();
-            handle.Complete();
-            
-            Debug.Log(array[0]);
+            CityBuilderSystem.Initialize();
+            _map = new DronesMap();
+            _map.Termination.Complete();
 
+            foreach (var pair in _map.RenderMeshes)
+            {
+                Debug.Log(pair.Value.Length);
+                foreach (var mesh in pair.Value)
+                {
+                    CityBuilderSystem.MakeBuilding(pair.Key.Position, mesh);    
+                }
+            }
         }
     }
 
