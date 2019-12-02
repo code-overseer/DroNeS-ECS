@@ -7,6 +7,7 @@ using Unity.Transforms;
 
 namespace DroNeS.Systems
 {
+    [DisableAutoCreation]
     public class DroneRotationSystem : JobComponentSystem
     {
         private EntityQuery _droneQuery;

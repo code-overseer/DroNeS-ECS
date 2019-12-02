@@ -1,16 +1,13 @@
-﻿using DroNeS.Mapbox.Custom;
-using DroNeS.Systems;
-using Mapbox.Map;
+﻿using Mapbox.Map;
 using Mapbox.Unity.Map;
 using UnityEngine;
 
-namespace DroNeS.Mapbox.ECS
+namespace DroNeS.Mapbox.Custom
 {
     public class TerrainImageFactory : CustomTileFactory
     {
 	    private readonly TerrainImageFetcher _dataFetcher;
 	    private ImageryLayerProperties Properties { get; }
-
 	    private string TilesetId => Properties.sourceOptions.Id;
 
 		public TerrainImageFactory()
@@ -38,10 +35,13 @@ namespace DroNeS.Mapbox.ECS
 		{
 			if (tile == null) return;
 			TilesWaitingResponse.Remove(tile);
-			var pos = tile.Position;
 			var rm = tile.SetRasterData(rasterTile.Data);
-			rm.layer = LayerMask.NameToLayer("Terrain");
-			CityBuilderSystem.MakeTerrain(in pos, in rm);
+			var tileObj = new GameObject(tile.ToString()) {layer = LayerMask.NameToLayer("Terrain")};
+			tileObj.transform.position = tile.Position;
+			var filter = tileObj.AddComponent<MeshFilter>();
+			filter.sharedMesh = rm.mesh;
+			var renderer = tileObj.AddComponent<MeshRenderer>();
+			renderer.sharedMaterial = rm.material;
 		}
 		#endregion
 

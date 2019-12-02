@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace DroNeS.Systems.EventSystem
 {
+    [DisableAutoCreation]
     [UpdateAfter(typeof(BuildPhysicsWorld)), UpdateBefore(typeof(EndFramePhysicsSystem))]
     public class OnClickSystem : JobComponentSystem
     {

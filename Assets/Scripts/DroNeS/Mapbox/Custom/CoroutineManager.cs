@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Mapbox.Unity.Utilities;
 using UnityEngine;
 
-namespace DroNeS.Mapbox.MonoBehaviour
+namespace DroNeS.Mapbox.Custom
 {
     public class CoroutineManager : UnityEngine.MonoBehaviour
     {

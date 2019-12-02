@@ -25,6 +25,7 @@ namespace DroNeS.Systems
         public CostFunction costFunction;
         public ParentHub hub;
     }
+    [DisableAutoCreation]
     [UpdateAfter(typeof(BuildPhysicsWorld)), UpdateBefore(typeof(EndFramePhysicsSystem))]
     public class JobGeneratorSystem : JobComponentSystem
     {

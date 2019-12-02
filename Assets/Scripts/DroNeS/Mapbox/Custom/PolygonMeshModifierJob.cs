@@ -1,13 +1,9 @@
-﻿using DroNeS.Mapbox.Custom;
-using DroNeS.Mapbox.ECS;
-using Mapbox.Unity.Map;
+﻿using Mapbox.Unity.Map;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
-using Unity.Mathematics;
 using UnityEngine;
 
-namespace DroNeS.Mapbox.JobSystem
+namespace DroNeS.Mapbox.Custom
 {
 
 	public struct Cont<T> where T : unmanaged

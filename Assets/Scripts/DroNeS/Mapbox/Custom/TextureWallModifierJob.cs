@@ -1,5 +1,4 @@
 ﻿using System;
-using DroNeS.Mapbox.Custom;
 using DroNeS.Utils;
 using Mapbox.Unity.Map;
 using Unity.Collections;
@@ -7,7 +6,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace DroNeS.Mapbox.JobSystem
+namespace DroNeS.Mapbox.Custom
 {
     public struct TextureSideWallModifierJob : IJob
 	{

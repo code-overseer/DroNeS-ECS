@@ -1,4 +1,5 @@
-﻿using DroNeS.Systems.EventSystem;
+﻿using System.Collections;
+using DroNeS.Systems.EventSystem;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,9 +19,11 @@ namespace DroNeS.MonoBehaviours
             }
         }
 
-        private void Start()
+        private IEnumerator Start()
         {
-            _camerasMovementSystem = World.Active.GetOrCreateSystem<CameraMovementSystem>();
+            while (World.Active.GetExistingSystem<CameraMovementSystem>() == null) yield return null;
+            
+            _camerasMovementSystem = World.Active.GetExistingSystem<CameraMovementSystem>();
             Change.onClick.AddListener(_camerasMovementSystem.OnCameraSwap);
         }
     }

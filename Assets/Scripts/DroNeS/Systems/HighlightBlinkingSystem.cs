@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace DroNeS.Systems
 {
+    [DisableAutoCreation]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class HighlightBlinkingSystem : ComponentSystem
     {

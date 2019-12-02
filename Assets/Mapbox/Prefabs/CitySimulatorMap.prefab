@@ -10,14 +10,13 @@ GameObject:
   m_Component:
   - component: {fileID: 4187505068457818}
   - component: {fileID: 114196496685157712}
-  - component: {fileID: 1881281695483644424}
   m_Layer: 0
   m_Name: CitySimulatorMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4187505068457818
 Transform:
   m_ObjectHideFlags: 0
@@ -49,7 +48,7 @@ MonoBehaviour:
       latitudeLongitude: 40.764170691358686, -73.97670925665614
       zoom: 16
     extentOptions:
-      extentType: 3
+      extentType: 1
       defaultExtents:
         cameraBoundsOptions:
           camera: {fileID: 0}
@@ -209,7 +208,7 @@ MonoBehaviour:
               - {fileID: 2100000, guid: 28da7a4fc66ea43979c8695d764b6af7, type: 2}
             - Materials:
               - {fileID: 2100000, guid: 28da7a4fc66ea43979c8695d764b6af7, type: 2}
-            atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21,
+            atlasInfo: {fileID: 11400000, guid: 733b2da1fe66841d5a53c7d268ebc1ca,
               type: 2}
             colorPalette: {fileID: 11400000, guid: 57bdfa37edf7a4f7f999d19443497554,
               type: 2}
@@ -289,18 +288,6 @@ MonoBehaviour:
         _maskValue: 0
         selectedTypes: 
       locationPrefabList: []
-  _tileProvider: {fileID: 1881281695483644424}
+  _tileProvider: {fileID: 0}
   _previewOptions:
     isPreviewEnabled: 0
---- !u!114 &1881281695483644424
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1290224484336908}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7aa00fdca26764e56afe3f51b8d0df31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

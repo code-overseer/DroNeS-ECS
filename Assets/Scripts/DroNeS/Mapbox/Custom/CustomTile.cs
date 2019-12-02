@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DroNeS.Mapbox.ECS;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.Map.Interfaces;
@@ -9,6 +8,7 @@ using Mapbox.Utils;
 using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
+using IMap = DroNeS.Mapbox.Interfaces.IMap;
 
 namespace DroNeS.Mapbox.Custom
 {

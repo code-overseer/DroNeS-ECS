@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using DroNeS.Mapbox.Custom;
+using DroNeS.Mapbox.Interfaces;
 using DroNeS.Utils;
 using Mapbox.Unity.Map;
 using Unity.Collections;
@@ -10,9 +10,9 @@ using Unity.Jobs;
 using Unity.Rendering;
 using UnityEngine;
 
-namespace DroNeS.Mapbox.JobSystem
+namespace DroNeS.Mapbox.Custom
 {
-    public class MeshProcessor : IDisposable
+    public class ParallelMeshProcessor : IDisposable, IMeshProcessor
     {
 		private static Material _buildingMaterial;
 		private static Material BuildingMaterial
@@ -28,9 +28,9 @@ namespace DroNeS.Mapbox.JobSystem
 		private readonly Dictionary<CustomTile, JobHandle> _jobs = new Dictionary<CustomTile, JobHandle>();
 		private readonly Dictionary<CustomTile, NativePtr<int>> _currentIndex = new Dictionary<CustomTile, NativePtr<int>>();
 		private int _count = 0;
-		public Dictionary<CustomTile, RenderMesh[]> RenderMeshes { get; } = new Dictionary<CustomTile, RenderMesh[]>();
+		public Dictionary<CustomTile, IEnumerable<RenderMesh>> RenderMeshes { get; } = new Dictionary<CustomTile, IEnumerable<RenderMesh>>();
 
-		public MeshProcessor()
+		public ParallelMeshProcessor()
 		{
 			Application.quitting += Dispose;
 		}
@@ -134,7 +134,7 @@ namespace DroNeS.Mapbox.JobSystem
 				var gcHandles = new NativeArray<GCHandle>(count, Allocator.TempJob);
 				for (var i = 0; i < count; ++i)
 				{
-					RenderMeshes[tile][i] = new RenderMesh
+					((RenderMesh[])RenderMeshes[tile])[i] = new RenderMesh
 					{
 						mesh = new Mesh(),
 						material = BuildingMaterial,
@@ -143,7 +143,7 @@ namespace DroNeS.Mapbox.JobSystem
 					
 					gcHandles[i] = new MeshAllocationTask
 					{
-						Mesh = RenderMeshes[tile][i].mesh,
+						Mesh = ((RenderMesh[])RenderMeshes[tile])[i].mesh,
 						Native = pair.Value[i]
 					}.Handle;
 				}
@@ -151,7 +151,7 @@ namespace DroNeS.Mapbox.JobSystem
 				{
 					GcHandles = gcHandles
 				}.Schedule(count, 2, _jobs[tile]);
-				_jobs[tile] = MeshProxyArrayUtilities.GenerateArray(RenderMeshes[tile], Allocator.TempJob, _jobs[tile],
+				_jobs[tile] = MeshProxyArrayUtilities.GenerateArray(((RenderMesh[])RenderMeshes[tile]), Allocator.TempJob, _jobs[tile],
 					out var meshProxies);
 
 				_jobs[tile] = new NativeToManageJob

@@ -11,6 +11,7 @@ using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Systems.EventSystem
 {
+    [DisableAutoCreation]
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public class InterStreamingSystem : ComponentSystem
     {

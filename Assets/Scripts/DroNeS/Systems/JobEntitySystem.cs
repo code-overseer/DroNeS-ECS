@@ -7,6 +7,7 @@ using Unity.Jobs;
 
 namespace DroNeS.Systems
 {
+    [DisableAutoCreation]
     [UpdateAfter(typeof(JobGeneratorSystem))]
     public class JobEntitySystem : JobComponentSystem
     {

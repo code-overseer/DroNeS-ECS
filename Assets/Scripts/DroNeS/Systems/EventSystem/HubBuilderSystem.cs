@@ -13,6 +13,7 @@ using Collider = Unity.Physics.Collider;
 
 namespace DroNeS.Systems.EventSystem
 {
+    [DisableAutoCreation]
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public class HubBuilderSystem : ComponentSystem
     {

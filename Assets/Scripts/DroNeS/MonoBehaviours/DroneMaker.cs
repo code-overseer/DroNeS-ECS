@@ -1,4 +1,5 @@
-﻿using DroNeS.Systems.EventSystem;
+﻿using System.Collections;
+using DroNeS.Systems.EventSystem;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,8 +18,10 @@ namespace DroNeS.MonoBehaviours
             }
         }
         
-        private void Start()
+        private IEnumerator Start()
         {
+            while (World.Active.GetExistingSystem<DroneBuilderSystem>() == null) yield return null;
+            
             BuildDrone.onClick.AddListener(World.Active.GetOrCreateSystem<DroneBuilderSystem>().AddDrone);
         }
 

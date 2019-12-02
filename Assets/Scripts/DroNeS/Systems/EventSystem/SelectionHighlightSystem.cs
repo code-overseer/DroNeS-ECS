@@ -6,11 +6,13 @@ using UnityEngine;
 
 namespace DroNeS.Systems.EventSystem
 {
+    [DisableAutoCreation]
     [UpdateInGroup(typeof(LateSimulationSystemGroup)), UpdateBefore(typeof(SelectionHighlightSystem))]
     public class OnClickEntityCommandBufferSystem : EntityCommandBufferSystem
     {
     }
     
+    [DisableAutoCreation]
     [UpdateInGroup(typeof(LateSimulationSystemGroup)), UpdateBefore(typeof(InterStreamingSystem))]
     public class SelectionHighlightSystem : ComponentSystem
     {

@@ -1,36 +1,43 @@
 ﻿using System.Collections.Generic;
-using DroNeS.Mapbox.Custom;
-using DroNeS.Systems;
-using DroNeS.Utils;
+using DroNeS.Mapbox.Interfaces;
+using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Unity.Rendering;
 using UnityEngine;
 
-namespace DroNeS.Mapbox.ECS
+namespace DroNeS.Mapbox.Custom
 {
-	public class MeshMerger : ModifierStackBase
+	public class SerialMeshProcessor : IMeshProcessor
     {
 	    private readonly Dictionary<CustomTile, MeshData> _accumulation = new Dictionary<CustomTile, MeshData>();
-		
-		private static Material _buildingMaterial;
+	    private readonly MeshModifier[] _modifiers;
+	    public Dictionary<CustomTile, IEnumerable<RenderMesh>> RenderMeshes { get; }
+	    private readonly Material _buildingMaterial;
+	    
 
-		private void OnEnable()
+	    public SerialMeshProcessor()
 		{
 			_buildingMaterial = Resources.Load("Materials/BuildingMaterial") as Material;
+			_modifiers = new[]
+			{
+				(MeshModifier)ScriptableObject.CreateInstance<PolygonMeshModifier>(),
+				ScriptableObject.CreateInstance<TextureSideWallModifier>(),
+			};
+
+			RenderMeshes = new Dictionary<CustomTile, IEnumerable<RenderMesh>>();
 		}
 
-	    public override void Initialize()
+	    public void SetOptions(UVModifierOptions uvOptions, GeometryExtrusionWithAtlasOptions extrusionOptions)
 	    {
-		    foreach (var modifier in MeshModifiers)
-		    {
-			    modifier.Initialize();
-		    }
+		    _modifiers[0].SetProperties(uvOptions);
+		    _modifiers[1].SetProperties(extrusionOptions);
 	    }
 
-	    public void Execute(CustomTile tile, CustomFeatureUnity feature, MeshData meshData, string type = "")
+		public void Execute(CustomTile tile, CustomFeatureUnity feature)
 	    {
+		    var meshData = new MeshData{TileRect = tile.Rect};
 		    if (!_accumulation.ContainsKey(tile))
 		    {
 			    _accumulation.Add(tile, new MeshData
@@ -42,14 +49,12 @@ namespace DroNeS.Mapbox.ECS
 					UV = new List<List<Vector2>>{new List<Vector2>()},
 					Vertices = new List<Vector3>()
 			    });
+			    RenderMeshes.Add(tile, new List<RenderMesh>());
 		    }
 
-		    foreach (var modifier in MeshModifiers)
+		    foreach (var modifier in _modifiers)
 		    {
-			    if (modifier != null && modifier.Active)
-			    {
-				    modifier.Run((VectorFeatureUnity)feature, meshData);
-			    }
+			    modifier.Run((VectorFeatureUnity)feature, meshData);
 		    }
 		    
 		    if (_accumulation[tile].Vertices.Count + meshData.Vertices.Count < 65000)
@@ -127,10 +132,8 @@ namespace DroNeS.Mapbox.ECS
 			    renderMesh.mesh.SetUVs(i, value.UV[i]);
 		    }
 		    renderMesh.layer = LayerMask.NameToLayer("Buildings");
-
-		    var pos = tile.Position;
-			
-		    CityBuilderSystem.MakeBuilding(in pos, in renderMesh);
+		    
+			((List<RenderMesh>)RenderMeshes[tile]).Add(renderMesh);
 
 		    _accumulation[tile] = data;
 	    }
@@ -159,9 +162,7 @@ namespace DroNeS.Mapbox.ECS
 			    }
 			    renderMesh.layer = LayerMask.NameToLayer("Buildings");
 
-			    var pos = tile.Position;
-			
-			    CityBuilderSystem.MakeBuilding(in pos, in renderMesh);
+			    ((List<RenderMesh>)RenderMeshes[tile]).Add(renderMesh);
 		    }
 		    
 		    tile.VectorDataState = TilePropertyState.Loaded;

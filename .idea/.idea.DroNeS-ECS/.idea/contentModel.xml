@@ -575,37 +575,31 @@
             <e p="Enums.cs" t="Include" />
             <e p="Mapbox" t="Include">
               <e p="Custom" t="Include">
+                <e p="BuildingMeshFactory.cs" t="Include" />
                 <e p="BuildingMeshFetcher.cs" t="Include" />
+                <e p="CoroutineManager.cs" t="Include" />
                 <e p="CustomFeatureUnity.cs" t="Include" />
                 <e p="CustomTile.cs" t="Include" />
                 <e p="CustomTileFactory.cs" t="Include" />
-                <e p="IMap.cs" t="Include" />
-                <e p="ManhattanTileProvider.cs" t="Include" />
-                <e p="TerrainImageFactory.cs" t="Include" />
-                <e p="TerrainImageFetcher.cs" t="Include" />
-              </e>
-              <e p="ECS" t="Include">
-                <e p="BuildingMeshBuilder.cs" t="Include" />
-                <e p="BuildingMeshFactory.cs" t="Include" />
-                <e p="DronesMap.cs" t="Include" />
-                <e p="MeshMerger.cs" t="Include" />
-                <e p="MeshRendererModifier.cs" t="Include" />
-              </e>
-              <e p="JobSystem" t="Include">
-                <e p="BuildingMeshBuilder.cs" t="Include" />
-                <e p="BuildingMeshFactory.cs" t="Include" />
                 <e p="DronesMap.cs" t="Include" />
                 <e p="EarcutLibrary.cs" t="Include" />
-                <e p="MeshProcessor.cs" t="Include" />
+                <e p="JobSystemMap.cs" t="Include" />
+                <e p="ManhattanTileProvider.cs" t="Include" />
+                <e p="MonoBehaviourMap.cs" t="Include" />
+                <e p="ParallelMeshBuilder.cs" t="Include" />
+                <e p="ParallelMeshProcessor.cs" t="Include" />
                 <e p="PolygonMeshModifierJob.cs" t="Include" />
+                <e p="SerialMeshBuilder.cs" t="Include" />
+                <e p="SerialMeshProcessor.cs" t="Include" />
+                <e p="TerrainImageFactory.cs" t="Include" />
+                <e p="TerrainImageFetcher.cs" t="Include" />
                 <e p="TextureWallModifierJob.cs" t="Include" />
                 <e p="UnmanagedStructs.cs" t="Include" />
               </e>
-              <e p="MonoBehaviour" t="Include">
-                <e p="CoroutineManager.cs" t="Include" />
-                <e p="DronesMap.cs" t="Include" />
-                <e p="ManhattanTileProvider.cs" t="Include" />
-                <e p="ManhattanVisualizer.cs" t="Include" />
+              <e p="Interfaces" t="Include">
+                <e p="IMap.cs" t="Include" />
+                <e p="IMeshBuilder.cs" t="Include" />
+                <e p="IMeshProcessor.cs" t="Include" />
               </e>
             </e>
             <e p="MonoBehaviours" t="Include">
@@ -660,6 +654,7 @@
               <e p="NativeStreamExtension.cs" t="Include" />
               <e p="RandomExtension.cs" t="Include" />
               <e p="Ray.cs" t="Include" />
+              <e p="Vector2dExtension.cs" t="Include" />
               <e p="Vector3Extension.cs" t="Include" />
             </e>
           </e>

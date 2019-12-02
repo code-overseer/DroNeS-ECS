@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using DroNeS.Mapbox.ECS;
+using DroNeS.Mapbox.Interfaces;
 using Mapbox.Map;
 using Unity.Mathematics;
 

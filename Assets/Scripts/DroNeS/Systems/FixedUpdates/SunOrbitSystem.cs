@@ -11,6 +11,7 @@ using Unity.Transforms;
 
 namespace DroNeS.Systems.FixedUpdates
 {
+    [DisableAutoCreation]
     [UpdateInGroup(typeof(FixedUpdateGroup))]
     public class SunOrbitSystem : JobComponentSystem
     {
