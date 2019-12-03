@@ -30,9 +30,9 @@ namespace DroNeS.Mapbox.Custom
         {
             if (tile == null) return;
             TilesWaitingResponse.Remove(tile);
-            tile.SetVectorData(vectorTile);
+//            tile.SetVectorData(vectorTile);
 			
-            _builder.Create(tile.VectorData.Data.GetLayer(DronesMap.LayerName), tile);
+            _builder.Create(vectorTile.Data.GetLayer(DronesMap.LayerName), tile);
         }
         
         protected override void OnRegistered(CustomTile tile)

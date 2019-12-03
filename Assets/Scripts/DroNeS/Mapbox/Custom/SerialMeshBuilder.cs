@@ -11,6 +11,7 @@ using Mapbox.Unity.MeshGeneration.Filters;
 using Mapbox.VectorTile;
 using Mapbox.VectorTile.Geometry;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Mapbox.Custom
 {
@@ -79,7 +80,6 @@ namespace DroNeS.Mapbox.Custom
 		public void Create(VectorTileLayer layer, CustomTile tile)
         {
             if (tile == null || layer == null) return;
-            
             CoroutineManager.Run(ProcessLayer(MakeProperties(layer), tile));
         }
 		

@@ -29,7 +29,7 @@ namespace DroNeS.Utils
         private DisposeSentinel m_DisposeSentinel;
 #endif
         [NativeDisableUnsafePtrRestriction]
-        internal UnsafeList* m_meshes;
+        internal UnsafeList* m_Buffer;
 
         internal Allocator m_allocator;
 
@@ -123,6 +123,7 @@ namespace DroNeS.Utils
                 }
             }
             
+            [WriteAccessRequired]
             public void Deallocate(int index)
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -131,16 +132,16 @@ namespace DroNeS.Utils
                     FailOutOfRangeError(index);
                 
 #endif
-                var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_Buffer, index);
-                UnsafeList.Destroy(element.m_normals);
-                UnsafeList.Destroy(element.m_triangles);
-                UnsafeList.Destroy(element.m_vertices);
-                UnsafeList.Destroy(element.m_uv);
+                var element = (NativeMeshElement*) ( (IntPtr) m_Buffer + index * sizeof(NativeMeshElement));
+                UnsafeList.Destroy(element->m_normals);
+                UnsafeList.Destroy(element->m_triangles);
+                UnsafeList.Destroy(element->m_vertices);
+                UnsafeList.Destroy(element->m_uv);
                 
-                element.m_triangles = null;
-                element.m_vertices = null;
-                element.m_normals = null;
-                element.m_uv = null;
+                element->m_triangles = null;
+                element->m_vertices = null;
+                element->m_normals = null;
+                element->m_uv = null;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.Release(m_Safety);
 #endif
@@ -185,7 +186,7 @@ namespace DroNeS.Utils
 
             DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, disposeSentinelStackDepth, allocator);
 #endif
-            m_meshes = UnsafeList.Create(UnsafeUtility.SizeOf<NativeMeshElement>(), UnsafeUtility.AlignOf<NativeMeshElement>(), meshes, allocator);
+            m_Buffer = UnsafeList.Create(UnsafeUtility.SizeOf<NativeMeshElement>(), UnsafeUtility.AlignOf<NativeMeshElement>(), meshes, allocator);
             
             m_allocator = allocator;
 
@@ -200,20 +201,21 @@ namespace DroNeS.Utils
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
-                if ((uint)index >= (uint)m_meshes->Length || index < 0)
-                    throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{m_meshes->Length}' Length.");
+                if ((uint)index >= (uint)m_Buffer->Length || index < 0)
+                    throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{m_Buffer->Length}' Length.");
 #endif
-                var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_meshes->Ptr, index);
+                var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_Buffer->Ptr, index);
                 return AsNativeMesh(element, m_Safety);
             }
+            [WriteAccessRequired]
             set
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-                if ((uint)index >= (uint)m_meshes->Length || index < 0)
-                    throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{m_meshes->Length}' Length.");
+                if ((uint)index >= (uint)m_Buffer->Length || index < 0)
+                    throw new IndexOutOfRangeException($"Index {index} is out of range in NativeList of '{m_Buffer->Length}' Length.");
 #endif
-                UnsafeUtility.WriteArrayElement(m_meshes->Ptr, index, new NativeMeshElement(value, m_allocator));
+                UnsafeUtility.WriteArrayElement(m_Buffer->Ptr, index, new NativeMeshElement(value, m_allocator));
             }
         }
         
@@ -224,7 +226,7 @@ namespace DroNeS.Utils
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
 #endif
-                return m_meshes->Length;
+                return m_Buffer->Length;
             }
         }
         
@@ -235,17 +237,18 @@ namespace DroNeS.Utils
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
 #endif
-                return m_meshes->Capacity;
+                return m_Buffer->Capacity;
             }
 
+            [WriteAccessRequired]
             set
             {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_Safety);
-                if (value < m_meshes->Length)
+                if (value < m_Buffer->Length)
                     throw new ArgumentException("Capacity must be larger than the length of the NativeList.");
 #endif
-                m_meshes->SetCapacity<NativeMeshElement>(value);
+                m_Buffer->SetCapacity<NativeMeshElement>(value);
             }
         }
         
@@ -254,7 +257,7 @@ namespace DroNeS.Utils
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_Safety);
 #endif
-            m_meshes->Add(new NativeMeshElement(element, m_allocator));
+            m_Buffer->Add(new NativeMeshElement(element, m_allocator));
         }
 
         public void RemoveAtSwapBack(int index)
@@ -265,23 +268,20 @@ namespace DroNeS.Utils
             if (index < 0 || index >= Length)
                 throw new ArgumentOutOfRangeException(index.ToString());
 #endif
-            m_meshes->RemoveAtSwapBack<NativeMeshElement>(index);
+            m_Buffer->RemoveAtSwapBack<NativeMeshElement>(index);
         }
 
         public Parallel AsParallel()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(m_Safety);
-            var arraySafety = m_Safety;
-            AtomicSafetyHandle.UseSecondaryVersion(ref arraySafety);
-            return new Parallel(m_meshes, arraySafety, m_allocator);
+            var parallel = new Parallel(m_Buffer, m_Safety, m_allocator);
+            AtomicSafetyHandle.UseSecondaryVersion(ref parallel.m_Safety);
 #else
-            return new Parallel(m_meshes, allocator);
-#endif       
+			Parallel parallel = new Parallel(m_Buffer);
+#endif
+            return parallel;     
         }
-        
-        public bool IsCreated => m_meshes != null;
-        
+
         private void Deallocate()
         {
             var l = Length;
@@ -290,70 +290,64 @@ namespace DroNeS.Utils
             {
                 Deallocate(i);
             }
-            UnsafeList.Destroy(m_meshes);
-            m_meshes = null;
+            UnsafeList.Destroy(m_Buffer);
+            m_Buffer = null;
         }
-
+        
         private void Deallocate(int index)
         {
-            var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_meshes, index);
-            UnsafeList.Destroy(element.m_normals);
-            UnsafeList.Destroy(element.m_triangles);
-            UnsafeList.Destroy(element.m_vertices);
-            UnsafeList.Destroy(element.m_uv);
+            var element = (NativeMeshElement*) ( (IntPtr) m_Buffer->Ptr + index * sizeof(NativeMeshElement));
+            UnsafeList.Destroy(element->m_normals);
+            UnsafeList.Destroy(element->m_triangles);
+            UnsafeList.Destroy(element->m_vertices);
+            UnsafeList.Destroy(element->m_uv);
                 
-            element.m_triangles = null;
-            element.m_vertices = null;
-            element.m_normals = null;
-            element.m_uv = null;
+            element->m_triangles = null;
+            element->m_vertices = null;
+            element->m_normals = null;
+            element->m_uv = null;
         }
+        
+        public bool IsCreated => m_Buffer != null;
 
+        [WriteAccessRequired]
         public void Dispose()
         {
+            if (!IsCreated) return;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
 #endif
             Deallocate();
+            m_Buffer = null;
         }
         
+        [WriteAccessRequired]
         public JobHandle Dispose(JobHandle inputDeps)
         {
+            if (!IsCreated) return inputDeps;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Clear(ref m_DisposeSentinel);
 #endif
-            var jobHandle = new DisposeJob { Container = this }.Schedule(
-                new DisposeElementsJob{Container = AsParallel()}.Schedule(Length, 2, inputDeps));
-
+            var jobHandle = new DisposeJob {Container = this}.Schedule(inputDeps);
+            m_Buffer = null;
+            
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.Release(m_Safety);
 #endif
-            m_meshes = null;
-
             return jobHandle;
-        }
-        
-        [BurstCompile]
-        private struct DisposeElementsJob : IJobParallelFor
-        {
-            public Parallel Container;
-            public void Execute(int index)
-            {
-                Container.Deallocate(index);
-            }
         }
         
         [BurstCompile]
         private struct DisposeJob : IJob
         {
             public NativeMeshList Container;
-
             public void Execute()
             {
-                UnsafeList.Destroy(Container.m_meshes);
-                Container.m_meshes = null;
+                Container.Deallocate();
             }
         }
         
+        [WriteAccessRequired]
         public void Clear()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -365,16 +359,16 @@ namespace DroNeS.Utils
             {
                 Clear(i);
             }
-            m_meshes->Clear();
+            m_Buffer->Clear();
         }
 
         private void Clear(int index)
         {
-            var element = UnsafeUtility.ReadArrayElement<NativeMeshElement>(m_meshes, index);
-            element.m_triangles->Clear();
-            element.m_vertices->Clear();
-            element.m_normals->Clear();
-            element.m_uv->Clear();
+            var element = (NativeMeshElement*) ( (IntPtr) m_Buffer->Ptr + index * sizeof(NativeMeshElement));
+            element->m_triangles->Clear();
+            element->m_vertices->Clear();
+            element->m_normals->Clear();
+            element->m_uv->Clear();
         }
 
         private static NativeMesh AsNativeMesh(NativeMeshElement element, in AtomicSafetyHandle instanceSafety)
@@ -462,7 +456,7 @@ namespace DroNeS.Utils
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(list.m_Safety);
 #endif
-            list.m_meshes->Add(Convert(data, list.m_allocator));
+            list.m_Buffer->Add(Convert(data, list.m_allocator));
         }
     }
 }

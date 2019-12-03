@@ -1,39 +1,75 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using DroNeS.Mapbox.Interfaces;
+using Mapbox.Unity;
 using Unity.Jobs;
 using Unity.Rendering;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Mapbox.Custom
 {
-    public class JobSystemMap
+    public class JobSystemMap : MonoBehaviour
     {
-        private readonly IMap _map;
-        private readonly ParallelMeshProcessor _processor;
-        private readonly CustomTileFactory _imageFactory;
-        private readonly CustomTileFactory _meshFactory;
-        public JobHandle Termination { get; }
-        public Dictionary<CustomTile, IEnumerable<RenderMesh>> RenderMeshes => _processor.RenderMeshes;
+        private MapboxAccess _access;
+        private IMap _map;
+        private CustomTileFactory _imageFactory;
+        private CustomTileFactory _meshFactory;
+        private ParallelMeshProcessor _processor;
+        private Material _terrainMaterial;
+        private Mesh _terrainMesh;
+        private MeshFilter _filter;
+        private MeshRenderer _renderer;
+        private readonly int _textureArray = Shader.PropertyToID("_TextureArray");
 
-        public JobSystemMap()
+        private void OnAllImageLoaded(Texture array)
         {
-            if (!Application.isPlaying) return;
-            _map = new DronesMap();
-            _processor = new ParallelMeshProcessor();
-            _imageFactory = new TerrainImageFactory();
-            _meshFactory = new BuildingMeshFactory(new ParallelMeshBuilder(_map.BuildingProperties, _processor));
-            InitializeMap();
-            Termination = _processor.Terminate();
+            _terrainMaterial.SetTexture(_textureArray, array);
         }
 
-        private void InitializeMap()
+        private void Awake()
         {
+            _access = MapboxAccess.Instance;
+            _map = new DronesMap();
+            _processor = new ParallelMeshProcessor();
+            _terrainMaterial = new Material(Shader.Find("Custom/TerrainShader"));
+            _imageFactory  = new TerrainImageFactory(OnAllImageLoaded);
+            _meshFactory = new BuildingMeshFactory(new ParallelMeshBuilder(_map.BuildingProperties, _processor));
+//            _filter = gameObject.AddComponent<MeshFilter>();
+//            _renderer = gameObject.AddComponent<MeshRenderer>();
+//            _renderer.sharedMaterial = _terrainMaterial;
+        }
+        
+        private Stopwatch _profiler;
+        private IEnumerator Start()
+        {
+            while (!MapboxAccess.Configured) yield return null;
+//            var instance = new CombineInstance[ManhattanTileProvider.Tiles.Count];
+//            var i = 0;
+            var root = transform;
+            _profiler = new Stopwatch();
+            _profiler.Start();
+            
             foreach (var tileId in _map.Tiles)
             {
-                var tile = new CustomTile(_map, in tileId);
-                _imageFactory.Register(tile);
+                var tile = new CustomTile(root, _map, in tileId);
+//                instance[i].mesh = tile.QuadMesh;
+//                instance[i].transform = root.localToWorldMatrix * tile.Transform.localToWorldMatrix;
+//                tile.ClearMesh();
+//                i++;
+//                _imageFactory.Register(tile);
                 _meshFactory.Register(tile);
+                break;
             }
+//            _filter.sharedMesh = new Mesh();
+//            _filter.sharedMesh.CombineMeshes(instance);
+            while (CoroutineManager.Count > 0) yield return null;
+            var handle = _processor.Terminate();
+            while (!handle.IsCompleted) yield return null;
+            handle.Complete();
+            Debug.Log((_profiler.ElapsedMilliseconds/1000.0f).ToString());
+            _profiler.Stop();
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using DroNeS.Mapbox.Interfaces;
 using DroNeS.Utils;
@@ -9,6 +10,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Rendering;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Mapbox.Custom
 {
@@ -27,7 +29,7 @@ namespace DroNeS.Mapbox.Custom
 		private readonly Dictionary<CustomTile, NativeMeshList> _accumulation = new Dictionary<CustomTile, NativeMeshList>();
 		private readonly Dictionary<CustomTile, JobHandle> _jobs = new Dictionary<CustomTile, JobHandle>();
 		private readonly Dictionary<CustomTile, NativePtr<int>> _currentIndex = new Dictionary<CustomTile, NativePtr<int>>();
-		private int _count = 0;
+		private readonly HashSet<CustomTile> _tiles = new HashSet<CustomTile>();
 		public Dictionary<CustomTile, IEnumerable<RenderMesh>> RenderMeshes { get; } = new Dictionary<CustomTile, IEnumerable<RenderMesh>>();
 
 		public ParallelMeshProcessor()
@@ -55,30 +57,25 @@ namespace DroNeS.Mapbox.Custom
 
 			return points;
 		}
-
+		
 		public void Execute(CustomTile tile, CustomFeatureUnity feature, UVModifierOptions uvOptions, GeometryExtrusionWithAtlasOptions atlasOptions)
 		{
-			++_count;
-			if (_count > 1)
+			if (!_tiles.Contains(tile))
 			{
-				CombineAllDependencies().Complete();
-			}
-			if (!_accumulation.ContainsKey(tile))
-		    {
+				_tiles.Add(tile);
 			    _accumulation.Add(tile, new NativeMeshList(Allocator.Persistent));
 			    _currentIndex.Add(tile, new NativePtr<int>(0, Allocator.Persistent));
-			    _jobs[tile] = default;
-		    }
+			    _jobs.Add(tile, default);
+			}
+			var data = new MeshDataStruct(tile.Rect, Allocator.TempJob);
+			var points = Convert(feature);
 		    
-		    var data = new MeshDataStruct(tile.Rect, Allocator.TempJob);
-		    var points = Convert(feature);
 		    var polygonJob = new PolygonMeshModifierJob(uvOptions, points, ref data);
+		    
+		    //Dispose points
+		    
 		    var textureJob = new TextureSideWallModifierJob(atlasOptions, feature, points, ref data);
 		    
-		    var deallocationJob = new InternalListDeallocationJob
-		    {
-				Lists = points
-		    };
 		    var branchingJob = new BranchingJob
 		    {
 			    Data = data,
@@ -90,26 +87,34 @@ namespace DroNeS.Mapbox.Custom
 		    var trianglePlusJob = new TriangleUpdateJob
 		    {
 			    Triangles = data.Triangles,
-			    VertCount = branchingJob.VertCount,
-			    Skip = branchingJob.Skip,
+			    VertCount = branchingJob.VertCount.AsParallel(),
+			    Skip = branchingJob.Skip.AsParallel(),
 		    };
 		    var appendJob = new MeshAppendJob
 		    {
 			    Data = data,
-			    VertCount = trianglePlusJob.VertCount,
+			    VertCount = branchingJob.VertCount,
 			    Accumulation = _accumulation[tile],
 			    Index = _currentIndex[tile],
-			    Skip = trianglePlusJob.Skip
+			    Skip = branchingJob.Skip
 		    };
 		    //Dispose Skip & data & VertCount
 		    
-		    _jobs[tile] = points.Dispose(deallocationJob.Schedule(points.Length, 64, polygonJob.Schedule(_jobs[tile])));
-		    _jobs[tile] = textureJob.Schedule(_jobs[tile]);
+		    var parPoints = points.AsParallelWriter();
+		    
+		    _jobs[tile] = UnsafeListDeallocationJob.Schedule(ref parPoints, polygonJob.Schedule(_jobs[tile]));
+		    _jobs[tile] = JobHandle.CombineDependencies(
+			    points.Dispose(_jobs[tile]),
+				textureJob.Schedule(_jobs[tile]));
+		    
 		    _jobs[tile] = branchingJob.Schedule(_jobs[tile]);
 		    _jobs[tile] = trianglePlusJob.Schedule(trianglePlusJob.Triangles.Length, 256, _jobs[tile]);
 		    _jobs[tile] = appendJob.Schedule(_jobs[tile]);
-		    _jobs[tile] = JobHandle.CombineDependencies(appendJob.Skip.Dispose(_jobs[tile]), data.Dispose(_jobs[tile]), trianglePlusJob.VertCount.Dispose(_jobs[tile]));
-	    }
+		    _jobs[tile] = JobHandle.CombineDependencies(
+			    data.Dispose(_jobs[tile]), 
+			    branchingJob.Skip.Dispose(_jobs[tile]),
+			    branchingJob.VertCount.Dispose(_jobs[tile]));
+		}
 
 		public JobHandle CombineAllDependencies()
 		{
@@ -125,11 +130,9 @@ namespace DroNeS.Mapbox.Custom
 		public JobHandle Terminate() 
 		{
 			JobHandle output = default;
-			foreach (var pair in _accumulation)
+			foreach (var tile in _tiles)
 			{
-				var tile = pair.Key;
-				_jobs[tile] = _currentIndex[tile].Dispose(_jobs[tile]);
-				var count = pair.Value.Length;
+				var count = _accumulation[tile].Length;
 				RenderMeshes.Add(tile, new RenderMesh[count]);
 				var gcHandles = new NativeArray<GCHandle>(count, Allocator.TempJob);
 				for (var i = 0; i < count; ++i)
@@ -144,37 +147,48 @@ namespace DroNeS.Mapbox.Custom
 					gcHandles[i] = new MeshAllocationTask
 					{
 						Mesh = ((RenderMesh[])RenderMeshes[tile])[i].mesh,
-						Native = pair.Value[i]
+						Native = _accumulation[tile][i]
 					}.Handle;
 				}
 				_jobs[tile] = new MeshAllocationJob
 				{
+					// deallocate on completion
 					GcHandles = gcHandles
 				}.Schedule(count, 2, _jobs[tile]);
-				_jobs[tile] = MeshProxyArrayUtilities.GenerateArray(((RenderMesh[])RenderMeshes[tile]), Allocator.TempJob, _jobs[tile],
+				_jobs[tile] = MeshProxyArrayUtilities.GenerateArray((RenderMesh[])RenderMeshes[tile], Allocator.TempJob, _jobs[tile],
 					out var meshProxies);
 
 				_jobs[tile] = new NativeToManageJob
 				{
 					Managed = meshProxies,
-					Native = pair.Value.AsParallel(),
+					Native = _accumulation[tile].AsParallel(),
 				}.Schedule(meshProxies.Length, 64, _jobs[tile]);
 
-				_jobs[tile] = pair.Value.Dispose(_jobs[tile]);
+				var list = _accumulation[tile];
+				var index = _currentIndex[tile];
+				_jobs[tile] = JobHandle.CombineDependencies(
+					list.Dispose(_jobs[tile]),
+					index.Dispose(_jobs[tile]),
+					meshProxies.Dispose(_jobs[tile])
+				);
+				_accumulation[tile] = list;
+				_currentIndex[tile] = index;
 				output = JobHandle.CombineDependencies(_jobs[tile], output);
 			}
 
 			return output;
 		}
-
-		private struct InternalListDeallocationJob : IJobParallelFor
+		
+		public void Dispose()
 		{
-			public NativeArray<UnsafeListContainer> Lists;
-			public void Execute(int index)
+			JobHandle handles = default;
+			foreach (var tile in _jobs.Keys)
 			{
-				Lists[index].Deallocate();
+				handles = JobHandle.CombineDependencies(_accumulation[tile].Dispose(_jobs[tile]), _currentIndex[tile].Dispose(_jobs[tile]), handles);
 			}
+			handles.Complete();
 		}
+		
 		
 		private class MeshAllocationTask : ITask
 		{
@@ -219,7 +233,9 @@ namespace DroNeS.Mapbox.Custom
 			[ReadOnly]
 			public NativeMeshList Accumulation;
 			public NativePtr<int> Index;
+			[WriteOnly]
 			public NativePtr<int> VertCount;
+			[WriteOnly]
 			public NativePtr<Bool> Skip;
 			public void Execute()
 			{
@@ -245,9 +261,9 @@ namespace DroNeS.Mapbox.Custom
 		{
 			public NativeArray<int> Triangles;
 			[ReadOnly, NativeDisableParallelForRestriction]
-			public NativePtr<int> VertCount;
+			public NativePtr<int>.Parallel VertCount;
 			[ReadOnly, NativeDisableParallelForRestriction]
-			public NativePtr<Bool> Skip;
+			public NativePtr<Bool>.Parallel Skip;
 			public void Execute(int index)
 			{
 				if (Skip.Value || VertCount.Value == 0) return;
@@ -263,9 +279,9 @@ namespace DroNeS.Mapbox.Custom
 			public NativeMeshList Accumulation;
 			[ReadOnly]
 			public NativePtr<int> Index;
-			[ReadOnly]
+			[ReadOnly, DeallocateOnJobCompletion]
 			public NativePtr<Bool> Skip;
-			[ReadOnly]
+			[ReadOnly, DeallocateOnJobCompletion]
 			public NativePtr<int> VertCount;
 			public void Execute()
 			{
@@ -295,19 +311,21 @@ namespace DroNeS.Mapbox.Custom
 			}
 		}
 
-		public void Dispose()
-	    {
-		    JobHandle handles = default;
-		    foreach (var tile in _jobs.Keys)
-		    {
-			    if (_currentIndex[tile].IsCreated && _accumulation[tile].IsCreated)
-					handles = JobHandle.CombineDependencies(_accumulation[tile].Dispose(_jobs[tile]), _currentIndex[tile].Dispose(_jobs[tile]), handles);
-			    else if (_currentIndex[tile].IsCreated)
-				    handles = JobHandle.CombineDependencies(_currentIndex[tile].Dispose(_jobs[tile]), handles);
-			    else if (_accumulation[tile].IsCreated)
-					handles = JobHandle.CombineDependencies(_accumulation[tile].Dispose(_jobs[tile]), handles);
-		    }
-		    handles.Complete();
-	    }
+		private struct UnsafeListDeallocationJob : IJobParallelFor
+		{
+			public static JobHandle Schedule(ref NativeArray<UnsafeListContainer> list, JobHandle inputDeps)
+			{
+				var job = new UnsafeListDeallocationJob {List = list};
+				
+				return job.Schedule(list.Length, 32, inputDeps);
+			}
+			
+			private NativeArray<UnsafeListContainer> List;
+			
+			public void Execute(int index)
+			{
+				List[index].Deallocate();
+			}
+		}
     }
 }

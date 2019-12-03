@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics;
 using DroNeS.Mapbox.Interfaces;
 using Mapbox.Unity;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Mapbox.Custom
 {
@@ -14,11 +16,15 @@ namespace DroNeS.Mapbox.Custom
         private CustomTileFactory _meshFactory;
         private SerialMeshProcessor _processor;
         private Material _terrainMaterial;
-//        private Texture2DArray _textures;
-        private Mesh _wholeMesh;
+        private Mesh _terrainMesh;
         private MeshFilter _filter;
         private MeshRenderer _renderer;
         private readonly int _textureArray = Shader.PropertyToID("_TextureArray");
+
+        private void OnAllImageLoaded(Texture array)
+        {
+            _terrainMaterial.SetTexture(_textureArray, array);
+        }
 
         private void Awake()
         {
@@ -26,18 +32,22 @@ namespace DroNeS.Mapbox.Custom
             _map = new DronesMap();
             _processor = new SerialMeshProcessor();
             _terrainMaterial = new Material(Shader.Find("Custom/TerrainShader"));
-            _imageFactory  = new TerrainImageFactory();
+            _imageFactory  = new TerrainImageFactory(OnAllImageLoaded);
             _meshFactory = new BuildingMeshFactory(new SerialMeshBuilder(_map.BuildingProperties, _processor));
             _filter = gameObject.AddComponent<MeshFilter>();
             _renderer = gameObject.AddComponent<MeshRenderer>();
             _renderer.sharedMaterial = _terrainMaterial;
         }
+
+        private Stopwatch _profiler;
         private IEnumerator Start()
         {
             while (!MapboxAccess.Configured) yield return null;
             var instance = new CombineInstance[ManhattanTileProvider.Tiles.Count];
             var i = 0;
             var root = transform;
+            _profiler = new Stopwatch();
+            _profiler.Start();
             
             foreach (var tileId in _map.Tiles)
             {
@@ -47,15 +57,15 @@ namespace DroNeS.Mapbox.Custom
                 tile.ClearMesh();
                 i++;
                 _imageFactory.Register(tile);
+                
                 _meshFactory.Register(tile);
             }
             _filter.sharedMesh = new Mesh();
             _filter.sharedMesh.CombineMeshes(instance);
-            while (((TerrainImageFactory) _imageFactory).TextureArray == null) yield return null;
-            
-            _terrainMaterial.SetTexture(_textureArray, ((TerrainImageFactory) _imageFactory).TextureArray);
-        }
 
-        
+            while (CoroutineManager.Count > 0) yield return null;
+            Debug.Log((_profiler.ElapsedMilliseconds/1000.0f).ToString());
+            _profiler.Stop();
+        }
     }
 }

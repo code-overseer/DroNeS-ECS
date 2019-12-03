@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DroNeS.Mapbox.Interfaces;
@@ -48,7 +49,7 @@ namespace DroNeS.Mapbox.Custom
         {
             if (tile == null || layer == null) return;
 
-            ProcessLayer(MakeProperties(layer), tile);
+            CoroutineManager.Run(ProcessLayer(MakeProperties(layer), tile));
         }
         private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)
         {
@@ -79,11 +80,12 @@ namespace DroNeS.Mapbox.Custom
             return output;
         }
 
-        private void ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile)
+        private IEnumerator ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile)
         {
             for (var i = 0; i < properties.FeatureCount; ++i)
             {
                 ProcessFeature(i, tile, properties);
+                yield return null;
             }
         }
         

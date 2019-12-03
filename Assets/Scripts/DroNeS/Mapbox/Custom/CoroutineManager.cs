@@ -10,6 +10,7 @@ namespace DroNeS.Mapbox.Custom
         private static CoroutineManager Instance => Singleton<CoroutineManager>.Instance;
         private readonly Dictionary<int, Routine> _routines = new Dictionary<int, Routine>();
         private readonly List<Routine> _awaitingActivation = new List<Routine>();
+        public static int Count => Instance._awaitingActivation.Count + Instance._routines.Count;
         private const int MaxRoutines = 32;
         private int _nextId = 1;
         

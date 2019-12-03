@@ -6,7 +6,6 @@ namespace DroNeS.Mapbox.Custom
 	{
 		protected readonly HashSet<CustomTile> TilesWaitingResponse;
 		protected readonly HashSet<CustomTile> TilesWaitingProcessing;
-
 		protected CustomTileFactory()
 		{
 			TilesWaitingResponse = new HashSet<CustomTile>();

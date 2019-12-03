@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace DroNeS.Mapbox.Custom
 {
+	public delegate void CompletionDelegate(Texture argument);
     public class TerrainImageFactory : CustomTileFactory
     {
 	    private readonly TerrainImageFetcher _dataFetcher;
@@ -13,10 +14,12 @@ namespace DroNeS.Mapbox.Custom
 
 	    private int _counter = 0;
 	    private Texture2D[] Textures { get; set; }
-	    public Texture2DArray TextureArray { get; private set; }
+	    private Texture2DArray TextureArray { get; set; }
 
-	    public TerrainImageFactory()
-		{
+	    private event CompletionDelegate AllImagesLoaded;
+	    public TerrainImageFactory(CompletionDelegate completionCallback = null)
+	    {
+		    AllImagesLoaded += completionCallback;
 			_dataFetcher = ScriptableObject.CreateInstance<TerrainImageFetcher>();
 			_dataFetcher.dataReceived += OnImageReceived;
 			Properties = new ImageryLayerProperties
@@ -59,6 +62,7 @@ namespace DroNeS.Mapbox.Custom
 			}
 			Textures = null;
 			TextureArray.Apply();
+			AllImagesLoaded?.Invoke(TextureArray);
 		}
 
 		protected override void OnRegistered(CustomTile tile)

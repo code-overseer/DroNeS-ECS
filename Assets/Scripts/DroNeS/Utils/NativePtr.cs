@@ -1,222 +1,180 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
+using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
 
 namespace DroNeS.Utils
 {
-    /// <summary>
-    ///   <para>A NativePtr exposes a buffer of native memory to managed code, making it possible to share data between managed and native without marshalling costs.</para>
-    /// </summary>
-    [DebuggerTypeProxy(typeof(NativePtrDebugView<>))]
     [NativeContainer]
-    [NativeContainerSupportsDeferredConvertListToArray]
-    [NativeContainerSupportsDeallocateOnJobCompletion]
-    [DebuggerDisplay("Length = {Length}")]
-    [NativeContainerSupportsMinMaxWriteRestriction]
-    public struct NativePtr<T> : IDisposable, IEquatable<NativePtr<T>> where T : unmanaged
-    {
-        internal AtomicSafetyHandle m_Safety;
-        [NativeSetClassTypeToNullOnSchedule] internal DisposeSentinel m_DisposeSentinel;
+	[NativeContainerSupportsDeallocateOnJobCompletion]
+	[DebuggerTypeProxy(typeof(NativePtrDebugView<>))]
+	[DebuggerDisplay("Value = {" + nameof(Value) + "}")]
+	[StructLayout(LayoutKind.Sequential)]
+	public unsafe struct NativePtr<T> : IDisposable where T : unmanaged
+	{
+		[NativeContainer]
+		[NativeContainerIsReadOnly]
+		public struct Parallel
+		{
+			[NativeDisableUnsafePtrRestriction]
+			internal readonly void* m_Buffer;
 
-        [NativeDisableUnsafePtrRestriction] internal unsafe void* m_Buffer;
-        internal Allocator m_AllocatorLabel;
-
-        public unsafe NativePtr(Allocator allocator, NativeArrayOptions options = NativeArrayOptions.ClearMemory)
-        {
-            Allocate(allocator, out this);
-            if ((NativeArrayOptions.ClearMemory & options) != NativeArrayOptions.ClearMemory) return;
-
-            UnsafeUtility.MemClear(m_Buffer, (long) UnsafeUtility.SizeOf<T>());
-        }
-
-        public NativePtr(T item, Allocator allocator)
-        {
-            Allocate(allocator, out this);
-            Copy(item, this);
-        }
-
-        public NativePtr(NativePtr<T> array, Allocator allocator)
-        {
-            Allocate(allocator, out this);
-            Copy(array, this);
-        }
-
-        private static unsafe void Allocate(Allocator allocator, out NativePtr<T> array)
-        {
-            var size = (long) UnsafeUtility.SizeOf<T>();
-            array = new NativePtr<T>();
-            
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            if (allocator <= Allocator.None)
-                throw new ArgumentException("Allocator must be Temp, TempJob or Persistent", nameof(allocator));
-            
-            DisposeSentinel.Create(out array.m_Safety, out array.m_DisposeSentinel, 2, allocator);
+			
+			internal AtomicSafetyHandle m_Safety;
+			
+			internal Parallel(void* value, AtomicSafetyHandle safety)
+			{
+				m_Buffer = value;
+				m_Safety = safety;
+			}
+#else
+			internal Parallel(void* value)
+			{
+				m_Buffer = value;
+			}
 #endif
+			public T Value => *(T*)m_Buffer;
+		}
+		
+		[NativeDisableUnsafePtrRestriction]
+		internal void* m_Buffer;
+		internal readonly Allocator m_AllocatorLabel;
 
-            array.m_Buffer = UnsafeUtility.Malloc(size, UnsafeUtility.AlignOf<T>(), allocator);
-            array.m_AllocatorLabel = allocator;
-#if UNITY_2019_3_OR_NEWER && ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(m_Safety, true);
-#endif
-        }
-
-        public unsafe bool IsCreated => m_Buffer != null;
-
-        private unsafe void Deallocate()
-        {
-            UnsafeUtility.Free(m_Buffer, m_AllocatorLabel);
-            m_Buffer = null;
-        }
-
-        [WriteAccessRequired]
-        public void Dispose()
-        {
+		
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            
-            if (!UnsafeUtility.IsValidAllocator(m_AllocatorLabel))
-                throw new InvalidOperationException(
-                    "The NativePtr can not be disposed because it was not allocated with a valid allocator.");
-            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-            
-            DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
-#endif            
-            
-            Deallocate();
-        }
-        
-        public unsafe JobHandle Dispose(JobHandle inputDeps)
-        {
-            if (!IsCreated) return default;
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            
-            if (!UnsafeUtility.IsValidAllocator(m_AllocatorLabel))
-                throw new InvalidOperationException(
-                    "The NativePtr can not be disposed because it was not allocated with a valid allocator.");
-            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-            
-            DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
+		private AtomicSafetyHandle m_Safety;
+		
+		[NativeSetClassTypeToNullOnSchedule]
+		private DisposeSentinel m_DisposeSentinel;
 #endif
-            var handle = new DisposalJob
-            {
-                Container = this
-            }.Schedule(inputDeps);
+		
+		public NativePtr(T value, Allocator allocator)
+		{
+			if (allocator <= Allocator.None) throw new ArgumentException("Allocator must be Temp, TempJob or Persistent allocator");
+			
+			m_Buffer = UnsafeUtility.Malloc(sizeof(T), UnsafeUtility.AlignOf<T>(), allocator);
 
-            m_Buffer = null;
-            return handle;
-        }
-        
-        private struct DisposalJob : IJob
-        {
-            public NativePtr<T> Container;
-            public void Execute()
-            {
-                if (!Container.IsCreated) return;
-                Container.Deallocate();
-            }
-        }
+			// Store the allocator to use when deallocating
+			m_AllocatorLabel = allocator;
 
-        [WriteAccessRequired]
-        public void CopyFrom(T array)
-        {
-            Copy(array, this);
-        }
-
-        [WriteAccessRequired]
-        public void CopyFrom(NativePtr<T> array)
-        {
-            Copy(array, this);
-        }
-
-        public void CopyTo(NativePtr<T> array)
-        {
-            Copy(this, array);
-        }
-
-        public unsafe T Value
-        {
-            get
-            {
+			// Create the dispose sentinel
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
-                if (!IsCreated) throw new NullReferenceException("Invalid read operation, ptr was not allocated");
+#if UNITY_2018_3_OR_NEWER
+			DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, 0, allocator);
+#else
+			DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, 0);
 #endif
-                return *(T*)m_Buffer;
-            }
-            [WriteAccessRequired]
-            set
-            {
+#endif
+			UnsafeUtility.WriteArrayElement(m_Buffer, 0, value);
+		}
+		
+		public T Value
+		{
+			get
+			{
+				RequireReadAccess();
+				return *(T*)m_Buffer;
+			}
+
+			[WriteAccessRequired]
+			set
+			{
+				RequireWriteAccess();
+				*(T*)m_Buffer = value;
+			}
+		}
+		
+		public Parallel AsParallel()
+		{
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-                if (!IsCreated) throw new NullReferenceException("Invalid write operation, ptr was not allocated");
+			var parallel = new Parallel(m_Buffer, m_Safety);
+			AtomicSafetyHandle.UseSecondaryVersion(ref parallel.m_Safety);
+#else
+			Parallel parallel = new Parallel(m_Buffer);
 #endif
-                *(T*)m_Buffer = value;
-            }
-        }
-        
+			return parallel;
+		}
+		
+		public bool IsCreated => m_Buffer != null;
 
-        public unsafe bool Equals(NativePtr<T> other)
-        {
-            return m_Buffer == other.m_Buffer;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-
-            return obj is NativePtr<T> ptr && Equals(ptr);
-        }
-
-        public override unsafe int GetHashCode()
-        {
-            return ((int) m_Buffer * 397) ^ 1;
-        }
-
-        public static bool operator ==(NativePtr<T> left, NativePtr<T> right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(NativePtr<T> left, NativePtr<T> right)
-        {
-            return !left.Equals(right);
-        }
-
-        public static unsafe void Copy(T src, NativePtr<T> dst)
-        {
+		[WriteAccessRequired]
+		public void Dispose()
+		{
+			if (m_Buffer == null) return;
+			RequireWriteAccess();
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(dst.m_Safety);
-            if (!dst.IsCreated) throw new NullReferenceException("Invalid write operation, ptr was not allocated");
+#if UNITY_2018_3_OR_NEWER
+			DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
+#else
+			DisposeSentinel.Dispose(m_Safety, ref m_DisposeSentinel);
 #endif
+#endif
+			UnsafeUtility.Free(m_Buffer, m_AllocatorLabel);
+			m_Buffer = null;
+		}
 
-            var ptr = UnsafeUtility.AddressOf(ref src);
-            UnsafeUtility.MemCpy(dst.m_Buffer, ptr, UnsafeUtility.SizeOf<T>());
-        }
-
-        public static unsafe void Copy(NativePtr<T> src, NativePtr<T> dst)
-        {
+		[WriteAccessRequired]
+		public JobHandle Dispose(JobHandle inputDeps)
+		{
+			if (m_Buffer == null) return inputDeps;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(dst.m_Safety);
-            if (!dst.IsCreated) throw new NullReferenceException("Invalid write operation, ptr was not allocated");
-            AtomicSafetyHandle.CheckReadAndThrow(src.m_Safety);
-            if (!src.IsCreated) throw new NullReferenceException("Invalid read operation, ptr was not allocated");
+			DisposeSentinel.Clear(ref m_DisposeSentinel);
 #endif
-            UnsafeUtility.MemCpy(dst.m_Buffer, src.m_Buffer, UnsafeUtility.SizeOf<T>());
-        }
-    }
+			var jobHandle = new DisposeJob { Container = this }.Schedule(inputDeps);
 
-    internal sealed class NativePtrDebugView<T> where T : unmanaged
-    {
-        private NativePtr<T> m_Ptr;
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+			AtomicSafetyHandle.Release(m_Safety);
+#endif
+			m_Buffer = null;
 
-        public NativePtrDebugView(NativePtr<T> ptr)
-        {
-            m_Ptr = ptr;
-        }
+			return jobHandle;
+		}
+		
+		[BurstCompile]
+		private struct DisposeJob : IJob
+		{
+			public NativePtr<T> Container;
+			public void Execute()
+			{
+				UnsafeUtility.Free(Container.m_Buffer, Container.m_AllocatorLabel);
+				Container.m_Buffer = null;
+			}
+		}
 
-        public T Item => m_Ptr.Value;
-    }
+		[Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
+		private void RequireReadAccess()
+		{
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+			AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
+#endif
+		}
+
+		[Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
+		private void RequireWriteAccess()
+		{
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+			AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
+#endif
+		}
+	}
+	
+	internal sealed class NativePtrDebugView<T> where T : unmanaged
+	{
+		private readonly NativePtr<T> m_Ptr;
+		
+		public NativePtrDebugView(NativePtr<T> ptr)
+		{
+			m_Ptr = ptr;
+		}
+		
+		public T Value => m_Ptr.Value;
+	}
 }

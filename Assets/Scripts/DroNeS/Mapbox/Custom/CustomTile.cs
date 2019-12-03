@@ -12,7 +12,6 @@ namespace DroNeS.Mapbox.Custom
 	public class CustomTile
 	{
 		public TilePropertyState VectorDataState;
-		public VectorTile VectorData { get; private set; }
 		public RectD Rect { get; }
 		public float3 Position { get; }
 		public float TileScale { get; }
@@ -83,11 +82,6 @@ namespace DroNeS.Mapbox.Custom
 				new Vector3(1, 0, TextureIndex),
 				new Vector3(0, 0, TextureIndex)
 			});
-		}
-
-		public void SetVectorData(VectorTile vectorTile)
-		{
-			VectorData = vectorTile;
 		}
 
 	}

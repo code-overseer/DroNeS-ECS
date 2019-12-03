@@ -33,7 +33,6 @@ namespace DroNeS.Utils
         [StructLayout(LayoutKind.Sequential)]
         public struct MeshProxyElement : IDisposable
         {
-            private GCHandle _meshHandle;
             private GCHandle _verticesHandle;
             private GCHandle _normalsHandle;
             private GCHandle _trianglesHandle;
@@ -47,23 +46,23 @@ namespace DroNeS.Utils
             internal void* Triangles;
             [NativeDisableUnsafePtrRestriction]
             internal void* UV;
+            
             public int VertexCount { get; private set; }
             public int NormalCount { get; private set; }
             public int TriangleCount { get; private set; }
             public int UVCount { get; private set; }
 
-            internal MeshProxyElement(Mesh mesh)
+            internal MeshProxyElement(Vector3[] vertices, Vector3[] normals, int[] triangles, Vector2[] uv)
             {
-                VertexCount = mesh.vertices.Length;
-                NormalCount = mesh.normals.Length;
-                TriangleCount = mesh.triangles.Length;
-                UVCount = mesh.uv.Length;
-
-                _meshHandle = GCHandle.Alloc(mesh, GCHandleType.Pinned);
-                _verticesHandle = GCHandle.Alloc(mesh.vertices, GCHandleType.Pinned);
-                _normalsHandle = GCHandle.Alloc(mesh.normals, GCHandleType.Pinned);
-                _trianglesHandle = GCHandle.Alloc(mesh.triangles, GCHandleType.Pinned);
-                _uvHandle = GCHandle.Alloc(mesh.uv, GCHandleType.Pinned);
+                VertexCount = vertices.Length;
+                NormalCount = normals.Length;
+                TriangleCount = triangles.Length;
+                UVCount = uv.Length;
+                
+                _verticesHandle = GCHandle.Alloc(vertices, GCHandleType.Pinned);
+                _normalsHandle = GCHandle.Alloc(normals, GCHandleType.Pinned);
+                _trianglesHandle = GCHandle.Alloc(triangles, GCHandleType.Pinned);
+                _uvHandle = GCHandle.Alloc(uv, GCHandleType.Pinned);
 
                 Vertices = (void*)_verticesHandle.AddrOfPinnedObject();
                 Normals = (void*)_normalsHandle.AddrOfPinnedObject();
@@ -77,7 +76,6 @@ namespace DroNeS.Utils
                 _normalsHandle.Free();
                 _trianglesHandle.Free();
                 _uvHandle.Free();
-                _meshHandle.Free();
                 Vertices = null;
                 Normals = null;
                 Triangles = null;
@@ -140,7 +138,10 @@ namespace DroNeS.Utils
             if ((uint)index >= (uint)m_MaxIndex || index < m_MinIndex)
                 FailOutOfRangeError(index);
 #endif
-            UnsafeUtility.WriteArrayElement(m_Meshes, index, new MeshProxyElement(mesh));
+            UnsafeUtility.WriteArrayElement(m_Meshes, index, new MeshProxyElement(mesh.vertices,
+                mesh.normals,
+                mesh.triangles,
+                mesh.uv));
         }
         
         public void SetMesh(RenderMesh mesh, int index)
@@ -150,7 +151,11 @@ namespace DroNeS.Utils
             if ((uint)index >= (uint)m_MaxIndex || index < m_MinIndex)
                 FailOutOfRangeError(index);
 #endif
-            UnsafeUtility.WriteArrayElement(m_Meshes, index, new MeshProxyElement(mesh.mesh));
+            UnsafeUtility.WriteArrayElement(m_Meshes, index, new MeshProxyElement(mesh.mesh.vertices,
+                mesh.mesh.normals,
+                mesh.mesh.triangles,
+                mesh.mesh.uv
+            ));
         }
 
         public bool IsCreated => (IntPtr) this.m_Meshes != IntPtr.Zero;
@@ -163,12 +168,39 @@ namespace DroNeS.Utils
             return element;
         }
 
+        [WriteAccessRequired]
         public void Dispose()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
 #endif
             Release();
+        }
+        
+        [WriteAccessRequired]
+        public JobHandle Dispose(JobHandle inputDeps)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            DisposeSentinel.Clear(ref m_DisposeSentinel);
+#endif
+            var jobHandle = new DisposeJob { Container = this }.Schedule(inputDeps);
+
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.Release(m_Safety);
+#endif
+            m_Meshes = null;
+
+            return jobHandle;
+        }
+        
+        private struct DisposeJob : IJob
+        {
+            [WriteOnly]
+            public MeshProxyArray Container;
+            public void Execute()
+            {
+                Container.Release();
+            }
         }
         
         private void Release()
@@ -267,7 +299,10 @@ namespace DroNeS.Utils
         private unsafe class ProxyAssignmentTask : ITask
         {
             private GCHandle _handle;
-            private readonly Mesh _mesh;
+            private readonly Vector3[] _vertices;
+            private readonly Vector3[] _normals;
+            private readonly int[] _triangles;
+            private readonly Vector2[] _uv;
             private readonly MeshProxyArray.MeshProxyElement* _proxy;
             public GCHandle Handle 
             {
@@ -281,18 +316,24 @@ namespace DroNeS.Utils
             public ProxyAssignmentTask(in RenderMesh mesh, in MeshProxyArray array, int index)
             {
                 _proxy = array.GetUnsafePtr(index);
-                _mesh = mesh.mesh;
+                _vertices = mesh.mesh.vertices;
+                _normals = mesh.mesh.normals;
+                _triangles = mesh.mesh.triangles;
+                _uv = mesh.mesh.uv;
             }
             
             public ProxyAssignmentTask(in Mesh mesh, in MeshProxyArray array, int index)
             {
                 _proxy = array.GetUnsafePtr(index);
-                _mesh = mesh;
+                _vertices = mesh.vertices;
+                _normals = mesh.normals;
+                _triangles = mesh.triangles;
+                _uv = mesh.uv;
             }
 
             public void Execute()
             {
-                *_proxy = new MeshProxyArray.MeshProxyElement(_mesh);
+                *_proxy = new MeshProxyArray.MeshProxyElement(_vertices, _normals, _triangles, _uv);
             }
         }
 
