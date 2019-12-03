@@ -4,7 +4,7 @@ namespace DroNeS.Utils
 {
     public interface ITask
     {
-        GCHandle Handle { get; }
+        GCHandle TaskHandle { get; }
         void Execute();
     }
 

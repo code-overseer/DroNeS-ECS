@@ -11,7 +11,7 @@ using Unity.Transforms;
 
 namespace DroNeS.Systems
 {
-    [DisableAutoCreation]
+//    [DisableAutoCreation]
     public class DroneMovementSystem : JobComponentSystem
     {
         private SunOrbitSystem _time;

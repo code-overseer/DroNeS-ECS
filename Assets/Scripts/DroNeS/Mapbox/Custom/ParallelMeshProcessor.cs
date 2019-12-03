@@ -148,7 +148,7 @@ namespace DroNeS.Mapbox.Custom
 					{
 						Mesh = ((RenderMesh[])RenderMeshes[tile])[i].mesh,
 						Native = _accumulation[tile][i]
-					}.Handle;
+					}.TaskHandle;
 				}
 				_jobs[tile] = new MeshAllocationJob
 				{
@@ -195,7 +195,7 @@ namespace DroNeS.Mapbox.Custom
 			private GCHandle _handle;
 			public Mesh Mesh;
 			public NativeMesh Native;
-			public GCHandle Handle 
+			public GCHandle TaskHandle 
 			{
 				get
 				{

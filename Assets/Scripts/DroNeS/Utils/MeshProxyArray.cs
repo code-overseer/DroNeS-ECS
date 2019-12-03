@@ -304,7 +304,7 @@ namespace DroNeS.Utils
             private readonly int[] _triangles;
             private readonly Vector2[] _uv;
             private readonly MeshProxyArray.MeshProxyElement* _proxy;
-            public GCHandle Handle 
+            public GCHandle TaskHandle 
             {
                 get
                 {
@@ -345,7 +345,7 @@ namespace DroNeS.Utils
             {
                 var task = (ITask)Tasks[index].Target;
                 task.Execute();
-                task.Handle.Free();
+                task.TaskHandle.Free();
             }
         }
 
@@ -377,7 +377,7 @@ namespace DroNeS.Utils
             var tasks = new NativeArray<GCHandle>(mesh.Length, Allocator.TempJob);
             for (var i = 0; i < mesh.Length; ++i)
             {
-                tasks[i] = new ProxyAssignmentTask(mesh[i], array, i).Handle;
+                tasks[i] = new ProxyAssignmentTask(mesh[i], array, i).TaskHandle;
             }
             
             return new MeshProxyAssignmentJob{ Tasks = tasks }.Schedule(mesh.Length, 32, inputDeps);
@@ -389,7 +389,7 @@ namespace DroNeS.Utils
             var tasks = new NativeArray<GCHandle>(mesh.Length, Allocator.TempJob);
             for (var i = 0; i < mesh.Length; ++i)
             {
-                tasks[i] = new ProxyAssignmentTask(mesh[i], array, i).Handle;
+                tasks[i] = new ProxyAssignmentTask(mesh[i], array, i).TaskHandle;
             }
             
             return new MeshProxyAssignmentJob{ Tasks = tasks }.Schedule(mesh.Length, 32, inputDeps);

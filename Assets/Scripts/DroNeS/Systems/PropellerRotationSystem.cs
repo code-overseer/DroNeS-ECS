@@ -9,7 +9,7 @@ using Unity.Transforms;
 
 namespace DroNeS.Systems
 {
-    [DisableAutoCreation]
+//    [DisableAutoCreation]
     public class PropellerRotationSystem : JobComponentSystem
     {
         private EntityQuery _propellerQuery;

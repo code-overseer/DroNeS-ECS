@@ -11,7 +11,7 @@ using ReadOnlyAttribute = Unity.Collections.ReadOnlyAttribute;
 
 namespace DroNeS.Systems
 {
-    [DisableAutoCreation]
+//    [DisableAutoCreation]
     [UpdateAfter(typeof(DroneMovementSystem))]
     public class WaypointUpdateSystem : JobComponentSystem
     {

@@ -12,7 +12,7 @@ using Random = UnityEngine.Random;
 
 namespace DroNeS.Systems.EventSystem
 {
-    [DisableAutoCreation]
+//    [DisableAutoCreation]
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public class DroneBuilderSystem : ComponentSystem
     {

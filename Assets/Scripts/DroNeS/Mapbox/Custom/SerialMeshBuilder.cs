@@ -80,8 +80,14 @@ namespace DroNeS.Mapbox.Custom
 		public void Create(VectorTileLayer layer, CustomTile tile)
         {
             if (tile == null || layer == null) return;
-            CoroutineManager.Run(ProcessLayer(MakeProperties(layer), tile));
+            ProcessLayer(MakeProperties(layer), tile);
         }
+		
+		public IEnumerator CreationRoutine(VectorTileLayer layer, CustomTile tile)
+		{
+			if (tile == null || layer == null) yield break;
+			ProcessLayer(MakeProperties(layer), tile);
+		}
 		
         private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)
         {
@@ -112,12 +118,11 @@ namespace DroNeS.Mapbox.Custom
             return output;
         }
         
-        private IEnumerator ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile)
+        private void ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile)
         {
 	        for (var i = 0; i < properties.FeatureCount; ++i)
             {
                 ProcessFeature(i, tile, properties);
-                yield return null;
             }
 	        _processor.Terminate(tile);
         }
@@ -161,5 +166,7 @@ namespace DroNeS.Mapbox.Custom
         {
             return layerProperties.LayerFeatureFilters.Length < 1 || layerProperties.LayerFeatureFilterCombiner.Try((VectorFeatureUnity)feature);
         }
+        
+        
     }
 }
