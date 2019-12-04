@@ -14,7 +14,7 @@ namespace DroNeS.Mapbox.Custom
 	    private readonly Dictionary<CustomTile, MeshData> _accumulation = new Dictionary<CustomTile, MeshData>();
 	    private readonly MeshModifier[] _modifiers;
 	    public Dictionary<CustomTile, IEnumerable<RenderMesh>> RenderMeshes { get; }
-	    private Dictionary<CustomTile, int> _indices = new Dictionary<CustomTile, int>();
+	    private readonly Dictionary<CustomTile, int> _indices = new Dictionary<CustomTile, int>();
 	    private readonly Material _buildingMaterial;
 
 	    public MeshProcessor()

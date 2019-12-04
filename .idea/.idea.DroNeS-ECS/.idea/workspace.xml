@@ -1,32 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="65bcd551-ed8a-4fb4-b5f4-4d844e6715d5" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/contentModel.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DroNeS-ECS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/BuildingMeshFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/BuildingMeshFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/JobSystemMap.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/JobSystemMap.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/MonoBehaviourMap.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/MonoBehaviourMap.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/ParallelMeshBuilder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/ParallelMeshBuilder.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/ParallelMeshProcessor.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/ParallelMeshProcessor.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/SerialMeshBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/SerialMeshBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/SerialMeshProcessor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/MeshProcessor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/SerialMeshProcessor.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/MeshProcessor.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/TerrainImageFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/TerrainImageFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Interfaces/IMeshBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Interfaces/IMeshBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/TestScript.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/MonoBehaviours/TestScript.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/IRoutine.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/IRoutine.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/ITask.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/ITask.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/NativeMeshList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/NativeMeshList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/NativeRoutineArray.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/NativeRoutines.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/NativeRoutineArray.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DroNeS/Utils/NativeRoutines.cs.meta" afterDir="false" />
-    </list>
+    <list default="true" id="65bcd551-ed8a-4fb4-b5f4-4d844e6715d5" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,11 +46,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/AsynchronousMeshBuilder.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="256">
-              <caret line="63" column="59" selection-start-line="63" selection-start-column="59" selection-end-line="63" selection-end-column="59" />
+            <state relative-caret-position="407">
+              <caret line="143" column="29" selection-start-line="143" selection-start-column="29" selection-end-line="143" selection-end-column="29" />
               <folding>
                 <marker date="1575476384429" expanded="true" signature="6:507" ph="..." />
                 <marker date="1575476384429" expanded="true" signature="539:6734" ph="{...}" />
@@ -86,13 +61,13 @@
                 <marker date="1575476384429" expanded="true" signature="2204:2419" ph="{...}" />
                 <marker date="1575476384429" expanded="false" signature="2466:2947" ph="{...}" />
                 <marker date="1575476384429" expanded="true" signature="2620:2750" ph="{...}" />
-                <marker date="1575476384429" expanded="false" signature="3048:3214" ph="{...}" />
+                <marker date="1575476384429" expanded="true" signature="3048:3214" ph="{...}" />
                 <marker date="1575476384429" expanded="true" signature="3105:3179" ph="{...}" />
                 <marker date="1575476384429" expanded="true" signature="3246:3558" ph="{...}" />
                 <marker date="1575476384429" expanded="false" signature="3645:5002" ph="{...}" />
                 <marker date="1575476384429" expanded="true" signature="3727:4058" ph="{...}" />
                 <marker date="1575476384429" expanded="true" signature="4126:4833" ph="{...}" />
-                <marker date="1575476384429" expanded="false" signature="5114:6416" ph="{...}" />
+                <marker date="1575476384429" expanded="true" signature="5114:6416" ph="{...}" />
                 <marker date="1575476384429" expanded="true" signature="5371:5572" ph="{...}" />
                 <marker date="1575476384429" expanded="true" signature="5589:5702" ph="{...}" />
                 <marker date="1575476384429" expanded="false" signature="6560:6726" ph="{...}" />
@@ -175,11 +150,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/MeshProcessor.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1346">
-              <caret line="43" selection-start-line="43" selection-end-line="43" />
+            <state relative-caret-position="848">
+              <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
               <folding>
                 <marker date="1575469277423" expanded="false" signature="6:257" ph="..." />
                 <marker date="1575469277423" expanded="true" signature="289:4905" ph="{...}" />
@@ -792,7 +767,7 @@
       <workItem from="1575286692756" duration="39424000" />
       <workItem from="1575378691981" duration="5052000" />
       <workItem from="1575384884029" duration="23823000" />
-      <workItem from="1575464060153" duration="11142000" />
+      <workItem from="1575464060153" duration="11852000" />
     </task>
     <task id="LOCAL-00001" summary="* Imported new Drone and Propeller Mesh&#10;* Implemented Drone and Propeller rotation systems">
       <created>1574283723050</created>
@@ -840,7 +815,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="578745000" />
+    <option name="totallyTimeSpent" value="579455000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -852,7 +827,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="23" width="1575" height="922" extended-state="0" />
+    <frame x="-38" y="23" width="1575" height="922" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49759036" visible="true" weight="0.21069798" />
@@ -947,13 +922,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7B9DEAD9-ECA5-4A08-82B9-9C1E553FB9BE/ed/15dd9b2c/UnsafeUtility.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="282" column="83" lean-forward="true" selection-start-line="282" selection-start-column="14" selection-end-line="282" selection-end-column="83" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/CustomFeatureUnity.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="128">
@@ -1977,10 +1945,45 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46C28768-88CA-4405-B893-CEA4E20D647F/b6/e0492486/VectorTileFeature.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="640">
+          <caret line="42" column="34" selection-start-line="42" selection-start-column="34" selection-end-line="42" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/AsynchronousMeshBuilder.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="407">
+          <caret line="143" column="29" selection-start-line="143" selection-start-column="29" selection-end-line="143" selection-end-column="29" />
+          <folding>
+            <marker date="1575476384429" expanded="true" signature="6:507" ph="..." />
+            <marker date="1575476384429" expanded="true" signature="539:6734" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="597:6732" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="857:944" ph="{...}" />
+            <marker date="1575476384429" expanded="false" signature="1026:2139" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="1744:1899" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="2204:2419" ph="{...}" />
+            <marker date="1575476384429" expanded="false" signature="2466:2947" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="2620:2750" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="3048:3214" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="3105:3179" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="3246:3558" ph="{...}" />
+            <marker date="1575476384429" expanded="false" signature="3645:5002" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="3727:4058" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="4126:4833" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="5114:6416" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="5371:5572" ph="{...}" />
+            <marker date="1575476384429" expanded="true" signature="5589:5702" ph="{...}" />
+            <marker date="1575476384429" expanded="false" signature="6560:6726" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/MeshProcessor.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1346">
-          <caret line="43" selection-start-line="43" selection-end-line="43" />
+        <state relative-caret-position="848">
+          <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
           <folding>
             <marker date="1575469277423" expanded="false" signature="6:257" ph="..." />
             <marker date="1575469277423" expanded="true" signature="289:4905" ph="{...}" />
@@ -2009,34 +2012,6 @@
             <marker date="1575469277423" expanded="true" signature="4292:4532" ph="{...}" />
             <marker date="1575469277423" expanded="true" signature="4582:4891" ph="{...}" />
             <marker date="1575469277423" expanded="true" signature="4675:4788" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Assets/Scripts/DroNeS/Mapbox/Custom/AsynchronousMeshBuilder.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="63" column="59" selection-start-line="63" selection-start-column="59" selection-end-line="63" selection-end-column="59" />
-          <folding>
-            <marker date="1575476384429" expanded="true" signature="6:507" ph="..." />
-            <marker date="1575476384429" expanded="true" signature="539:6734" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="597:6732" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="857:944" ph="{...}" />
-            <marker date="1575476384429" expanded="false" signature="1026:2139" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="1744:1899" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="2204:2419" ph="{...}" />
-            <marker date="1575476384429" expanded="false" signature="2466:2947" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="2620:2750" ph="{...}" />
-            <marker date="1575476384429" expanded="false" signature="3048:3214" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="3105:3179" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="3246:3558" ph="{...}" />
-            <marker date="1575476384429" expanded="false" signature="3645:5002" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="3727:4058" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="4126:4833" ph="{...}" />
-            <marker date="1575476384429" expanded="false" signature="5114:6416" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="5371:5572" ph="{...}" />
-            <marker date="1575476384429" expanded="true" signature="5589:5702" ph="{...}" />
-            <marker date="1575476384429" expanded="false" signature="6560:6726" ph="{...}" />
           </folding>
         </state>
       </provider>

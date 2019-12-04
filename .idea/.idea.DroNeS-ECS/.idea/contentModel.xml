@@ -641,7 +641,6 @@
               <e p="WaypointUpdateSystem.cs" t="Include" />
             </e>
             <e p="Utils" t="Include">
-              <e p="ArrayList.cs" t="Include" />
               <e p="Bool.cs" t="Include" />
               <e p="Bootstrap.cs" t="Include" />
               <e p="Interfaces" t="Include">
