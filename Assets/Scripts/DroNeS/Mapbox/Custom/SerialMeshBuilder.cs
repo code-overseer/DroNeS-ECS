@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using DroNeS.Mapbox.Interfaces;
 using Mapbox.Unity.Map;
@@ -11,58 +10,25 @@ using Mapbox.Unity.MeshGeneration.Filters;
 using Mapbox.VectorTile;
 using Mapbox.VectorTile.Geometry;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Mapbox.Custom
 {
-	// ReSharper disable once ClassNeverInstantiated.Global
-	public class BuildingMeshBuilderProperties
-    {
-        public FeatureProcessingStage FeatureProcessingStage;
-        public bool BuildingsWithUniqueIds;
-        public VectorTileLayer VectorTileLayer;
-        public ILayerFeatureFilterComparer[] LayerFeatureFilters;
-        public ILayerFeatureFilterComparer LayerFeatureFilterCombiner;
-        public int FeatureCount;
-    }
-	
-	internal class ProcessingState : IEnumerator
-	{
-		private int _index;
-		private readonly BuildingMeshBuilderProperties _properties;
-
-		public ProcessingState(BuildingMeshBuilderProperties properties)
-		{
-			_properties = properties;
-			_index = 0;
-		}
-		public bool MoveNext()
-		{
-			return ++_index < _properties.FeatureCount;
-		}
-		public void Reset()
-		{
-			_index = 0;
-		}
-		public object Current => this;
-	}
-    
-    public class SerialMeshBuilder : IMeshBuilder
+	public class SerialMeshBuilder : IMeshBuilder
     {
 	    public VectorSubLayerProperties SubLayerProperties { get; }
 	    public IMeshProcessor Processor => _processor;
-	    private readonly SerialMeshProcessor _processor;
+	    private readonly MeshProcessor _processor;
 
-	    public SerialMeshBuilder(VectorSubLayerProperties subLayerProperties, IMeshProcessor processor)
+	    public SerialMeshBuilder(VectorSubLayerProperties subLayerProperties)
 	    {
 		    SubLayerProperties = subLayerProperties;
-		    _processor = processor as SerialMeshProcessor ?? throw new ArgumentException($"Expected {_processor.GetType().Name}");
-
 		    SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
 		    SubLayerProperties.extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
 		    SubLayerProperties.extrusionOptions.extrusionScaleFactor = 1.3203f;
 		    SubLayerProperties.extrusionOptions.propertyName = "height";
 		    SubLayerProperties.extrusionOptions.extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
+		    
+		    _processor = new MeshProcessor();
             
 		    var uvOptions = new UVModifierOptions
 		    {
@@ -80,13 +46,18 @@ namespace DroNeS.Mapbox.Custom
 		public void Create(VectorTileLayer layer, CustomTile tile)
         {
             if (tile == null || layer == null) return;
-            ProcessLayer(MakeProperties(layer), tile);
+            var properties = MakeProperties(layer);
+            CoroutineManager.Run(ProcessingRoutine(properties, tile));
         }
-		
-		public IEnumerator CreationRoutine(VectorTileLayer layer, CustomTile tile)
+
+		private IEnumerator ProcessingRoutine(BuildingMeshBuilderProperties properties, CustomTile tile)
 		{
-			if (tile == null || layer == null) yield break;
-			ProcessLayer(MakeProperties(layer), tile);
+			for (var i = 0; i < properties.FeatureCount; ++i)
+			{
+				ProcessFeature(i, tile, properties);
+				yield return null;
+			}
+			_processor.Terminate(tile);
 		}
 		
         private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)
@@ -95,7 +66,6 @@ namespace DroNeS.Mapbox.Custom
             {
                 VectorTileLayer = layer,
                 FeatureCount = layer?.FeatureCount() ?? 0,
-                FeatureProcessingStage = FeatureProcessingStage.PreProcess,
                 LayerFeatureFilters =
                     SubLayerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray(),
                 LayerFeatureFilterCombiner = new LayerFilterComparer()
@@ -117,16 +87,7 @@ namespace DroNeS.Mapbox.Custom
             output.BuildingsWithUniqueIds = SubLayerProperties.honorBuildingIdSetting && SubLayerProperties.buildingsWithUniqueIds;
             return output;
         }
-        
-        private void ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile)
-        {
-	        for (var i = 0; i < properties.FeatureCount; ++i)
-            {
-                ProcessFeature(i, tile, properties);
-            }
-	        _processor.Terminate(tile);
-        }
-        
+
         private void ProcessFeature(int index, CustomTile tile, BuildingMeshBuilderProperties layerProperties)
         {
             var layerExtent = layerProperties.VectorTileLayer.Extent;

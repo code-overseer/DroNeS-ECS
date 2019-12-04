@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace DroNeS.Mapbox.Custom
 {
-	public class SerialMeshProcessor : IMeshProcessor
+	public class MeshProcessor : IMeshProcessor
     {
 	    private readonly Dictionary<CustomTile, MeshData> _accumulation = new Dictionary<CustomTile, MeshData>();
 	    private readonly MeshModifier[] _modifiers;
@@ -17,7 +17,7 @@ namespace DroNeS.Mapbox.Custom
 	    private Dictionary<CustomTile, int> _indices = new Dictionary<CustomTile, int>();
 	    private readonly Material _buildingMaterial;
 
-	    public SerialMeshProcessor()
+	    public MeshProcessor()
 		{
 			_buildingMaterial = Resources.Load("Materials/BuildingMaterial") as Material;
 			_modifiers = new[]

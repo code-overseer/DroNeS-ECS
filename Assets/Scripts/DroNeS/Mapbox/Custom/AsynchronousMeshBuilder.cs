@@ -2,62 +2,120 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using DroNeS.Mapbox.Interfaces;
+using DroNeS.Utils;
+using DroNeS.Utils.Interfaces;
+using DroNeS.Utils.Time;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Filters;
 using Mapbox.VectorTile;
 using Mapbox.VectorTile.Geometry;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace DroNeS.Mapbox.Custom
 {
-    public class ParallelMeshBuilder : IMeshBuilder
+    public class AsynchronousMeshBuilder : IMeshBuilder
     {
         public VectorSubLayerProperties SubLayerProperties { get; }
-        public IMeshProcessor Processor => _processor;
-        private readonly ParallelMeshProcessor _processor;
-        private readonly GeometryExtrusionWithAtlasOptions _atlasOptions;
-        private readonly UVModifierOptions _uvOptions;
+	    public IMeshProcessor Processor => _processor;
+	    private readonly MeshProcessor _processor;
+	    private NativeRoutines<ProcessingRoutine> _routines;
+	    private void Destroy()
+	    {
+		    Debug.Log(_routines.Length.ToString());
+		    _routines.Dispose();
+	    }
 
-        public ParallelMeshBuilder(VectorSubLayerProperties subLayerProperties, IMeshProcessor processor)
-        {
-            SubLayerProperties = subLayerProperties;
-            _processor = processor as ParallelMeshProcessor ?? throw new ArgumentException($"Expected {_processor.GetType().Name}");
-
-            SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
-			
-            _uvOptions = new UVModifierOptions
-            {
-                texturingType = UvMapType.Atlas,
-                atlasInfo = Resources.Load("Atlases/BuildingAtlas") as AtlasInfo,
-                style = StyleTypes.Custom
-            };
+	    public AsynchronousMeshBuilder(VectorSubLayerProperties subLayerProperties)
+	    {
+		    _routines = new NativeRoutines<ProcessingRoutine>(ManhattanTileProvider.Tiles.Count, Allocator.Persistent);
+		    Application.quitting += Destroy;
+		    SubLayerProperties = subLayerProperties;
+		    SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
+		    SubLayerProperties.extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
+		    SubLayerProperties.extrusionOptions.extrusionScaleFactor = 1.3203f;
+		    SubLayerProperties.extrusionOptions.propertyName = "height";
+		    SubLayerProperties.extrusionOptions.extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
+		    
+		    _processor = new MeshProcessor();
             
-            SubLayerProperties.extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
-            SubLayerProperties.extrusionOptions.extrusionScaleFactor = 1.3203f;
-            SubLayerProperties.extrusionOptions.propertyName = "height";
-            SubLayerProperties.extrusionOptions.extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
-            
-            _atlasOptions = new GeometryExtrusionWithAtlasOptions(SubLayerProperties.extrusionOptions, _uvOptions);
+		    var uvOptions = new UVModifierOptions
+		    {
+			    texturingType = UvMapType.Atlas,
+			    atlasInfo = Resources.Load("Atlases/BuildingAtlas") as AtlasInfo,
+			    style = StyleTypes.Custom
+		    };
+		    var atlasOptions = new GeometryExtrusionWithAtlasOptions(SubLayerProperties.extrusionOptions, uvOptions);
+		    
+		    _processor.SetOptions(uvOptions, atlasOptions);
 
-            SubLayerProperties.filterOptions.RegisterFilters();
-        }
+		    SubLayerProperties.filterOptions.RegisterFilters();
+	    }
 
-        public void Create(VectorTileLayer layer, CustomTile tile)
+	    public void Create(VectorTileLayer layer, CustomTile tile)
         {
             if (tile == null || layer == null) return;
-
-            CoroutineManager.Run(ProcessLayer(MakeProperties(layer), tile));
+            var properties = MakeProperties(layer);
+            _routines.Add(new ProcessingRoutine(ProcessingFunction(properties, tile)));
         }
+
+		private struct ProcessingRoutine : IRoutine
+		{
+			private GCHandle _routine;
+			public Period Period { get; }
+			public CustomTimer Timer { get; }
+
+			public ProcessingRoutine(IEnumerator routine)
+			{
+				Period = new Period(0);
+				Timer = new CustomTimer();
+				_routine = GCHandle.Alloc(routine, GCHandleType.Pinned);
+			}
+
+			public bool MoveNext() => ((IEnumerator) _routine.Target).MoveNext();
+
+			public void Reset() { }
+
+			public object Current => _routine.Target;
+			public void Dispose() => _routine.Free();
+		}
+
+		private IEnumerator ProcessingFunction(BuildingMeshBuilderProperties properties, CustomTile tile)
+		{
+			for (var i = 0; i < properties.FeatureCount; ++i)
+			{
+				ProcessFeature(i, tile, properties);
+				yield return null;
+			}
+			_processor.Terminate(tile);
+		}
+
+		public IEnumerator Manager()
+		{
+			JobHandle handle = default;
+			do
+			{
+				handle = _routines.MoveNext(handle);
+				while (!handle.IsCompleted) yield return null;
+				handle.Complete();
+			} while (_routines.Length > 0);
+
+			handle = _routines.Dispose(handle);
+			while (!handle.IsCompleted) yield return null;
+			handle.Complete();
+		}
+		
         private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)
         {
             var output = new BuildingMeshBuilderProperties
             {
                 VectorTileLayer = layer,
                 FeatureCount = layer?.FeatureCount() ?? 0,
-                FeatureProcessingStage = FeatureProcessingStage.PreProcess,
                 LayerFeatureFilters =
                     SubLayerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray(),
                 LayerFeatureFilterCombiner = new LayerFilterComparer()
@@ -80,15 +138,6 @@ namespace DroNeS.Mapbox.Custom
             return output;
         }
 
-        private IEnumerator ProcessLayer(BuildingMeshBuilderProperties properties, CustomTile tile)
-        {
-            for (var i = 0; i < properties.FeatureCount; ++i)
-            {
-                ProcessFeature(i, tile, properties);
-                yield return null;
-            }
-        }
-        
         private void ProcessFeature(int index, CustomTile tile, BuildingMeshBuilderProperties layerProperties)
         {
             var layerExtent = layerProperties.VectorTileLayer.Extent;
@@ -120,7 +169,7 @@ namespace DroNeS.Mapbox.Custom
             if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"])) return;
             if (feature.Points.Count < 1) return;
             
-            _processor.Execute(tile, feature, _uvOptions, _atlasOptions);
+            _processor.Execute(tile, feature);
             
         }
         
@@ -128,7 +177,5 @@ namespace DroNeS.Mapbox.Custom
         {
             return layerProperties.LayerFeatureFilters.Length < 1 || layerProperties.LayerFeatureFilterCombiner.Try((VectorFeatureUnity)feature);
         }
-        
-        
     }
 }

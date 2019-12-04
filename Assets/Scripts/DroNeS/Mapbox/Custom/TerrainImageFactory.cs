@@ -1,11 +1,12 @@
 ﻿using Boo.Lang;
+using DroNeS.Utils;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using UnityEngine;
 
 namespace DroNeS.Mapbox.Custom
 {
-	public delegate void CompletionDelegate(Texture argument);
+	public delegate void TerrainCompletion(Texture argument, Mesh mesh);
     public class TerrainImageFactory : CustomTileFactory
     {
 	    private readonly TerrainImageFetcher _dataFetcher;
@@ -13,11 +14,12 @@ namespace DroNeS.Mapbox.Custom
 	    private string TilesetId => Properties.sourceOptions.Id;
 
 	    private int _counter = 0;
-	    private Texture2D[] Textures { get; set; }
-	    private Texture2DArray TextureArray { get; set; }
+	    private Texture2D[] _textures;
+	    private CombineInstance[] _combineInstances;
+	    private Texture2DArray _textureArray;
 
-	    private event CompletionDelegate AllImagesLoaded;
-	    public TerrainImageFactory(CompletionDelegate completionCallback = null)
+	    private event TerrainCompletion AllImagesLoaded;
+	    public TerrainImageFactory(TerrainCompletion completionCallback = null)
 	    {
 		    AllImagesLoaded += completionCallback;
 			_dataFetcher = ScriptableObject.CreateInstance<TerrainImageFetcher>();
@@ -36,7 +38,9 @@ namespace DroNeS.Mapbox.Custom
 					useCompression = true
 				}
 			};
-			Textures = new Texture2D[ManhattanTileProvider.Tiles.Count];
+			var tilesCount = ManhattanTileProvider.Tiles.Count;
+			_textures = new Texture2D[tilesCount];
+			_combineInstances = new CombineInstance[tilesCount];
 		}
 		
 		private void OnImageReceived(CustomTile tile, RasterTile rasterTile)
@@ -46,7 +50,14 @@ namespace DroNeS.Mapbox.Custom
 			var raster = new Texture2D(512, 512, TextureFormat.RGB24, false) {wrapMode = TextureWrapMode.Clamp};
 			raster.LoadImage(rasterTile.Data);
 			raster.Compress(true);
-			Textures[tile.TextureIndex] = raster;
+			_textures[tile.TextureIndex] = raster;
+			_combineInstances[tile.TextureIndex] = new CombineInstance
+			{
+				mesh = tile.QuadMesh,
+				transform = tile.Transform.parent.localToWorldMatrix * tile.Transform.localToWorldMatrix
+			};
+			tile.ClearMesh();
+			
 			if (++_counter == ManhattanTileProvider.Tiles.Count)
 			{
 				OnComplete();
@@ -55,18 +66,23 @@ namespace DroNeS.Mapbox.Custom
 
 		private void OnComplete()
 		{
-			TextureArray = new Texture2DArray(512,512, Textures.Length, TextureFormat.RGB24, false);
-			for (var i = 0; i < Textures.Length; ++i)
+			_textureArray = new Texture2DArray(512,512, _textures.Length, TextureFormat.RGB24, false);
+			for (var i = 0; i < _textures.Length; ++i)
 			{
-				TextureArray.SetPixels(Textures[i].GetPixels(), i);
+				_textureArray.SetPixels(_textures[i].GetPixels(), i);
 			}
-			Textures = null;
-			TextureArray.Apply();
-			AllImagesLoaded?.Invoke(TextureArray);
+			_textures = null;
+			_textureArray.Apply();
+			var mesh = new Mesh();
+			mesh.CombineMeshes(_combineInstances);
+			_combineInstances = null;
+			
+			AllImagesLoaded?.Invoke(_textureArray, mesh);
 		}
 
 		protected override void OnRegistered(CustomTile tile)
 		{
+
 			if (Properties.sourceType != ImagerySourceType.Custom)
 			{
 				Properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(Properties.sourceType);

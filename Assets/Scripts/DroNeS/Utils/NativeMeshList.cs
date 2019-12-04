@@ -73,10 +73,10 @@ namespace DroNeS.Utils
 
             [NativeDisableUnsafePtrRestriction]
             internal void* m_Buffer;
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
             internal int m_Length;
             internal int m_MinIndex;
             internal int m_MaxIndex;
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             internal AtomicSafetyHandle m_Safety;
 
             internal Parallel(in UnsafeList* list, in AtomicSafetyHandle safety, in Allocator allocator)
@@ -93,6 +93,8 @@ namespace DroNeS.Utils
             {
                 m_meshes = list->Ptr;
                 Length = list->Length;
+                m_MinIndex = 0;
+				m_MaxIndex = m_Length - 1;
                 m_allocator = allocator;
             }
 #endif
@@ -277,7 +279,7 @@ namespace DroNeS.Utils
             var parallel = new Parallel(m_Buffer, m_Safety, m_allocator);
             AtomicSafetyHandle.UseSecondaryVersion(ref parallel.m_Safety);
 #else
-			Parallel parallel = new Parallel(m_Buffer);
+			Parallel parallel = new Parallel(m_Buffer, , m_allocator);
 #endif
             return parallel;     
         }

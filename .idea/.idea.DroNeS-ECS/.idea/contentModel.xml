@@ -575,6 +575,8 @@
             <e p="Enums.cs" t="Include" />
             <e p="Mapbox" t="Include">
               <e p="Custom" t="Include">
+                <e p="AsynchronousMap.cs" t="Include" />
+                <e p="AsynchronousMeshBuilder.cs" t="Include" />
                 <e p="BuildingMeshFactory.cs" t="Include" />
                 <e p="BuildingMeshFetcher.cs" t="Include" />
                 <e p="CoroutineManager.cs" t="Include" />
@@ -583,14 +585,11 @@
                 <e p="CustomTileFactory.cs" t="Include" />
                 <e p="DronesMap.cs" t="Include" />
                 <e p="EarcutLibrary.cs" t="Include" />
-                <e p="JobSystemMap.cs" t="Include" />
                 <e p="ManhattanTileProvider.cs" t="Include" />
+                <e p="MeshProcessor.cs" t="Include" />
                 <e p="MonoBehaviourMap.cs" t="Include" />
-                <e p="ParallelMeshBuilder.cs" t="Include" />
-                <e p="ParallelMeshProcessor.cs" t="Include" />
                 <e p="PolygonMeshModifierJob.cs" t="Include" />
                 <e p="SerialMeshBuilder.cs" t="Include" />
-                <e p="SerialMeshProcessor.cs" t="Include" />
                 <e p="TerrainImageFactory.cs" t="Include" />
                 <e p="TerrainImageFetcher.cs" t="Include" />
                 <e p="TextureWallModifierJob.cs" t="Include" />
@@ -642,19 +641,26 @@
               <e p="WaypointUpdateSystem.cs" t="Include" />
             </e>
             <e p="Utils" t="Include">
+              <e p="ArrayList.cs" t="Include" />
               <e p="Bool.cs" t="Include" />
               <e p="Bootstrap.cs" t="Include" />
-              <e p="IRoutine.cs" t="Include" />
-              <e p="ITask.cs" t="Include" />
+              <e p="Interfaces" t="Include">
+                <e p="IRoutine.cs" t="Include" />
+                <e p="ITask.cs" t="Include" />
+              </e>
               <e p="MeshProxy.cs" t="Include" />
               <e p="MeshProxyArray.cs" t="Include" />
               <e p="NativeMesh.cs" t="Include" />
               <e p="NativeMeshList.cs" t="Include" />
               <e p="NativePtr.cs" t="Include" />
-              <e p="NativeRoutineArray.cs" t="Include" />
+              <e p="NativeRoutines.cs" t="Include" />
               <e p="NativeStreamExtension.cs" t="Include" />
               <e p="RandomExtension.cs" t="Include" />
               <e p="Ray.cs" t="Include" />
+              <e p="Time" t="Include">
+                <e p="CustomTimer.cs" t="Include" />
+                <e p="Period.cs" t="Include" />
+              </e>
               <e p="Vector2dExtension.cs" t="Include" />
               <e p="Vector3Extension.cs" t="Include" />
             </e>

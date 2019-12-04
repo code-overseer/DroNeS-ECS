@@ -11,13 +11,12 @@ using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Mapbox.Custom
 {
-    public class MonoBehaviourMap : UnityEngine.MonoBehaviour
+    public class AsynchronousMap : UnityEngine.MonoBehaviour
     {
         private MapboxAccess _access;
         private IMap _map;
         private CustomTileFactory _imageFactory;
         private CustomTileFactory _meshFactory;
-        private MeshProcessor _processor;
         private Material _terrainMaterial;
         private Mesh _terrainMesh;
         private MeshFilter _filter;
@@ -36,17 +35,19 @@ namespace DroNeS.Mapbox.Custom
             _map = new DronesMap();
             _terrainMaterial = new Material(Shader.Find("Custom/TerrainShader"));
             _imageFactory  = new TerrainImageFactory(OnAllImageLoaded);
-            _meshFactory = new BuildingMeshFactory(new SerialMeshBuilder(_map.BuildingProperties));
+            var builder = new AsynchronousMeshBuilder(_map.BuildingProperties);
+            _meshFactory = new BuildingMeshFactory(builder, () => { CoroutineManager.Run(builder.Manager()); });
             _filter = gameObject.AddComponent<MeshFilter>();
             _renderer = gameObject.AddComponent<MeshRenderer>();
             _renderer.sharedMaterial = _terrainMaterial;
         }
 
+        private CustomTimer _profiler;
         private IEnumerator Start()
         {
             while (!MapboxAccess.Configured) yield return null;
-            var profiler = new CustomTimer().Start();
-
+            _profiler = new CustomTimer().Start();
+            
             foreach (var tileId in _map.Tiles)
             {
                 var tile = new CustomTile(transform, _map, in tileId);
@@ -55,9 +56,8 @@ namespace DroNeS.Mapbox.Custom
             }
 
             while (CoroutineManager.Count > 0) yield return null;
-            
-            Debug.Log(profiler.ElapsedSeconds.ToString(CultureInfo.CurrentUICulture));
-            profiler.Stop();
+            Debug.Log(_profiler.ElapsedSeconds.ToString(CultureInfo.CurrentCulture));
+            _profiler.Stop();
         }
     }
 }
