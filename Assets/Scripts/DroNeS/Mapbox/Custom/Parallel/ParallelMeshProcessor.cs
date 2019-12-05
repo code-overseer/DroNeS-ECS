@@ -12,8 +12,9 @@ namespace DroNeS.Mapbox.Custom.Parallel
 {
     public class ParallelMeshProcessor : IMeshProcessor
     {
-        private readonly Dictionary<CustomTile, MeshDataStruct> _accumulation = new Dictionary<CustomTile, MeshDataStruct>();
         private readonly CustomMeshModifier[] _modifiers;
+        private readonly HashSet<CustomTile> _processing = new HashSet<CustomTile>();
+        private readonly Dictionary<CustomTile, MeshDataStruct> _accumulation = new Dictionary<CustomTile, MeshDataStruct>();
         private readonly Dictionary<CustomTile, int> _indices = new Dictionary<CustomTile, int>();
         private Material _buildingMaterial;
         
@@ -46,8 +47,9 @@ namespace DroNeS.Mapbox.Custom.Parallel
         public void Execute(CustomTile tile, CustomFeatureUnity feature)
         {
 	        var meshData = new MeshDataStruct(tile.Rect, Allocator.TempJob);
-            if (!_accumulation.ContainsKey(tile))
+            if (!_processing.Contains(tile))
             {
+	            _processing.Add(tile);
                 _accumulation.Add(tile, new MeshDataStruct(default, Allocator.Persistent));
                 _indices.Add(tile, 0);
             }

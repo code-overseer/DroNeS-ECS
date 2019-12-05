@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using DroNeS.Utils;
 using DroNeS.Utils.Time;
 using Mapbox.Unity.Map;
@@ -314,16 +315,21 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			foreach (var list in feature.Points)
 			{
 				points.Add(new UnsafeListContainer(list.Count, UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), Allocator.TempJob));
-				foreach (var vector in list)
-				{
-					points[i].Add(vector);
-				}
-
-				++i;
+				CopyList(list, points[i++]);
 			}
 			
 			return points.Dispose(new UnsafeListContainerDisposal(points).Schedule(
 				new PolygonMeshModifierJob(options, points, ref output).Schedule(dependencies)));
+		}
+
+		private static unsafe void CopyList(List<Vector3> list, UnsafeListContainer dst)
+		{
+			var array = list.GetInternalArray();
+			var gcHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+			var ptr = gcHandle.AddrOfPinnedObject();
+			UnsafeUtility.MemCpy(dst.m_ListData->Ptr, (void*) ptr, list.Count * sizeof(Vector3));
+			dst.m_ListData->Length = list.Count;
+			gcHandle.Free();
 		}
 
 		[BurstCompile]
