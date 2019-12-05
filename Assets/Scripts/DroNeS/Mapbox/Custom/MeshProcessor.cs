@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DroNeS.Mapbox.Custom.Parallel;
 using DroNeS.Mapbox.Interfaces;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -13,20 +14,8 @@ namespace DroNeS.Mapbox.Custom
     {
 	    private readonly Dictionary<CustomTile, MeshData> _accumulation = new Dictionary<CustomTile, MeshData>();
 	    private readonly MeshModifier[] _modifiers;
-	    public Dictionary<CustomTile, IEnumerable<RenderMesh>> RenderMeshes { get; }
 	    private readonly Dictionary<CustomTile, int> _indices = new Dictionary<CustomTile, int>();
-	    private readonly Material _buildingMaterial;
-
-	    public MeshProcessor()
-		{
-			_buildingMaterial = Resources.Load("Materials/BuildingMaterial") as Material;
-			_modifiers = new[]
-			{
-				(MeshModifier)ScriptableObject.CreateInstance<PolygonMeshModifier>(),
-				ScriptableObject.CreateInstance<TextureSideWallModifier>(),
-			};
-			RenderMeshes = new Dictionary<CustomTile, IEnumerable<RenderMesh>>();
-		}
+	    private Material _buildingMaterial;
 
 	    public void SetOptions(UVModifierOptions uvOptions, GeometryExtrusionWithAtlasOptions extrusionOptions)
 	    {
@@ -36,7 +25,24 @@ namespace DroNeS.Mapbox.Custom
 		    _modifiers[1].Initialize();
 	    }
 
-		public void Execute(CustomTile tile, CustomFeatureUnity feature)
+	    public Material BuildingMaterial
+	    {
+		    get
+		    {
+			    if (_buildingMaterial == null) _buildingMaterial = Resources.Load("Materials/BuildingMaterial") as Material;
+			    return _buildingMaterial;
+		    }
+	    }
+
+	    public MeshProcessor()
+		{
+			_modifiers = new[]
+			{
+				(MeshModifier)ScriptableObject.CreateInstance<StrippedPolygonMeshModifier>(),
+				ScriptableObject.CreateInstance<StrippedTextureSideWallModifier>(),
+			};
+		}
+	    public void Execute(CustomTile tile, CustomFeatureUnity feature)
 		{
 			var meshData = new MeshData{TileRect = tile.Rect};
 		    if (!_accumulation.ContainsKey(tile))
@@ -50,7 +56,6 @@ namespace DroNeS.Mapbox.Custom
 					UV = new List<List<Vector2>>{new List<Vector2>()},
 					Vertices = new List<Vector3>()
 			    });
-			    RenderMeshes.Add(tile, new List<RenderMesh>());
 			    _indices.Add(tile, 0);
 		    }
 
@@ -68,7 +73,6 @@ namespace DroNeS.Mapbox.Custom
 			    Terminate(tile, meshData);
 		    }
 	    }
-
 	    private void Append(CustomTile tile, MeshData data)
 	    {
 		    if (!_accumulation.TryGetValue(tile, out var value))
@@ -118,7 +122,7 @@ namespace DroNeS.Mapbox.Custom
 		    
 		    var filter = go.AddComponent<MeshFilter>();
 		    filter.sharedMesh = new Mesh();
-		    go.AddComponent<MeshRenderer>().sharedMaterial = _buildingMaterial;
+		    go.AddComponent<MeshRenderer>().sharedMaterial = BuildingMaterial;
 		    
 		    filter.sharedMesh.subMeshCount = value.Triangles.Count;
 		    filter.sharedMesh.SetVertices(value.Vertices);
@@ -135,14 +139,12 @@ namespace DroNeS.Mapbox.Custom
 		    }
 		    go.layer = LayerMask.NameToLayer("Buildings");
 	    }
-
 	    private void Terminate(CustomTile tile, MeshData data)
 	    {
 		    if (!_accumulation.TryGetValue(tile, out var value) || value.Vertices.Count <= 3) return;
 		    
 		    MakeEntity(tile, value);
-//			((List<RenderMesh>)RenderMeshes[tile]).Add(renderMesh);
-			_accumulation[tile] = data;
+		    _accumulation[tile] = data;
 	    }
 	    
 	    public void Terminate(CustomTile tile)
@@ -150,7 +152,6 @@ namespace DroNeS.Mapbox.Custom
 		    if (_accumulation.TryGetValue(tile, out var value) && value.Vertices.Count > 3)
 		    {
 			    MakeEntity(tile, value);
-//			    ((List<RenderMesh>)RenderMeshes[tile]).Add(renderMesh);
 		    }
 		    
 		    tile.VectorDataState = TilePropertyState.Loaded;

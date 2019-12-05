@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Diagnostics;
+﻿using System.Collections;
 using System.Globalization;
 using DroNeS.Mapbox.Interfaces;
 using DroNeS.Utils.Time;
 using Mapbox.Unity;
-using Unity.Jobs;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace DroNeS.Mapbox.Custom
+namespace DroNeS.Mapbox.Custom.Parallel
 {
-    public class AsynchronousMap : UnityEngine.MonoBehaviour
+    public class AsynchronousMap : MonoBehaviour
     {
         private MapboxAccess _access;
         private IMap _map;
@@ -41,12 +38,11 @@ namespace DroNeS.Mapbox.Custom
             _renderer = gameObject.AddComponent<MeshRenderer>();
             _renderer.sharedMaterial = _terrainMaterial;
         }
-
-        private CustomTimer _profiler;
+        
         private IEnumerator Start()
         {
             while (!MapboxAccess.Configured) yield return null;
-            _profiler = new CustomTimer().Start();
+            var profiler = new CustomTimer().Start();
             
             foreach (var tileId in _map.Tiles)
             {
@@ -56,8 +52,8 @@ namespace DroNeS.Mapbox.Custom
             }
 
             while (CoroutineManager.Count > 0) yield return null;
-            Debug.Log(_profiler.ElapsedSeconds.ToString(CultureInfo.CurrentCulture));
-            _profiler.Stop();
+            Debug.Log(profiler.ElapsedSeconds.ToString(CultureInfo.CurrentCulture));
+            profiler.Stop();
         }
     }
 }

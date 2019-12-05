@@ -17,7 +17,6 @@ namespace DroNeS.Mapbox.Custom
         private IMap _map;
         private CustomTileFactory _imageFactory;
         private CustomTileFactory _meshFactory;
-        private MeshProcessor _processor;
         private Material _terrainMaterial;
         private Mesh _terrainMesh;
         private MeshFilter _filter;

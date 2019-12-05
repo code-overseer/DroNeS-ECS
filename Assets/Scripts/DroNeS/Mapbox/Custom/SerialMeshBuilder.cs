@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DroNeS.Mapbox.Custom.Parallel;
 using DroNeS.Mapbox.Interfaces;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -29,7 +30,7 @@ namespace DroNeS.Mapbox.Custom
 		    SubLayerProperties.extrusionOptions.extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 		    
 		    _processor = new MeshProcessor();
-            
+
 		    var uvOptions = new UVModifierOptions
 		    {
 			    texturingType = UvMapType.Atlas,
@@ -120,7 +121,7 @@ namespace DroNeS.Mapbox.Custom
             if (feature.Points.Count < 1) return;
             
             _processor.Execute(tile, feature);
-            
+
         }
         
         private static bool IsFeatureEligibleAfterFiltering(CustomFeatureUnity feature, BuildingMeshBuilderProperties layerProperties)

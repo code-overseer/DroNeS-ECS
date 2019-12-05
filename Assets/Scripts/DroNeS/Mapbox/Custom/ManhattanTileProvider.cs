@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DroNeS.Mapbox.Interfaces;
 using Mapbox.Map;
+using Mapbox.Utils;
 using Unity.Mathematics;
 
 // ReSharper disable HeapView.ObjectAllocation.Evident
@@ -59,6 +60,11 @@ namespace DroNeS.Mapbox.Custom
 
         public static HashSet<UnwrappedTileId> GetTiles(IMap map)
         {
+            return Test(map);
+        }
+
+        private static HashSet<UnwrappedTileId> Actual(IMap map)
+        {
             var n = West.Length;
             for (var i = 0; i < n; i++)
             {
@@ -75,6 +81,23 @@ namespace DroNeS.Mapbox.Custom
                     }
                 }
             }
+            return Tiles;
+        }
+
+        private static HashSet<UnwrappedTileId> Test(IMap map)
+        {
+            var latLng = new Vector2d(map.CenterLatitudeLongitude.x, map.CenterLatitudeLongitude.y);
+            var centerTile = TileCover.CoordinateToTileId(latLng, map.AbsoluteZoom);
+            Tiles.Add(new UnwrappedTileId(map.AbsoluteZoom, centerTile.X, centerTile.Y));
+
+            for (var x = (centerTile.X - 1); x <= (centerTile.X + 1); x++)
+            {
+                for (var y = (centerTile.Y - 1); y <= (centerTile.Y + 1); y++)
+                {
+                    Tiles.Add(new UnwrappedTileId(map.AbsoluteZoom, x, y));
+                }
+            }
+
             return Tiles;
         }
 

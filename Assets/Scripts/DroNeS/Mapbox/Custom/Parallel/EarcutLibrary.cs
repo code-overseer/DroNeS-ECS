@@ -8,7 +8,7 @@ using UnityEngine;
 
 // ReSharper disable CompareOfFloatsByEqualityOperator
 
-namespace DroNeS.Mapbox.Custom
+namespace DroNeS.Mapbox.Custom.Parallel
 {
     public static unsafe class EarcutLibrary
     {

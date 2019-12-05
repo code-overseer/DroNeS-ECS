@@ -17,7 +17,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-namespace DroNeS.Mapbox.Custom
+namespace DroNeS.Mapbox.Custom.Parallel
 {
     public class AsynchronousMeshBuilder : IMeshBuilder
     {

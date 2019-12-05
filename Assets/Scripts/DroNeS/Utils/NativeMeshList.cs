@@ -144,9 +144,6 @@ namespace DroNeS.Utils
                 element->m_vertices = null;
                 element->m_normals = null;
                 element->m_uv = null;
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-                AtomicSafetyHandle.Release(m_Safety);
-#endif
             }
             
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -279,7 +276,7 @@ namespace DroNeS.Utils
             var parallel = new Parallel(m_Buffer, m_Safety, m_allocator);
             AtomicSafetyHandle.UseSecondaryVersion(ref parallel.m_Safety);
 #else
-			Parallel parallel = new Parallel(m_Buffer, , m_allocator);
+			Parallel parallel = new Parallel(m_Buffer, m_allocator);
 #endif
             return parallel;     
         }
