@@ -18,7 +18,7 @@ namespace DroNeS.Mapbox.Custom
     {
 	    public VectorSubLayerProperties SubLayerProperties { get; }
 	    public IMeshProcessor Processor => _processor;
-	    private readonly MeshProcessor _processor;
+	    private readonly ParallelMeshProcessor _processor;
 
 	    public SerialMeshBuilder(VectorSubLayerProperties subLayerProperties)
 	    {
@@ -29,7 +29,7 @@ namespace DroNeS.Mapbox.Custom
 		    SubLayerProperties.extrusionOptions.propertyName = "height";
 		    SubLayerProperties.extrusionOptions.extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 		    
-		    _processor = new MeshProcessor();
+		    _processor = new ParallelMeshProcessor();
 
 		    var uvOptions = new UVModifierOptions
 		    {

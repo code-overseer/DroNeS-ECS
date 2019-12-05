@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using DroNeS.Utils.Time;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Modifiers;
@@ -21,23 +22,22 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		private AtlasEntityStruct _currentFacade;
 		private ModifierVectors _vectors;
 		private ModifierFloats _floats;
-		private float _minHeight;
-		private float _maxHeight;
+		private readonly float _maxHeight;
 
-		public MeshDataStruct Output;
+		private MeshDataStruct _output;
 
 		private TextureSideWallModifierJob(GeometryExtrusionWithAtlasOptions options, VectorFeatureUnity feature, ref MeshDataStruct output)
 		{
 			_vectors = default;
 			_floats = default;
-			_minHeight = 0.0f;
+			var minHeight = 0.0f;
 			_maxHeight = 0.0f;
 			if (feature.Properties.ContainsKey(options.propertyName))
 			{
 				_maxHeight = Convert.ToSingle(feature.Properties[options.propertyName]);
 				if (feature.Properties.ContainsKey("min_height"))
 				{
-					_minHeight = Convert.ToSingle(feature.Properties["min_height"]);
+					minHeight = Convert.ToSingle(feature.Properties["min_height"]);
 				}
 			}
 
@@ -45,10 +45,10 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			_currentFacade.CalculateParameters();
 			_floats.extrusionScaleFactor = options.extrusionScaleFactor;
 			_maxHeight = _maxHeight * _floats.extrusionScaleFactor * Scale;
-			_minHeight = _minHeight * _floats.extrusionScaleFactor * Scale;
+			minHeight = minHeight * _floats.extrusionScaleFactor * Scale;
 			
-			_floats.height = _maxHeight - _minHeight;
-			Output = output;
+			_floats.height = _maxHeight - minHeight;
+			_output = output;
 		}
 
 		public static JobHandle Schedule(JobHandle dependencies, GeometryExtrusionWithAtlasOptions options, VectorFeatureUnity feature,
@@ -66,7 +66,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			var scaledPreferredWallLength = Scale * _currentFacade.PreferredEdgeSectionLength;
 			_floats.scaledFloorHeight = scaledPreferredWallLength * _currentFacade.WallToFloorRatio;
 
-			for (var i = 0; i < Output.Vertices.Length; i++) Output.Vertices[i] = Output.Vertices[i] + Vector3.up * _maxHeight;
+			for (var i = 0; i < _output.Vertices.Length; i++) _output.Vertices[i] = _output.Vertices[i] + Vector3.up * _maxHeight;
 
 			var scaledTopFloorHeight = Scale * _currentFacade.TopFloorHeight;
 
@@ -89,10 +89,10 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			
 			var singleColumnLength = scaledPreferredWallLength / _currentFacade.ColumnCount;
 			
-			for (var i = 0; i < Output.Edges.Length; i += 2)
+			for (var i = 0; i < _output.Edges.Length; i += 2)
 			{
-				var v1 = Output.Vertices[Output.Edges[i]];
-				var v2 = Output.Vertices[Output.Edges[i + 1]];
+				var v1 = _output.Vertices[_output.Edges[i]];
+				var v2 = _output.Vertices[_output.Edges[i + 1]];
 
 				var currentWallLength = Vector3.Distance(v1, v2);
 				var leftOverColumnLength = currentWallLength % singleColumnLength;
@@ -168,48 +168,48 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			//leftover. we're moving small leftover row to top of the building
 			if (!(_floats.finalLeftOverRowHeight > 0)) return;
 
-			var triIndex = Output.Vertices.Length;
+			var triIndex = _output.Vertices.Length;
 			
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, _floats.currentY1, _vectors.wallSegmentFirstVertex.z));
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, _floats.currentY2, _vectors.wallSegmentSecondVertex.z));
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, _floats.currentY1, _vectors.wallSegmentFirstVertex.z));
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, _floats.currentY2, _vectors.wallSegmentSecondVertex.z));
 			//move offsets bottom
 			_floats.currentY1 -= _floats.finalLeftOverRowHeight;
 			_floats.currentY2 -= _floats.finalLeftOverRowHeight;
 			//bottom two vertices
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, _floats.currentY1, _vectors.wallSegmentFirstVertex.z));
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, _floats.currentY2, _vectors.wallSegmentSecondVertex.z));
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, _floats.currentY1, _vectors.wallSegmentFirstVertex.z));
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, _floats.currentY2, _vectors.wallSegmentSecondVertex.z));
 
 			if (_floats.wallSegmentLength >= _floats.minWallLength)
 			{
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMax));
-				Output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TextureRect.yMax));
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin,
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMax));
+				_output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TextureRect.yMax));
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin,
 					_currentFacade.TextureRect.yMax - ShortRowHeightDelta));
-				Output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TextureRect.yMax - ShortRowHeightDelta));
+				_output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TextureRect.yMax - ShortRowHeightDelta));
 			}
 			else
 			{
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMax));
-				Output.UV.Add(
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMax));
+				_output.UV.Add(
 					new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta, _currentFacade.TextureRect.yMax));
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin,
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin,
 					_currentFacade.TextureRect.yMax - ShortRowHeightDelta));
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta,
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta,
 					_currentFacade.TextureRect.yMax - ShortRowHeightDelta));
 			}
 
-			Output.Normals.Add(_vectors.wallNormal);
-			Output.Normals.Add(_vectors.wallNormal);
-			Output.Normals.Add(_vectors.wallNormal);
-			Output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
 
-			Output.Triangles.Add(triIndex);
-			Output.Triangles.Add(triIndex + 1);
-			Output.Triangles.Add(triIndex + 2);
+			_output.Triangles.Add(triIndex);
+			_output.Triangles.Add(triIndex + 1);
+			_output.Triangles.Add(triIndex + 2);
 
-			Output.Triangles.Add(triIndex + 1);
-			Output.Triangles.Add(triIndex + 3);
-			Output.Triangles.Add(triIndex + 2);
+			_output.Triangles.Add(triIndex + 1);
+			_output.Triangles.Add(triIndex + 3);
+			_output.Triangles.Add(triIndex + 2);
 		}
 
 		private void MidFloors()
@@ -217,55 +217,55 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			var currentMidHeight = _floats.finalMidHeight;
 			while (currentMidHeight >= _floats.singleFloorHeight - 0.01f)
 			{
-				var triIndex = Output.Vertices.Length;
+				var triIndex = _output.Vertices.Length;
 				var midUvInCurrentStep =
 					math.min(_currentFacade.MidFloorCount,
 						math.round(currentMidHeight / _floats.singleFloorHeight)) / _currentFacade.MidFloorCount;
 
 				//top two vertices
-				Output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, _floats.currentY1, _vectors.wallSegmentFirstVertex.z));
-				Output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, _floats.currentY2, _vectors.wallSegmentSecondVertex.z));
+				_output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, _floats.currentY1, _vectors.wallSegmentFirstVertex.z));
+				_output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, _floats.currentY2, _vectors.wallSegmentSecondVertex.z));
 				//move offsets bottom
 				_floats.currentY1 -= (_floats.scaledFloorHeight * midUvInCurrentStep);
 				_floats.currentY2 -= (_floats.scaledFloorHeight * midUvInCurrentStep);
 				//bottom two vertices
-				Output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, _floats.currentY1, _vectors.wallSegmentFirstVertex.z));
-				Output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, _floats.currentY2, _vectors.wallSegmentSecondVertex.z));
+				_output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, _floats.currentY1, _vectors.wallSegmentFirstVertex.z));
+				_output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, _floats.currentY2, _vectors.wallSegmentSecondVertex.z));
 
 				//we uv narrow walls different so they won't have condensed windows
 				if (_floats.wallSegmentLength >= _floats.minWallLength)
 				{
-					Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TopOfMidUv));
-					Output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TopOfMidUv));
-					Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin,
+					_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TopOfMidUv));
+					_output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TopOfMidUv));
+					_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin,
 						_currentFacade.TopOfMidUv - _currentFacade.MidUvHeight * midUvInCurrentStep));
-					Output.UV.Add(new Vector2(_floats.rightOfEdgeUv,
+					_output.UV.Add(new Vector2(_floats.rightOfEdgeUv,
 						_currentFacade.TopOfMidUv - _currentFacade.MidUvHeight * midUvInCurrentStep));
 				}
 				else
 				{
-					Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TopOfMidUv));
-					Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta,
+					_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TopOfMidUv));
+					_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta,
 						_currentFacade.TopOfMidUv));
-					Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin,
+					_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin,
 						_currentFacade.TopOfMidUv - _currentFacade.MidUvHeight * midUvInCurrentStep));
-					Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta,
+					_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta,
 						_currentFacade.TopOfMidUv - _currentFacade.MidUvHeight * midUvInCurrentStep));
 				}
 
-				Output.Normals.Add(_vectors.wallNormal);
-				Output.Normals.Add(_vectors.wallNormal);
-				Output.Normals.Add(_vectors.wallNormal);
-				Output.Normals.Add(_vectors.wallNormal);
+				_output.Normals.Add(_vectors.wallNormal);
+				_output.Normals.Add(_vectors.wallNormal);
+				_output.Normals.Add(_vectors.wallNormal);
+				_output.Normals.Add(_vectors.wallNormal);
 				
 
-				Output.Triangles.Add(triIndex);
-				Output.Triangles.Add(triIndex + 1);
-				Output.Triangles.Add(triIndex + 2);
+				_output.Triangles.Add(triIndex);
+				_output.Triangles.Add(triIndex + 1);
+				_output.Triangles.Add(triIndex + 2);
 
-				Output.Triangles.Add(triIndex + 1);
-				Output.Triangles.Add(triIndex + 3);
-				Output.Triangles.Add(triIndex + 2);
+				_output.Triangles.Add(triIndex + 1);
+				_output.Triangles.Add(triIndex + 3);
+				_output.Triangles.Add(triIndex + 2);
 				
 				currentMidHeight -= math.max(0.1f, (_floats.scaledFloorHeight * midUvInCurrentStep));
 			}
@@ -273,97 +273,97 @@ namespace DroNeS.Mapbox.Custom.Parallel
 
 		private void FirstFloor()
 		{
-			var triIndex = Output.Vertices.Length;
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, 
+			var triIndex = _output.Vertices.Length;
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, 
 				_vectors.wallSegmentFirstVertex.y - _floats.height + _floats.finalFirstHeight,
 				_vectors.wallSegmentFirstVertex.z));
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, 
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, 
 				_vectors.wallSegmentSecondVertex.y - _floats.height + _floats.finalFirstHeight,
 				_vectors.wallSegmentSecondVertex.z));
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, 
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, 
 				_vectors.wallSegmentFirstVertex.y - _floats.height,
 				_vectors.wallSegmentFirstVertex.z));
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, 
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, 
 				_vectors.wallSegmentSecondVertex.y - _floats.height,
 				_vectors.wallSegmentSecondVertex.z));
 
-			Output.Normals.Add(_vectors.wallNormal);
-			Output.Normals.Add(_vectors.wallNormal);
-			Output.Normals.Add(_vectors.wallNormal);
-			Output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
 
 			if (_floats.wallSegmentLength >= _floats.minWallLength)
 			{
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TopOfBottomUv));
-				Output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TopOfBottomUv));
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMin));
-				Output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TextureRect.yMin));
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TopOfBottomUv));
+				_output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TopOfBottomUv));
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMin));
+				_output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TextureRect.yMin));
 			}
 			else
 			{
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TopOfBottomUv));
-				Output.UV.Add(
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TopOfBottomUv));
+				_output.UV.Add(
 					new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta, _currentFacade.TopOfBottomUv));
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMin));
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta, _currentFacade.TextureRect.yMin));
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMin));
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta, _currentFacade.TextureRect.yMin));
 			}
 
-			Output.Triangles.Add(triIndex);
-			Output.Triangles.Add(triIndex + 1);
-			Output.Triangles.Add(triIndex + 2);
+			_output.Triangles.Add(triIndex);
+			_output.Triangles.Add(triIndex + 1);
+			_output.Triangles.Add(triIndex + 2);
 
-			Output.Triangles.Add(triIndex + 1);
-			Output.Triangles.Add(triIndex + 3);
-			Output.Triangles.Add(triIndex + 2);
+			_output.Triangles.Add(triIndex + 1);
+			_output.Triangles.Add(triIndex + 3);
+			_output.Triangles.Add(triIndex + 2);
 
 		}
 		
 		private void TopFloor()
 		{
-			var triIndex = Output.Vertices.Length;
+			var triIndex = _output.Vertices.Length;
 			_floats.currentY1 -= _floats.finalTopHeight;
 			_floats.currentY2 -= _floats.finalTopHeight;
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, 
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, 
 				_vectors.wallSegmentFirstVertex.y - _floats.finalLeftOverRowHeight,
 				_vectors.wallSegmentFirstVertex.z));
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, 
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x, 
 				_vectors.wallSegmentSecondVertex.y - _floats.finalLeftOverRowHeight,
 				_vectors.wallSegmentSecondVertex.z));
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, 
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentFirstVertex.x, 
 				_vectors.wallSegmentFirstVertex.y - _floats.finalLeftOverRowHeight - _floats.finalTopHeight,
 				_vectors.wallSegmentFirstVertex.z));
-			Output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x,
+			_output.Vertices.Add(new Vector3(_vectors.wallSegmentSecondVertex.x,
 				_vectors.wallSegmentSecondVertex.y - _floats.finalLeftOverRowHeight - _floats.finalTopHeight, 
 				_vectors.wallSegmentSecondVertex.z));
 
 			if (_floats.wallSegmentLength >= _floats.minWallLength)
 			{
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMax));
-				Output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TextureRect.yMax));
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.BottomOfTopUv));
-				Output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.BottomOfTopUv));
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMax));
+				_output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.TextureRect.yMax));
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.BottomOfTopUv));
+				_output.UV.Add(new Vector2(_floats.rightOfEdgeUv, _currentFacade.BottomOfTopUv));
 			}
 			else
 			{
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMax));
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta, _currentFacade.TextureRect.yMax));
-				Output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.BottomOfTopUv));
-				Output.UV.Add(
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.TextureRect.yMax));
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta, _currentFacade.TextureRect.yMax));
+				_output.UV.Add(new Vector2(_currentFacade.TextureRect.xMin, _currentFacade.BottomOfTopUv));
+				_output.UV.Add(
 					new Vector2(_currentFacade.TextureRect.xMin + NarrowWallWidthDelta, _currentFacade.BottomOfTopUv));
 			}
 
-			Output.Normals.Add(_vectors.wallNormal);
-			Output.Normals.Add(_vectors.wallNormal);
-			Output.Normals.Add(_vectors.wallNormal);
-			Output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
+			_output.Normals.Add(_vectors.wallNormal);
 
-			Output.Triangles.Add(triIndex);
-			Output.Triangles.Add(triIndex + 1);
-			Output.Triangles.Add(triIndex + 2);
+			_output.Triangles.Add(triIndex);
+			_output.Triangles.Add(triIndex + 1);
+			_output.Triangles.Add(triIndex + 2);
 
-			Output.Triangles.Add(triIndex + 1);
-			Output.Triangles.Add(triIndex + 3);
-			Output.Triangles.Add(triIndex + 2);
+			_output.Triangles.Add(triIndex + 1);
+			_output.Triangles.Add(triIndex + 3);
+			_output.Triangles.Add(triIndex + 2);
 		}
 	}
 
@@ -384,14 +384,6 @@ namespace DroNeS.Mapbox.Custom.Parallel
 	    public float minWallLength;
 	    public float singleFloorHeight;
 	    public float extrusionScaleFactor;
-
-	    public override string ToString()
-	    {
-		    return
-			    $"{wallSegmentLength}, {finalFirstHeight}, {finalTopHeight}, {finalMidHeight}, {finalLeftOverRowHeight}, " +
-			    $"{scaledFloorHeight}, {columnScaleRatio}, {rightOfEdgeUv}, {currentY1}, {currentY2}, {height}, {minWallLength}, " +
-			    $"{singleFloorHeight}, {extrusionScaleFactor}";
-	    }
     }
 
     [StructLayout(LayoutKind.Sequential)]

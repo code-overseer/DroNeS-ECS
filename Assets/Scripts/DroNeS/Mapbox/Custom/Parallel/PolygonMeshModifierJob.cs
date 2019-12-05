@@ -1,37 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using DroNeS.Utils;
+using DroNeS.Utils.Time;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Modifiers;
+using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 using UnityEngine;
 
 
 namespace DroNeS.Mapbox.Custom.Parallel
 {
-	
 
 	public class StrippedPolygonMeshModifier : CustomMeshModifier
 	{
 		public override ModifierType Type => ModifierType.Preprocess;
 
 		private UVModifierOptions _options;
-		private Vector3 _v1, _v2;
-
-		#region Atlas Fields
-
-		private Vector3 _vert;
 		private AtlasEntity _currentFacade;
-		private Quaternion _textureDirection;
-		private Vector2[] _textureUvCoordinates;
-		private Vector3 _vertexRelativePos;
-		private Vector3 _firstVert;
-
-		private float minx;
-		private float miny;
-		private float maxx;
-		private float maxy;
-
-		#endregion
 
 		public override void SetProperties(ModifierProperties properties)
 		{
@@ -105,29 +94,28 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			{
 				_currentFacade = _options.atlasInfo.Roofs[UnityEngine.Random.Range(0, _options.atlasInfo.Roofs.Count)];
 
-				minx = float.MaxValue;
-				miny = float.MaxValue;
-				maxx = float.MinValue;
-				maxy = float.MinValue;
+				var minx = float.MaxValue;
+				var miny = float.MaxValue;
+				var maxx = float.MinValue;
+				var maxy = float.MinValue;
 
-				_textureUvCoordinates = new Vector2[md.Vertices.Length];
-				_textureDirection = Quaternion.FromToRotation((md.Vertices[0] - md.Vertices[1]), Vector3.right);
-				_textureUvCoordinates[0] = new Vector2(0, 0);
-				_firstVert = md.Vertices[0];
+				var textureUvCoordinates = new Vector2[md.Vertices.Length];
+				var textureDirection = Quaternion.FromToRotation(md.Vertices[0] - md.Vertices[1], Vector3.right);
+				textureUvCoordinates[0] = new Vector2(0, 0);
+
 				for (var i = 1; i < md.Vertices.Length; i++)
 				{
-					_vert = md.Vertices[i];
-					_vertexRelativePos = _vert - _firstVert;
-					_vertexRelativePos = _textureDirection * _vertexRelativePos;
-					_textureUvCoordinates[i] = new Vector2(_vertexRelativePos.x, _vertexRelativePos.z);
-					if (_vertexRelativePos.x < minx)
-						minx = _vertexRelativePos.x;
-					if (_vertexRelativePos.x > maxx)
-						maxx = _vertexRelativePos.x;
-					if (_vertexRelativePos.z < miny)
-						miny = _vertexRelativePos.z;
-					if (_vertexRelativePos.z > maxy)
-						maxy = _vertexRelativePos.z;
+					var vert = md.Vertices[i];
+					var vertexRelativePos = textureDirection * (vert - md.Vertices[0]);
+					textureUvCoordinates[i] = new Vector2(vertexRelativePos.x, vertexRelativePos.z);
+					if (vertexRelativePos.x < minx)
+						minx = vertexRelativePos.x;
+					if (vertexRelativePos.x > maxx)
+						maxx = vertexRelativePos.x;
+					if (vertexRelativePos.z < miny)
+						miny = vertexRelativePos.z;
+					if (vertexRelativePos.z > maxy)
+						maxy = vertexRelativePos.z;
 				}
 
 				var width = maxx - minx;
@@ -136,8 +124,8 @@ namespace DroNeS.Mapbox.Custom.Parallel
 				for (var i = 0; i < md.Vertices.Length; i++)
 				{
 					md.UV.Add(new Vector2(
-						(((_textureUvCoordinates[i].x - minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
-						(((_textureUvCoordinates[i].y - miny) / height) * _currentFacade.TextureRect.height) + _currentFacade.TextureRect.y));
+						(((textureUvCoordinates[i].x - minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
+						(((textureUvCoordinates[i].y - miny) / height) * _currentFacade.TextureRect.height) + _currentFacade.TextureRect.y));
 				}
 			}
 
@@ -226,29 +214,27 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			{
 				_currentFacade = _options.atlasInfo.Roofs[UnityEngine.Random.Range(0, _options.atlasInfo.Roofs.Count)];
 
-				minx = float.MaxValue;
-				miny = float.MaxValue;
-				maxx = float.MinValue;
-				maxy = float.MinValue;
+				var minx = float.MaxValue;
+				var miny = float.MaxValue;
+				var maxx = float.MinValue;
+				var maxy = float.MinValue;
 
-				_textureUvCoordinates = new Vector2[md.Vertices.Count];
-				_textureDirection = Quaternion.FromToRotation((md.Vertices[0] - md.Vertices[1]), Vector3.right);
-				_textureUvCoordinates[0] = new Vector2(0, 0);
-				_firstVert = md.Vertices[0];
+				var textureUvCoordinates = new Vector2[md.Vertices.Count];
+				var textureDirection = Quaternion.FromToRotation((md.Vertices[0] - md.Vertices[1]), Vector3.right);
+				textureUvCoordinates[0] = new Vector2(0, 0);
 				for (var i = 1; i < md.Vertices.Count; i++)
 				{
-					_vert = md.Vertices[i];
-					_vertexRelativePos = _vert - _firstVert;
-					_vertexRelativePos = _textureDirection * _vertexRelativePos;
-					_textureUvCoordinates[i] = new Vector2(_vertexRelativePos.x, _vertexRelativePos.z);
-					if (_vertexRelativePos.x < minx)
-						minx = _vertexRelativePos.x;
-					if (_vertexRelativePos.x > maxx)
-						maxx = _vertexRelativePos.x;
-					if (_vertexRelativePos.z < miny)
-						miny = _vertexRelativePos.z;
-					if (_vertexRelativePos.z > maxy)
-						maxy = _vertexRelativePos.z;
+					var vert = md.Vertices[i];
+					var vertexRelativePos = textureDirection * (vert - md.Vertices[0]);
+					textureUvCoordinates[i] = new Vector2(vertexRelativePos.x, vertexRelativePos.z);
+					if (vertexRelativePos.x < minx)
+						minx = vertexRelativePos.x;
+					if (vertexRelativePos.x > maxx)
+						maxx = vertexRelativePos.x;
+					if (vertexRelativePos.z < miny)
+						miny = vertexRelativePos.z;
+					if (vertexRelativePos.z > maxy)
+						maxy = vertexRelativePos.z;
 				}
 
 				var width = maxx - minx;
@@ -257,8 +243,8 @@ namespace DroNeS.Mapbox.Custom.Parallel
 				for (var i = 0; i < md.Vertices.Count; i++)
 				{
 					md.UV[0].Add(new Vector2(
-						(((_textureUvCoordinates[i].x - minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
-						(((_textureUvCoordinates[i].y - miny) / height) * _currentFacade.TextureRect.height) + _currentFacade.TextureRect.y));
+						(((textureUvCoordinates[i].x - minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
+						(((textureUvCoordinates[i].y - miny) / height) * _currentFacade.TextureRect.height) + _currentFacade.TextureRect.y));
 				}
 			}
 
@@ -278,100 +264,123 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			md.Triangles.Add(triList);
 		}
 
-		private bool IsClockwise(IList<Vector3> vertices)
+		private static bool IsClockwise(IList<Vector3> vertices)
 		{
 			var sum = 0.0;
 			var counter = vertices.Count;
+			
 			for (var i = 0; i < counter; i++)
 			{
-				_v1 = vertices[i];
-				_v2 = vertices[(i + 1) % counter];
-				sum += (_v2.x - _v1.x) * (_v2.z + _v1.z);
+				var v1 = vertices[i];
+				var v2 = vertices[(i + 1) % counter];
+				sum += (v2.x - v1.x) * (v2.z + v1.z);
 			}
 
 			return sum > 0.0;
 		}
 	}
 	
-#if dont
+	public class JobifiedPolygonMeshModifier : CustomMeshModifier
+	{
+		private UVModifierOptions _options;
+		public override void SetProperties(ModifierProperties properties)
+		{
+			if (!(properties is UVModifierOptions options))
+				throw new ArgumentException("Expected UVModifierOptions");
+			_options = options;
+		}
+
+		public override void Run(VectorFeatureUnity feature, ref MeshDataStruct md)
+		{
+			PolygonMeshModifierJob.Schedule(default, _options, feature, ref md).Complete();
+		}
+	}
+	
+	[BurstCompile]
 	public struct PolygonMeshModifierJob : IJob
     {
-	    
-	    #region Atlas Fields
-	    private Vector3 _v1, _v2;
-		private Vector3 _vert;
-		private Quaternion _textureDirection;
-		private Vector3 _vertexRelativePos;
-		private Vector3 _firstVert;
-
-		private float _minx;
-		private float _miny;
-		private float _maxx;
-		private float _maxy;
-		#endregion
-		
-		#region Inputs
+	    #region Inputs
 		private readonly UvMapType _textureType;
 		private readonly AtlasEntityStruct _currentFacade;
-		private MeshDataStruct _mesh;
+		private MeshDataStruct _output;
 		private readonly NativeList<UnsafeListContainer> _points;
 		#endregion
 
-		public PolygonMeshModifierJob(UVModifierOptions properties, NativeList<UnsafeListContainer> points, ref MeshDataStruct md)
+		public static JobHandle Schedule(JobHandle dependencies, UVModifierOptions options, VectorFeatureUnity feature,
+			ref MeshDataStruct output)
+		{
+			var points = new NativeList<UnsafeListContainer>(feature.Points.Count, Allocator.TempJob);
+			var i = 0;
+			foreach (var list in feature.Points)
+			{
+				points.Add(new UnsafeListContainer(list.Count, UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), Allocator.TempJob));
+				foreach (var vector in list)
+				{
+					points[i].Add(vector);
+				}
+
+				++i;
+			}
+			
+			return points.Dispose(new UnsafeListContainerDisposal(points).Schedule(
+				new PolygonMeshModifierJob(options, points, ref output).Schedule(dependencies)));
+		}
+
+		[BurstCompile]
+		private struct UnsafeListContainerDisposal : IJob
+		{
+			private NativeList<UnsafeListContainer> _list;
+			public UnsafeListContainerDisposal(NativeList<UnsafeListContainer> list)
+			{
+				_list = list;
+			}
+			public void Execute()
+			{
+				for (var i = 0; i < _list.Length; ++i)
+				{
+					_list[i].Dispose();
+				}
+			}
+		}
+		private PolygonMeshModifierJob(UVModifierOptions properties, NativeList<UnsafeListContainer> points, ref MeshDataStruct md)
 		{
 			_points = points;
 			_textureType = properties.texturingType;
 			_currentFacade = properties.atlasInfo.Roofs[0];
-			_mesh = md;
-
-			_v1 = default;
-			_v2 = default;
-			_vert = default;
-			_textureDirection = default;
-			_vertexRelativePos = default;
-			_firstVert = default;
-			_minx = default;
-			_miny = default;
-			_maxx = default;
-			_maxy = default;
+			_output = md;
 		}
 
-		private bool IsClockwise(UnsafeListContainer vertices)
+		private static bool IsClockwise(UnsafeListContainer vertices)
 		{
 			var sum = 0.0;
 			var counter = vertices.Length;
 			for (var i = 0; i < counter; i++)
 			{
-				_v1 = vertices.Get<Vector3>(i);
-				_v2 = vertices.Get<Vector3>((i + 1) % counter);
-				sum += (_v2.x - _v1.x) * (_v2.z + _v1.z);
+				var v1 = vertices.Get<Vector3>(i);
+				var v2 = vertices.Get<Vector3>((i + 1) % counter);
+				sum += (v2.x - v1.x) * (v2.z + v1.z);
 			}
 
 			return sum > 0.0;
 		}
 
-		
 		public void Execute()
 		{
-			var linkedList = new NativeList<Node>(64, Allocator.Temp);
-			var subset = new NativeList<UnsafeListContainer>(128, Allocator.Temp);
-			Data flatData;
+			var subset = new NativeList<UnsafeListContainer>(4, Allocator.Temp);
 			NativeList<int> result;
 			var currentIndex = 0;
-			var polygonVertexCount = 0;
+			int polygonVertexCount;
 			NativeList<int> triList = default;
-			
+
 			var counter = _points.Length;
 			
 			for (var i = 0; i < counter; i++)
 			{
 				var sub = _points[i];
-				var vertCount = _mesh.Vertices.Length;
+				var vertCount = _output.Vertices.Length;
 				if (IsClockwise(sub) && vertCount > 0)
 				{
-					flatData = EarcutLibrary.Flatten(subset);
-					
-					result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim, ref linkedList);
+					result = EarcutStruct.Earcut(subset);
 					polygonVertexCount = result.Length;
 					if (!triList.IsCreated)
 					{
@@ -390,67 +399,64 @@ namespace DroNeS.Mapbox.Custom.Parallel
 					currentIndex = vertCount;
 					subset.Clear();
 				}
+				
 				subset.Add(sub);
 
 				polygonVertexCount = sub.Length;
-				_mesh.Vertices.Capacity = _mesh.Vertices.Length + polygonVertexCount;
-				_mesh.Normals.Capacity = _mesh.Normals.Length + polygonVertexCount;
-				_mesh.Edges.Capacity = _mesh.Edges.Length + polygonVertexCount * 2;
-				var size = _mesh.TileRect.Size;
+				_output.Vertices.Capacity = _output.Vertices.Length + polygonVertexCount;
+				_output.Normals.Capacity = _output.Normals.Length + polygonVertexCount;
+				_output.Edges.Capacity = _output.Edges.Length + polygonVertexCount * 2;
 
 				for (var j = 0; j < polygonVertexCount; j++)
 				{
-					_mesh.Edges.Add(vertCount + (j + 1) % polygonVertexCount);
-					_mesh.Edges.Add(vertCount + j);
-					_mesh.Vertices.Add(sub.Get<Vector3>(j));
-					_mesh.Normals.Add(Vector3.up);
+					_output.Edges.Add(vertCount + (j + 1) % polygonVertexCount);
+					_output.Edges.Add(vertCount + j);
+					_output.Vertices.Add(sub.Get<Vector3>(j));
+					_output.Normals.Add(Vector3.up);
 
 					if (_textureType != UvMapType.Tiled) continue;
 					var val = sub.Get<Vector3>(j);
-					_mesh.UV.Add(new Vector2(val.x, val.z));
+					_output.UV.Add(new Vector2(val.x, val.z));
 				}
 
 			}
-
-			flatData = EarcutLibrary.Flatten(subset);
-			result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim, ref linkedList);
+			
+			result = EarcutStruct.Earcut(subset);
 			polygonVertexCount = result.Length;
 
 			if (_textureType == UvMapType.Atlas || _textureType == UvMapType.AtlasWithColorPalette)
 			{
-				_minx = float.MaxValue;
-				_miny = float.MaxValue;
-				_maxx = float.MinValue;
-				_maxy = float.MinValue;
+				var minx = float.MaxValue;
+				var miny = float.MaxValue;
+				var maxx = float.MinValue;
+				var maxy = float.MinValue;
 
-				var textureUvCoordinates = new NativeArray<Vector2>(_mesh.Vertices.Length, Allocator.Temp);
-				_textureDirection = Quaternion.FromToRotation(_mesh.Vertices[0] - _mesh.Vertices[1], new Vector3(1,0,0));
-				textureUvCoordinates[0] = Vector2.zero;
-				_firstVert = _mesh.Vertices[0];
-				for (var i = 1; i < _mesh.Vertices.Length; i++)
+				var textureUvCoordinates =
+					new NativeArray<Vector2>(_output.Vertices.Length, Allocator.Temp) {[0] = Vector2.zero};
+				
+				var textureDirection = Quaternion.FromToRotation(_output.Vertices[0] - _output.Vertices[1], new Vector3(1,0,0));
+				for (var i = 1; i < _output.Vertices.Length; i++)
 				{
-					_vert = _mesh.Vertices[i];
-					_vertexRelativePos = _vert - _firstVert;
-					_vertexRelativePos = _textureDirection * _vertexRelativePos;
-					textureUvCoordinates[i] = new Vector2(_vertexRelativePos.x, _vertexRelativePos.z);
-					if (_vertexRelativePos.x < _minx)
-						_minx = _vertexRelativePos.x;
-					if (_vertexRelativePos.x > _maxx)
-						_maxx = _vertexRelativePos.x;
-					if (_vertexRelativePos.z < _miny)
-						_miny = _vertexRelativePos.z;
-					if (_vertexRelativePos.z > _maxy)
-						_maxy = _vertexRelativePos.z;
+					var vertexRelativePos = textureDirection * (_output.Vertices[i] - _output.Vertices[0]);
+					textureUvCoordinates[i] = new Vector2(vertexRelativePos.x, vertexRelativePos.z);
+					if (vertexRelativePos.x < minx)
+						minx = vertexRelativePos.x;
+					if (vertexRelativePos.x > maxx)
+						maxx = vertexRelativePos.x;
+					if (vertexRelativePos.z < miny)
+						miny = vertexRelativePos.z;
+					if (vertexRelativePos.z > maxy)
+						maxy = vertexRelativePos.z;
 				}
 
-				var width = _maxx - _minx;
-				var height = _maxy - _miny;
+				var width = maxx - minx;
+				var height = maxy - miny;
 
-				for (var i = 0; i < _mesh.Vertices.Length; i++)
+				for (var i = 0; i < _output.Vertices.Length; i++)
 				{
-					_mesh.UV.Add(new Vector2(
-						(((textureUvCoordinates[i].x - _minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
-						(((textureUvCoordinates[i].y - _miny) / height) * _currentFacade.TextureRect.height) + _currentFacade.TextureRect.y));
+					_output.UV.Add(new Vector2(
+						(textureUvCoordinates[i].x - minx) / width * _currentFacade.TextureRect.width + _currentFacade.TextureRect.x,
+						(textureUvCoordinates[i].y - miny) / height * _currentFacade.TextureRect.height + _currentFacade.TextureRect.y));
 				}
 			}
 
@@ -468,9 +474,9 @@ namespace DroNeS.Mapbox.Custom.Parallel
 				triList.Add(result[i] + currentIndex);
 			}
 			
-			_mesh.Triangles.AddRange(triList);
+			_output.Triangles.AddRange(triList);
 		}
     }
-#endif
+
 }
 

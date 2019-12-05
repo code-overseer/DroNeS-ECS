@@ -39,7 +39,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 	        Application.quitting += Destroy;
             _modifiers = new[]
             {
-                (CustomMeshModifier)ScriptableObject.CreateInstance<StrippedPolygonMeshModifier>(),
+                (CustomMeshModifier)ScriptableObject.CreateInstance<JobifiedPolygonMeshModifier>(),
                 ScriptableObject.CreateInstance<JobifiedTextureWallModifier>(),
             };
         }

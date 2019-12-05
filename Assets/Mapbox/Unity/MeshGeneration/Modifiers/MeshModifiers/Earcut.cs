@@ -671,7 +671,7 @@ namespace Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
 		}
 	}
 
-	public class Data // native stream
+	public class Data
 	{
 		public List<float> Vertices;
 		public List<int> Holes;
