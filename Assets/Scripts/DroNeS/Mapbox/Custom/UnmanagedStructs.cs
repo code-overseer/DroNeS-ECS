@@ -81,6 +81,27 @@ namespace DroNeS.Mapbox.Custom
 			Triangles.AddRange(other.Triangles.AsArray());
 			UV.AddRange(other.UV.AsArray());
 		}
+		
+		public JobHandle CopyFrom(in MeshDataStruct other, JobHandle dependencies)
+		{
+			return new ClearCopy(this, other).Schedule(dependencies);
+		}
+
+		private struct ClearCopy : IJob
+		{
+			private MeshDataStruct _dst;
+			private MeshDataStruct _src;
+
+			public ClearCopy(MeshDataStruct dst, MeshDataStruct src)
+			{
+				_dst = dst;
+				_src = src;
+			}
+			public void Execute()
+			{
+				_dst.CopyFrom(_src);
+			}
+		}
 
 		public void Dispose()
 		{

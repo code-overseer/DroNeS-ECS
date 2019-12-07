@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using DroNeS.Mapbox.Interfaces;
+using DroNeS.Utils;
 using DroNeS.Utils.Interfaces;
 using DroNeS.Utils.Time;
 using Mapbox.Unity.Map;
+using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Unity.Burst;
 using Unity.Collections;
@@ -23,11 +26,13 @@ namespace DroNeS.Mapbox.Custom.Parallel
         private UVModifierOptions _uvOptions;
         private GeometryExtrusionWithAtlasOptions _atlasOptions;
         private WaitForFixedUpdate _fixed;
+        private StrippedPolygonMeshModifier _modifer;
         
         public void SetOptions(UVModifierOptions uvOptions, GeometryExtrusionWithAtlasOptions extrusionOptions)
         {
 	        _uvOptions = uvOptions;
 	        _atlasOptions = extrusionOptions;
+	        _modifer.SetProperties(_uvOptions);
         }
 
         public Material BuildingMaterial
@@ -43,6 +48,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
         {
 	        Application.quitting += Destroy;
 	        _fixed = new WaitForFixedUpdate();
+	        _modifer = ScriptableObject.CreateInstance<StrippedPolygonMeshModifier>();
         }
 
         private int _count = 0;
@@ -62,17 +68,16 @@ namespace DroNeS.Mapbox.Custom.Parallel
         public IEnumerator RunJob(CustomTile tile)
         {
 	        if (!_queue.TryGetValue(tile, out var queue)) yield break;
-	        var b = queue.Count == 254;
+
 	        while (queue.Count > 0)
 	        {
 		        var feature = queue.Dequeue();
 		        var meshData = new MeshDataStruct(tile.Rect, Allocator.Persistent);
 		        var timer = new CustomTimer().Start();
-		        var handle = PolygonMeshModifierJob.Schedule(default, _uvOptions, feature, ref meshData); 
-			    handle = TextureSideWallModifierJob.Schedule(handle, _atlasOptions, feature, ref meshData);
+		        _modifer.Run(feature, ref meshData);
+				var handle = TextureSideWallModifierJob.Schedule(default, _atlasOptions, feature, ref meshData);
 			    while (!handle.IsCompleted)
 			    {
-				    if (b) Debug.Log($"Queue Count {queue.Count.ToString()}");
 				    yield return _fixed;
 				    timer.Restart();
 			    }
@@ -86,9 +91,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		        {
 			        Terminate(tile, meshData);
 		        }
-		        meshData.Dispose();
-		        
-		        if (timer.ElapsedMilliseconds > 8) yield return _fixed;
+		        meshData.Dispose(handle).Complete();
 	        }
 	        Terminate(tile);
         }
@@ -118,7 +121,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 
         private void Append(CustomTile tile, in MeshDataStruct data)
 	    {
-		    if (!_accumulation.TryGetValue(tile, out var value) || value.Vertices.Length <= 3) return;
+		    if (!_accumulation.TryGetValue(tile, out var value) || data.Vertices.Length <= 3) return;
 		    
 		    TriangleUpdateJob.Schedule(default, data.Triangles, value.Vertices.Length).Complete();
 		    value.Vertices.AddRange(data.Vertices);
@@ -132,7 +135,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		    var go = new GameObject($"Building {_indices[tile]++.ToString()}");
 		    go.transform.position = tile.Position;
 		    go.transform.SetParent(tile.Transform, true);
-		    
+		    go.layer = LayerMask.NameToLayer("Buildings");
 		    var filter = go.AddComponent<MeshFilter>();
 		    filter.sharedMesh = new Mesh();
 		    go.AddComponent<MeshRenderer>().sharedMaterial = BuildingMaterial;
@@ -142,7 +145,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		    filter.sharedMesh.normals = value.Normals.ToArray();
 		    filter.sharedMesh.triangles = value.Triangles.ToArray();
 		    filter.sharedMesh.uv = value.UV.ToArray();
-		    go.layer = LayerMask.NameToLayer("Buildings");
+		    
 	    }
 	    private void Terminate(CustomTile tile, in MeshDataStruct data)
 	    {
@@ -156,9 +159,9 @@ namespace DroNeS.Mapbox.Custom.Parallel
 	    {
 		    if (!_accumulation.TryGetValue(tile, out var value) || value.Vertices.Length <= 3) return;
 		    
-		    MakeEntity(tile, value);
 		    tile.VectorDataState = TilePropertyState.Loaded;
-		    _accumulation[tile].Dispose();
+		    MakeEntity(tile, value);
+		    value.Dispose();
 		    _accumulation.Remove(tile);
 		    _queue.Remove(tile);
 		    _indices.Remove(tile);

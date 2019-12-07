@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Globalization;
 using DroNeS.Mapbox.Interfaces;
-using DroNeS.Utils;
 using DroNeS.Utils.Time;
 using Mapbox.Unity;
 using UnityEngine;
@@ -49,12 +47,11 @@ namespace DroNeS.Mapbox.Custom.Parallel
             foreach (var tileId in _map.Tiles)
             {
                 var tile = new CustomTile(transform, _map, in tileId);
-//                _imageFactory.Register(tile);
+                _imageFactory.Register(tile);
                 _meshFactory.Register(tile);
             }
 
-            while (CoroutineManager.Count > 0) yield return null;
-            
+            while (CoroutineManager.Count > 0) yield return null; 
             Debug.Log(profiler.ElapsedSeconds.ToString(CultureInfo.CurrentCulture));
             profiler.Stop();
         }

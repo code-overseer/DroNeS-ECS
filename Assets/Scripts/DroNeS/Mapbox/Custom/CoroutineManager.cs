@@ -12,7 +12,7 @@ namespace DroNeS.Mapbox.Custom
         private readonly Queue<Routine> _routineQueue = new Queue<Routine>();
         public static int ActiveCount => Instance._routines.Count;
         public static int Count => Instance._routineQueue.Count + Instance._routines.Count;
-        private const int MaxRoutines = 8;
+        private const int MaxRoutines = 16;
         private int _nextId = 1;
         
         public static void Run(IEnumerator routine, string name = "")

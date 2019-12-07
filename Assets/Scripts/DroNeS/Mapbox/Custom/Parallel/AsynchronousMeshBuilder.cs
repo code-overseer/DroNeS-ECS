@@ -59,22 +59,11 @@ namespace DroNeS.Mapbox.Custom.Parallel
 
 	    private void ProcessingFunction(BuildingMeshBuilderProperties properties, CustomTile tile)
 		{
-			if (properties.FeatureCount < 250 || properties.FeatureCount > 275) return;
-			
 			for (var i = 0; i < properties.FeatureCount; ++i)
 			{
 				ProcessFeature(i, tile, properties);
 			}
-			var b = properties.FeatureCount == 254;
-			if (!b)
-			{
-				CoroutineManager.Run(_processor.RunJob(tile));	
-			}
-			else
-			{
-				CoroutineManager.Run(_processor.RunJob(tile), tile.CanonicalTileId.ToString());
-			}
-			
+			CoroutineManager.Run(_processor.RunJob(tile));
 		}
 
 	    private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)

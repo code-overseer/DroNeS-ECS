@@ -10,7 +10,6 @@ using Collider = Unity.Physics.Collider;
 
 namespace DroNeS.Systems
 {
-    [DisableAutoCreation]
     public class BuildingColliderInitializer : ComponentSystem
     {
         private BlobAssetReference<Collider> _collider;

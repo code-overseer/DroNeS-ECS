@@ -136,57 +136,55 @@ namespace DroNeS.Mapbox.Custom.Parallel
             return triangles;
         }
         
-        private void EarcutLinked(Node* ear, NativeList<int> triangles, float minX, float minY, float size, int pass = 0)
+        private void EarcutLinked(Node* ear, NativeList<int> triangles, float minX, float minY, float size)
         {
-            if (ear == null) return;
-            
-            if (pass == 0 && size > 0) IndexCurve(ear, minX, minY, size);
+            var innerEar = ear;
+            for (var pass = 0; pass < 3; ++pass) {
 
-            var stop = ear;
-            
-            while (ear->prev != ear->next)
-            {
-                var prev = ear->prev;
-                var next = ear->next;
+                if (innerEar == null) continue;
+    
+                if (pass == 0 && size > 0) IndexCurve(innerEar, minX, minY, size);
 
-                if (size > 0 ? IsEarHashed(ear, minX, minY, size) : IsEar(ear))
+                var stop = innerEar;
+        
+                while (innerEar->prev != innerEar->next)
                 {
-                    // cut off the triangle
-                    triangles.Add(prev->i / _result.Dim);
-                    triangles.Add(next->i / _result.Dim);
-                    triangles.Add(ear->i / _result.Dim);
+                    var prev = innerEar->prev;
+                    var next = innerEar->next;
 
-                    RemoveNode(ear);
+                    if (size > 0 ? IsEarHashed(innerEar, minX, minY, size) : IsEar(innerEar))
+                    {
+                        // cut off the triangle
+                        triangles.Add(prev->i / _result.Dim);
+                        triangles.Add(next->i / _result.Dim);
+                        triangles.Add(innerEar->i / _result.Dim);
 
-                    // skipping the next vertex leads to less sliver triangles
-                    ear = next->next;
-                    stop = next->next;
-                    continue;
+                        RemoveNode(innerEar);
+
+                        // skipping the next vertex leads to less sliver triangles
+                        innerEar = next->next;
+                        stop = next->next;
+                        continue;
+                    }
+
+                    innerEar = next;
+            
+                    if (innerEar != stop) continue;
+
+                    switch (pass)
+                    {
+                        case 0:
+                            innerEar = FilterPoints(innerEar, null);
+                            break;
+                        case 1:
+                            innerEar = CureLocalIntersections(innerEar, triangles);
+                            break;
+                        case 2:
+                            SplitEarcut(innerEar, triangles, minX, minY, size);
+                            break;
+                    }
+                    break;
                 }
-
-                ear = next;
-                
-                if (ear != stop) continue;
-                switch (pass)
-                {
-                    // try filtering points and slicing again
-                    case 0:
-                        EarcutLinked(FilterPoints(ear, null), triangles, minX, minY, size, 1);
-
-                        // if this didn't work, try curing all small self-intersections locally
-                        break;
-                    case 1:
-                        ear = CureLocalIntersections(ear, triangles);
-                        EarcutLinked(ear, triangles, minX, minY, size, 2);
-
-                        // as a last resort, try splitting the remaining polygon into two
-                        break;
-                    case 2:
-                        SplitEarcut(ear, triangles, minX, minY, size);
-                        break;
-                }
-
-                break;
             }
         }
         
@@ -387,7 +385,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
                         // split the polygon in two by the diagonal
                         var c = SplitPolygon(a, b);
 
-                        // filter colinear points around the cuts
+                        // filter co-linear points around the cuts
                         a = FilterPoints(a, a->next);
                         c = FilterPoints(c, c->next);
 

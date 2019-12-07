@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using DroNeS.Mapbox.Custom;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -18,27 +19,28 @@ namespace DroNeS.Utils
     public unsafe struct MeshProxy : IDisposable
     {
         internal GCHandle _meshHandle;
-        internal GCHandle _verticesHandle;
-        internal GCHandle _normalsHandle;
-        internal GCHandle _trianglesHandle;
-        internal GCHandle _uvHandle;
+        internal ulong _verticesHandle;
+        internal ulong _normalsHandle;
+        internal ulong _trianglesHandle;
+        internal ulong _uvHandle;
         public int VertexCount { get; private set; }
         public int NormalCount { get; private set; }
         public int TriangleCount { get; private set; }
         public int UVCount { get; private set; }
 
+        [NativeDisableUnsafePtrRestriction]
         internal void* Vertices;
+        [NativeDisableUnsafePtrRestriction]
         internal void* Normals;
+        [NativeDisableUnsafePtrRestriction]
         internal void* Triangles;
+        [NativeDisableUnsafePtrRestriction]
         internal void* UV;
 
-        private Allocator m_allocator;
+        private Allocator m_AllocatorLabel;
         
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-        internal AtomicSafetyHandle m_vertexSafety;
-        internal AtomicSafetyHandle m_normalSafety;
-        internal AtomicSafetyHandle m_triangleSafety;
-        internal AtomicSafetyHandle m_uvSafety;
+        internal AtomicSafetyHandle m_Safety;
 
         [NativeSetClassTypeToNullOnSchedule] 
         private DisposeSentinel m_DisposeSentinel;
@@ -51,22 +53,41 @@ namespace DroNeS.Utils
             UVCount = mesh.uv.Length;
 
             _meshHandle = GCHandle.Alloc(mesh, GCHandleType.Pinned);
-            _verticesHandle = GCHandle.Alloc(mesh.vertices, GCHandleType.Pinned);
-            _normalsHandle = GCHandle.Alloc(mesh.normals, GCHandleType.Pinned);
-            _trianglesHandle = GCHandle.Alloc(mesh.triangles, GCHandleType.Pinned);
-            _uvHandle = GCHandle.Alloc(mesh.uv, GCHandleType.Pinned);
 
-            Vertices = (void*)_verticesHandle.AddrOfPinnedObject();
-            Normals = (void*)_normalsHandle.AddrOfPinnedObject();
-            Triangles = (void*)_trianglesHandle.AddrOfPinnedObject();
-            UV = (void*)_uvHandle.AddrOfPinnedObject();
+            Vertices = UnsafeUtility.PinGCArrayAndGetDataAddress(mesh.vertices, out _verticesHandle);
+            Normals = UnsafeUtility.PinGCArrayAndGetDataAddress(mesh.normals, out _normalsHandle);
+            Triangles = UnsafeUtility.PinGCArrayAndGetDataAddress(mesh.triangles, out _trianglesHandle);
+            UV = UnsafeUtility.PinGCArrayAndGetDataAddress(mesh.uv, out _uvHandle);
             
-            m_allocator = Allocator.Persistent;
+            m_AllocatorLabel = Allocator.Persistent;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            DisposeSentinel.Create(out m_vertexSafety, out m_DisposeSentinel, 1, Allocator.Persistent);
-            m_normalSafety = AtomicSafetyHandle.Create();
-            m_triangleSafety = AtomicSafetyHandle.Create();
-            m_uvSafety = AtomicSafetyHandle.Create();
+            DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, 1, Allocator.Persistent);
+#if UNITY_2019_3_OR_NEWER
+            AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(m_vertexSafety, true);
+            AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(m_normalSafety, true);
+            AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(m_triangleSafety, true);
+            AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(m_uvSafety, true);
+#endif
+#endif
+        }
+        
+        public MeshProxy(Mesh mesh, int v, int n, int t, int u)
+        {
+            VertexCount = v;
+            NormalCount = n;
+            TriangleCount = t;
+            UVCount = u;
+
+            _meshHandle = GCHandle.Alloc(mesh, GCHandleType.Pinned);
+
+            Vertices = UnsafeUtility.PinGCArrayAndGetDataAddress(mesh.vertices, out _verticesHandle);
+            Normals = UnsafeUtility.PinGCArrayAndGetDataAddress(mesh.normals, out _normalsHandle);
+            Triangles = UnsafeUtility.PinGCArrayAndGetDataAddress(mesh.triangles, out _trianglesHandle);
+            UV = UnsafeUtility.PinGCArrayAndGetDataAddress(mesh.uv, out _uvHandle);
+            
+            m_AllocatorLabel = Allocator.Persistent;
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, 1, Allocator.Persistent);
 #if UNITY_2019_3_OR_NEWER
             AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(m_vertexSafety, true);
             AtomicSafetyHandle.SetBumpSecondaryVersionOnScheduleWrite(m_normalSafety, true);
@@ -79,7 +100,7 @@ namespace DroNeS.Utils
         public Vector3 GetVertex(int index)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(m_vertexSafety);
+            AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
             if ((uint)index >= (uint)VertexCount)
                 throw new IndexOutOfRangeException($"Index {index} is out of range in VertexArray of '{VertexCount}' Length.");
 #endif
@@ -89,7 +110,7 @@ namespace DroNeS.Utils
         public Vector3 GetNormal(int index) 
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(m_normalSafety);
+            AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
             if ((uint)index >= (uint)NormalCount)
                 throw new IndexOutOfRangeException($"Index {index} is out of range in VertexArray of '{NormalCount}' Length.");
 #endif
@@ -99,7 +120,7 @@ namespace DroNeS.Utils
         public int GetTriangle(int index)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(m_triangleSafety);
+            AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
             if ((uint)index >= (uint)TriangleCount)
                 throw new IndexOutOfRangeException($"Index {index} is out of range in VertexArray of '{TriangleCount}' Length.");
 #endif
@@ -109,47 +130,51 @@ namespace DroNeS.Utils
         public Vector2 GetUV(int index) 
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(m_uvSafety);
+            AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
             if ((uint)index >= (uint)UVCount)
                 throw new IndexOutOfRangeException($"Index {index} is out of range in VertexArray of '{UVCount}' Length.");
 #endif
             return UnsafeUtility.ReadArrayElement<Vector2>(UV, index);
         }
         
+        [WriteAccessRequired]
         public void SetVertex(int index, in Vector3 value)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(m_vertexSafety);
+            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
             if ((uint)index >= (uint)VertexCount)
                 throw new IndexOutOfRangeException($"Index {index} is out of range in VertexArray of '{VertexCount}' Length.");
 #endif
             UnsafeUtility.WriteArrayElement(Vertices, index, value);
         }
 
+        [WriteAccessRequired]
         public void SetNormal(int index, in Vector3 value) 
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(m_normalSafety);
+            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
             if ((uint)index >= (uint)NormalCount)
                 throw new IndexOutOfRangeException($"Index {index} is out of range in VertexArray of '{NormalCount}' Length.");
 #endif
             UnsafeUtility.WriteArrayElement(Normals, index, value);
         }
-
+        
+        [WriteAccessRequired]
         public void SetTriangle(int index, in int value)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(m_triangleSafety);
+            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
             if ((uint)index >= (uint)TriangleCount)
                 throw new IndexOutOfRangeException($"Index {index} is out of range in VertexArray of '{TriangleCount}' Length.");
 #endif
             UnsafeUtility.WriteArrayElement(Triangles, index, value);
         }
 
+        [WriteAccessRequired]
         public void SetUV(int index, in Vector2 value)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(m_uvSafety);
+            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
             if ((uint)index >= (uint)UVCount)
                 throw new IndexOutOfRangeException($"Index {index} is out of range in VertexArray of '{UVCount}' Length.");
 #endif
@@ -160,10 +185,10 @@ namespace DroNeS.Utils
 
         private void Release()
         {
-            _verticesHandle.Free();
-            _normalsHandle.Free();
-            _trianglesHandle.Free();
-            _uvHandle.Free();
+            UnsafeUtility.ReleaseGCObject(_verticesHandle);
+            UnsafeUtility.ReleaseGCObject(_normalsHandle);
+            UnsafeUtility.ReleaseGCObject(_trianglesHandle);
+            UnsafeUtility.ReleaseGCObject(_uvHandle);
             _meshHandle.Free();
             Vertices = null;
             Normals = null;
@@ -175,9 +200,10 @@ namespace DroNeS.Utils
             UVCount = 0;
         }
 
+        [WriteAccessRequired]
         public void Dispose()
         {
-            if (m_allocator < Allocator.None) // Not our responsibility to deallocate
+            if (m_AllocatorLabel < Allocator.None) // Not our responsibility to deallocate
             {
                 Vertices = null;
                 Normals = null;
@@ -185,18 +211,17 @@ namespace DroNeS.Utils
                 UV = null;
                 return;
             }
+            
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            DisposeSentinel.Dispose(ref m_vertexSafety, ref m_DisposeSentinel);
-            AtomicSafetyHandle.Release(m_normalSafety);
-            AtomicSafetyHandle.Release(m_triangleSafety);
-            AtomicSafetyHandle.Release(m_uvSafety);
+            DisposeSentinel.Dispose(ref m_Safety, ref m_DisposeSentinel);
 #endif
             Release();
         }
         
+        [WriteAccessRequired]
         public JobHandle Dispose(JobHandle inputDeps)
         {
-            if (m_allocator < Allocator.None) // Not our responsibility to deallocate
+            if (m_AllocatorLabel < Allocator.None) // Not our responsibility to deallocate
             {
                 Vertices = null;
                 Normals = null;
@@ -210,10 +235,7 @@ namespace DroNeS.Utils
             var jobHandle = new DisposeJob { Container = this }.Schedule(inputDeps);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.Release(m_vertexSafety);
-            AtomicSafetyHandle.Release(m_normalSafety);
-            AtomicSafetyHandle.Release(m_triangleSafety);
-            AtomicSafetyHandle.Release(m_uvSafety);
+            AtomicSafetyHandle.Release(m_Safety);
 #endif
             Vertices = null;
             Normals = null;
@@ -223,7 +245,6 @@ namespace DroNeS.Utils
             return jobHandle;
         }
         
-        [BurstCompile]
         private struct DisposeJob : IJob
         {
             public MeshProxy Container;
@@ -234,22 +255,21 @@ namespace DroNeS.Utils
             }
         }
         
+        [WriteAccessRequired]
         public bool CopyFrom(MeshProxy other)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(m_vertexSafety);
+            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
+            
             if ((uint)other.VertexCount != (uint)VertexCount)
                 throw new ArgumentException($"Vertex array size mismatch");
             UnsafeUtility.MemCpy(Vertices, other.Vertices, (long)sizeof(Vector3) * VertexCount);
-            AtomicSafetyHandle.CheckWriteAndThrow(m_normalSafety);
             if ((uint)other.NormalCount != (uint)NormalCount)
                 throw new ArgumentException($"Normal array size mismatch");
             UnsafeUtility.MemCpy(Normals, other.Normals, (long)sizeof(Vector3) * NormalCount);
-            AtomicSafetyHandle.CheckWriteAndThrow(m_triangleSafety);
             if ((uint)other.TriangleCount != (uint)TriangleCount)
                 throw new ArgumentException($"Triangle array size mismatch");
             UnsafeUtility.MemCpy(Triangles, other.Triangles, (long)sizeof(int) * TriangleCount);
-            AtomicSafetyHandle.CheckWriteAndThrow(m_uvSafety);
             if ((uint)other.UVCount != (uint)UVCount)
                 throw new ArgumentException($"UV array size mismatch");
             UnsafeUtility.MemCpy(UV, other.UV, (long)sizeof(Vector2) * UVCount);
@@ -266,24 +286,55 @@ namespace DroNeS.Utils
             return true;
         }
 
+        [WriteAccessRequired]
         public bool CopyFrom(NativeMesh other)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(m_vertexSafety);
+            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
+            
             if ((uint)other.VertexCount != (uint)VertexCount)
                 throw new ArgumentException($"Vertex array size mismatch");
             UnsafeUtility.MemCpy(Vertices, other.GetVerticesUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * VertexCount);
-            AtomicSafetyHandle.CheckWriteAndThrow(m_normalSafety);
             if ((uint)other.NormalCount != (uint)NormalCount)
                 throw new ArgumentException($"Normal array size mismatch");
             UnsafeUtility.MemCpy(Normals, other.GetNormalsUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * NormalCount);
-            AtomicSafetyHandle.CheckWriteAndThrow(m_triangleSafety);
             if ((uint)other.TriangleCount != (uint)TriangleCount)
                 throw new ArgumentException($"Triangle array size mismatch");
             UnsafeUtility.MemCpy(Triangles, other.GetTrianglesUnsafeReadOnlyPtr(), (long)sizeof(int) * TriangleCount);
-            AtomicSafetyHandle.CheckWriteAndThrow(m_uvSafety);
             if ((uint)other.UVCount != (uint)UVCount)
                 throw new ArgumentException($"UV array size mismatch");
+            UnsafeUtility.MemCpy(UV, other.GetUVUnsafeReadOnlyPtr(), (long)sizeof(Vector2) * UVCount);
+#else
+            if ((uint) other.VertexCount != (uint) VertexCount) return false;
+            UnsafeUtility.MemCpy(Vertices, other.GetVerticesUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * VertexCount);
+            if ((uint) other.NormalCount != (uint) NormalCount) return false;
+            UnsafeUtility.MemCpy(Normals, other.GetNormalsUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * NormalCount);
+            if ((uint) other.TriangleCount != (uint) TriangleCount) return false;
+            UnsafeUtility.MemCpy(Triangles, other.GetTrianglesUnsafeReadOnlyPtr(), (long)sizeof(int) * TriangleCount);
+            if ((uint) other.UVCount != (uint) UVCount) return false;
+            UnsafeUtility.MemCpy(UV, other.GetUVUnsafeReadOnlyPtr(), (long)sizeof(Vector2) * UVCount);
+#endif
+            return true;
+        }
+        
+        [WriteAccessRequired]
+        public bool CopyFrom(MeshDataStruct other)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
+            
+            if ((uint)other.Vertices.Length != (uint)VertexCount)
+                throw new ArgumentException($"Vertex array size mismatch");
+            UnsafeUtility.MemCpy(Vertices, other.Vertices.GetUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * other.Vertices.Length);
+            if ((uint)other.Normals.Length != (uint)NormalCount)
+                throw new ArgumentException($"Normal array size mismatch");
+            UnsafeUtility.MemCpy(Normals, other.Normals.GetUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * other.Normals.Length);
+            if ((uint)other.Triangles.Length != (uint)TriangleCount)
+                throw new ArgumentException($"Triangle array size mismatch");
+            UnsafeUtility.MemCpy(Triangles, other.Triangles.GetUnsafeReadOnlyPtr(), (long)sizeof(int) * other.Triangles.Length);
+            if ((uint)other.UV.Length != (uint)UVCount)
+                throw new ArgumentException($"UV array size mismatch");
+            UnsafeUtility.MemCpy(UV, other.UV.GetUnsafeReadOnlyPtr(), (long)sizeof(Vector2) * other.UV.Length);
 #else
             if ((uint) other.VertexCount != (uint) VertexCount) return false;
             UnsafeUtility.MemCpy(Vertices, other.GetVerticesUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * VertexCount);
@@ -314,18 +365,15 @@ namespace DroNeS.Utils
                 NormalCount = element.NormalCount,
                 TriangleCount = element.TriangleCount,
                 UVCount = element.UVCount,
-                m_allocator = Allocator.Invalid,
+                m_AllocatorLabel = Allocator.Invalid,
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                m_vertexSafety = AtomicSafetyHandle.GetTempMemoryHandle(),
-                m_normalSafety = AtomicSafetyHandle.GetTempMemoryHandle(),
-                m_triangleSafety = AtomicSafetyHandle.GetTempMemoryHandle(),
-                m_uvSafety = AtomicSafetyHandle.GetTempMemoryHandle()
+                m_Safety = AtomicSafetyHandle.GetTempMemoryHandle(),
 #endif
             };
         }
     }
 
-    internal struct MeshProxyDebugView
+    internal class MeshProxyDebugView
     {
         private MeshProxy _proxy;
         public MeshProxyDebugView(MeshProxy mesh)
