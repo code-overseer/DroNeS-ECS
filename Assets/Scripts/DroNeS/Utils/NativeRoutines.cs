@@ -174,7 +174,7 @@ namespace DroNeS.Utils
 
 		public void MoveNext()
 		{
-			var indices = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), Length, Allocator.Temp);
+			var indices = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), Length, Allocator.TempJob);
 			for (var index = 0; index < Length; ++index)
 			{
 				if (((T*) ((IntPtr) m_ListData->Ptr + index * sizeof(T)))->MoveNext()) continue;

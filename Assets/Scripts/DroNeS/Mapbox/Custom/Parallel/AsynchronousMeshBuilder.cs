@@ -23,18 +23,10 @@ namespace DroNeS.Mapbox.Custom.Parallel
     {
         public VectorSubLayerProperties SubLayerProperties { get; }
 	    public IMeshProcessor Processor => _processor;
-	    private readonly MeshProcessor _processor;
-	    private NativeRoutines<ProcessingRoutine> _routines;
-	    private void Destroy()
-	    {
-		    Debug.Log(_routines.Length.ToString());
-		    _routines.Dispose();
-	    }
+	    private readonly ParallelMeshProcessor _processor;
 
 	    public AsynchronousMeshBuilder(VectorSubLayerProperties subLayerProperties)
 	    {
-		    _routines = new NativeRoutines<ProcessingRoutine>(ManhattanTileProvider.Tiles.Count, Allocator.Persistent);
-		    Application.quitting += Destroy;
 		    SubLayerProperties = subLayerProperties;
 		    SubLayerProperties.materialOptions.SetDefaultMaterialOptions();
 		    SubLayerProperties.extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
@@ -42,7 +34,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		    SubLayerProperties.extrusionOptions.propertyName = "height";
 		    SubLayerProperties.extrusionOptions.extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 		    
-		    _processor = new MeshProcessor();
+		    _processor = new ParallelMeshProcessor();
             
 		    var uvOptions = new UVModifierOptions
 		    {
@@ -58,59 +50,34 @@ namespace DroNeS.Mapbox.Custom.Parallel
 	    }
 
 	    public void Create(VectorTileLayer layer, CustomTile tile)
-        {
-            if (tile == null || layer == null) return;
+	    {
+		    if (tile == null || layer == null) return;
             var properties = MakeProperties(layer);
-            _routines.Add(new ProcessingRoutine(ProcessingFunction(properties, tile)));
+            
+            ProcessingFunction(properties, tile);
         }
 
-		private struct ProcessingRoutine : IRoutine
+	    private void ProcessingFunction(BuildingMeshBuilderProperties properties, CustomTile tile)
 		{
-			private GCHandle _routine;
-			public Period Period { get; }
-			public CustomTimer Timer { get; }
-
-			public ProcessingRoutine(IEnumerator routine)
-			{
-				Period = new Period(0);
-				Timer = new CustomTimer();
-				_routine = GCHandle.Alloc(routine, GCHandleType.Pinned);
-			}
-
-			public bool MoveNext() => ((IEnumerator) _routine.Target).MoveNext();
-
-			public void Reset() { }
-
-			public object Current => _routine.Target;
-			public void Dispose() => _routine.Free();
-		}
-
-		private IEnumerator ProcessingFunction(BuildingMeshBuilderProperties properties, CustomTile tile)
-		{
+			if (properties.FeatureCount < 250 || properties.FeatureCount > 275) return;
+			
 			for (var i = 0; i < properties.FeatureCount; ++i)
 			{
 				ProcessFeature(i, tile, properties);
-				yield return null;
 			}
-			_processor.Terminate(tile);
-		}
-
-		public IEnumerator Manager()
-		{
-			JobHandle handle = default;
-			do
+			var b = properties.FeatureCount == 254;
+			if (!b)
 			{
-				handle = _routines.MoveNext(handle);
-				while (!handle.IsCompleted) yield return null;
-				handle.Complete();
-			} while (_routines.Length > 0);
-
-			handle = _routines.Dispose(handle);
-			while (!handle.IsCompleted) yield return null;
-			handle.Complete();
+				CoroutineManager.Run(_processor.RunJob(tile));	
+			}
+			else
+			{
+				CoroutineManager.Run(_processor.RunJob(tile), tile.CanonicalTileId.ToString());
+			}
+			
 		}
-		
-        private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)
+
+	    private BuildingMeshBuilderProperties MakeProperties(VectorTileLayer layer)
         {
             var output = new BuildingMeshBuilderProperties
             {
@@ -152,7 +119,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
             }
             else
             {
-                geom = fe.Geometry<float>(0); //passing zero means clip at tile edge
+                geom = fe.Geometry<float>(0);
             }
 
             var feature = new CustomFeatureUnity(
@@ -169,7 +136,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
             if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"])) return;
             if (feature.Points.Count < 1) return;
             
-            _processor.Execute(tile, feature);
+            _processor.Enqueue(tile, feature);
             
         }
         

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using DroNeS.Utils;
 using DroNeS.Utils.Time;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -23,13 +24,15 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		private ModifierVectors _vectors;
 		private ModifierFloats _floats;
 		private readonly float _maxHeight;
+		private readonly Bool _skip;
 
 		private MeshDataStruct _output;
 
-		private TextureSideWallModifierJob(GeometryExtrusionWithAtlasOptions options, VectorFeatureUnity feature, ref MeshDataStruct output)
+		private TextureSideWallModifierJob(Bool skip, GeometryExtrusionWithAtlasOptions options, CustomFeatureUnity feature, ref MeshDataStruct output)
 		{
 			_vectors = default;
 			_floats = default;
+			
 			var minHeight = 0.0f;
 			_maxHeight = 0.0f;
 			if (feature.Properties.ContainsKey(options.propertyName))
@@ -46,21 +49,31 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			_floats.extrusionScaleFactor = options.extrusionScaleFactor;
 			_maxHeight = _maxHeight * _floats.extrusionScaleFactor * Scale;
 			minHeight = minHeight * _floats.extrusionScaleFactor * Scale;
-			
 			_floats.height = _maxHeight - minHeight;
 			_output = output;
+			_skip = skip;
 		}
 
-		public static JobHandle Schedule(JobHandle dependencies, GeometryExtrusionWithAtlasOptions options, VectorFeatureUnity feature,
+		public static JobHandle Schedule(JobHandle dependencies, GeometryExtrusionWithAtlasOptions options, CustomFeatureUnity feature,
 			ref MeshDataStruct output)
 		{
-			if (output.Vertices.Length == 0 || feature == null || feature.Points.Count < 1) return default;
+			Bool skip = feature == null || feature.Points.Count < 1;
 
-			return new TextureSideWallModifierJob(options, feature, ref output).Schedule(dependencies);
+			return new TextureSideWallModifierJob(skip, options, feature, ref output).Schedule(dependencies);
+		}
+		
+		public static TextureSideWallModifierJob Get(GeometryExtrusionWithAtlasOptions options, CustomFeatureUnity feature,
+			ref MeshDataStruct output)
+		{
+			Bool skip = feature == null || feature.Points.Count < 1;
+
+			return new TextureSideWallModifierJob(skip, options, feature, ref output);
 		}
 		
 		public void Execute()
 		{
+			if (_output.Vertices.Length == 0 || _skip) return;
+			
 			_floats.singleFloorHeight = Scale * _currentFacade.FloorHeight / _currentFacade.MidFloorCount;
 			
 			var scaledPreferredWallLength = Scale * _currentFacade.PreferredEdgeSectionLength;
@@ -396,7 +409,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 
     public abstract class CustomMeshModifier : MeshModifier
     {
-	    public virtual void Run(VectorFeatureUnity feature, ref MeshDataStruct md)
+	    public virtual void Run(CustomFeatureUnity feature, ref MeshDataStruct md)
 	    {
 		    
 	    }
@@ -412,7 +425,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		    _options = options;
 	    }
 
-	    public override void Run(VectorFeatureUnity feature, ref MeshDataStruct md)
+	    public override void Run(CustomFeatureUnity feature, ref MeshDataStruct md)
 	    {
 		    TextureSideWallModifierJob.Schedule(default, _options, feature, ref md).Complete();
 	    }

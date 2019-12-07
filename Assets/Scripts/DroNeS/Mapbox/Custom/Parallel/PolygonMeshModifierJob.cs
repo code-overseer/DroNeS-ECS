@@ -28,7 +28,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			_options = (UVModifierOptions) properties;
 		}
 
-		public override void Run(VectorFeatureUnity feature, ref MeshDataStruct md)
+		public override void Run(CustomFeatureUnity feature, ref MeshDataStruct md)
 		{
 			var counter = feature.Points.Count;
 			var subset = new List<List<Vector3>>(counter);
@@ -291,7 +291,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 			_options = options;
 		}
 
-		public override void Run(VectorFeatureUnity feature, ref MeshDataStruct md)
+		public override void Run(CustomFeatureUnity feature, ref MeshDataStruct md)
 		{
 			PolygonMeshModifierJob.Schedule(default, _options, feature, ref md).Complete();
 		}
@@ -307,14 +307,14 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		private readonly NativeList<UnsafeListContainer> _points;
 		#endregion
 
-		public static JobHandle Schedule(JobHandle dependencies, UVModifierOptions options, VectorFeatureUnity feature,
+		public static JobHandle Schedule(JobHandle dependencies, UVModifierOptions options, CustomFeatureUnity feature,
 			ref MeshDataStruct output)
 		{
-			var points = new NativeList<UnsafeListContainer>(feature.Points.Count, Allocator.TempJob);
+			var points = new NativeList<UnsafeListContainer>(feature.Points.Count, Allocator.Persistent);
 			var i = 0;
 			foreach (var list in feature.Points)
 			{
-				points.Add(new UnsafeListContainer(list.Count, UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), Allocator.TempJob));
+				points.Add(new UnsafeListContainer(list.Count, UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), Allocator.Persistent));
 				CopyList(list, points[i++]);
 			}
 			

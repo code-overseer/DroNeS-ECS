@@ -24,6 +24,7 @@ namespace DroNeS.Utils
         internal AtomicSafetyHandle m_normalSafety;
         internal AtomicSafetyHandle m_triangleSafety;
         internal AtomicSafetyHandle m_uvSafety;
+        internal AtomicSafetyHandle m_edgeSafety;
 
         [NativeSetClassTypeToNullOnSchedule] 
         private DisposeSentinel m_DisposeSentinel;
@@ -36,6 +37,8 @@ namespace DroNeS.Utils
         internal UnsafeList* m_triangles;
         [NativeDisableUnsafePtrRestriction]
         internal UnsafeList* m_uv;
+        [NativeDisableUnsafePtrRestriction]
+        internal UnsafeList* m_edges;
         
         internal Allocator m_allocator;
 
@@ -53,8 +56,8 @@ namespace DroNeS.Utils
         {
         }
 
-        public NativeMesh(int vertices, int normals, int triangles, int uvs, Allocator allocator)
-            : this(vertices, normals, triangles, uvs, allocator, 2)
+        public NativeMesh(int vertices, int normals, int triangles, int uvs, int edges, Allocator allocator)
+            : this(vertices, normals, triangles, uvs, edges, allocator, 2)
         {
         }
         private NativeMesh(int initialCapacity, Allocator allocator, int disposeSentinelStackDepth)
@@ -75,12 +78,14 @@ namespace DroNeS.Utils
                 m_normalSafety = AtomicSafetyHandle.Create();
                 m_triangleSafety = AtomicSafetyHandle.Create();
                 m_uvSafety = AtomicSafetyHandle.Create();
+                m_edgeSafety = AtomicSafetyHandle.Create();
             }
             else
             {
                 m_normalSafety = AtomicSafetyHandle.GetTempMemoryHandle();
                 m_triangleSafety = AtomicSafetyHandle.GetTempMemoryHandle();
                 m_uvSafety = AtomicSafetyHandle.GetTempMemoryHandle();
+                m_edgeSafety = AtomicSafetyHandle.GetTempMemoryHandle();
             }
             
 #endif
@@ -88,6 +93,7 @@ namespace DroNeS.Utils
             m_normals = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), initialCapacity, allocator);
             m_triangles = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(),3 * initialCapacity, allocator);
             m_uv = UnsafeList.Create(UnsafeUtility.SizeOf<Vector2>(), UnsafeUtility.AlignOf<Vector2>(), initialCapacity, allocator);
+            m_edges = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), 2 * initialCapacity, allocator);
             m_allocator = allocator;
 
 #if UNITY_2019_3_OR_NEWER && ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -95,7 +101,7 @@ namespace DroNeS.Utils
 #endif
         }
 
-        private NativeMesh(int vertices, int normals, int triangles, int uvs, Allocator allocator,
+        private NativeMesh(int vertices, int normals, int triangles, int uvs, int edges, Allocator allocator,
             int disposeSentinelStackDepth)
         {
             var totalSize = (long)(vertices + normals) * UnsafeUtility.SizeOf<Vector3>() + (long)triangles * UnsafeUtility.SizeOf<int>() + (long)uvs * UnsafeUtility.SizeOf<Vector2>();
@@ -111,6 +117,8 @@ namespace DroNeS.Utils
                 throw new ArgumentOutOfRangeException(nameof(triangles), "Capacity must be >= 0");
             if (uvs < 0)
                 throw new ArgumentOutOfRangeException(nameof(uvs), "Capacity must be >= 0");
+            if (edges < 0)
+                throw new ArgumentOutOfRangeException(nameof(edges), "Capacity must be >= 0");
             if (totalSize > int.MaxValue)
                 throw new ArgumentOutOfRangeException($"Capacity has exceeded {int.MaxValue} bytes");
 
@@ -120,18 +128,21 @@ namespace DroNeS.Utils
                 m_normalSafety = AtomicSafetyHandle.Create();
                 m_triangleSafety = AtomicSafetyHandle.Create();
                 m_uvSafety = AtomicSafetyHandle.Create();
+                m_edgeSafety = AtomicSafetyHandle.Create();
             }
             else
             {
                 m_normalSafety = AtomicSafetyHandle.GetTempMemoryHandle();
                 m_triangleSafety = AtomicSafetyHandle.GetTempMemoryHandle();
                 m_uvSafety = AtomicSafetyHandle.GetTempMemoryHandle();
+                m_edgeSafety = AtomicSafetyHandle.GetTempMemoryHandle();
             }
 #endif
             m_vertices = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), vertices, allocator);
             m_normals = UnsafeList.Create(UnsafeUtility.SizeOf<Vector3>(), UnsafeUtility.AlignOf<Vector3>(), normals, allocator);
             m_triangles = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(),triangles, allocator);
             m_uv = UnsafeList.Create(UnsafeUtility.SizeOf<Vector2>(), UnsafeUtility.AlignOf<Vector2>(), uvs, allocator);
+            m_edges = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), edges, allocator);
             m_allocator = allocator;
 
 #if UNITY_2019_3_OR_NEWER && ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -149,6 +160,8 @@ namespace DroNeS.Utils
         public Vector2 GetUV(int index) => ReadValue<Vector2>(m_uv, m_uvSafety,index);
 
         public int GetTriangle(int index) => ReadValue<int>(m_triangles, m_triangleSafety, index);
+        
+        public int GetEdge(int index) => ReadValue<int>(m_edges, m_edgeSafety, index);
 
         public void SetVertex(int index, in Vector3 value)=> SetValue(m_vertices, m_vertexSafety, index, in value);
 
@@ -156,12 +169,15 @@ namespace DroNeS.Utils
 
         public void SetTriangle(int index, in int value) => SetValue(m_triangles, m_triangleSafety, index, in value);
         public void SetUV(int index, in Vector2 value) => SetValue(m_uv, m_uvSafety, index, in value);
+        
+        public void SetUV(int index, in int value) => SetValue(m_edges, m_edgeSafety, index, in value);
 
 
         public int VertexCount => GetCount(m_vertices, m_vertexSafety);
         public int NormalCount => GetCount(m_normals, m_normalSafety);
         public int TriangleCount => GetCount(m_triangles, m_triangleSafety);
         public int UVCount => GetCount(m_uv, m_uvSafety);
+        public int EdgeCount => GetCount(m_edges, m_edgeSafety);
         
         public int VerticesCapacity
         {
@@ -184,27 +200,37 @@ namespace DroNeS.Utils
             set => SetCapacity<Vector2>(m_uv, m_uvSafety, value);
         }
 
+        public int EdgeCapacity
+        {
+            get => GetCapacity(m_edges, m_edgeSafety);
+            set => SetCapacity<int>(m_edges, m_edgeSafety, value);
+        }
+
         public void AddVertex(in Vector3 element) => Add(m_vertices, m_vertexSafety, element);
         public void AddNormal(in Vector3 element) => Add(m_normals, m_normalSafety, element);
         public void AddTriangleValue(in int element) => Add(m_triangles, m_triangleSafety, element);
         public void AddUV(in Vector2 element) => Add(m_uv, m_uvSafety, element);
+        public void AddEdge(in int element) => Add(m_edges, m_edgeSafety, element);
 
         public void AddRangeVertices(in NativeArray<Vector3> elements) => AddRange(m_vertices, m_vertexSafety, elements);
         public void AddRangeNormals(in NativeArray<Vector3> elements) => AddRange(m_normals, m_normalSafety, elements);
         public void AddRangeTriangles(in NativeArray<int> elements) => AddRange(m_triangles, m_triangleSafety, elements);
         public void AddRangeUV(in NativeArray<Vector2> elements) => AddRange(m_uv, m_uvSafety, elements);
+        public void AddRangeEdges(in NativeArray<int> elements) => AddRange(m_edges, m_edgeSafety, elements);
 
         public void RemoveVertexAt(int index) => RemoveAt<Vector3>(m_vertices, m_vertexSafety, index, 1);
         public void RemoveNormalAt(int index) => RemoveAt<Vector3>(m_normals, m_normalSafety, index, 1);
         public void RemoveTriangleAt(int index) => RemoveAt<int>(m_triangles, m_triangleSafety, index, 1);
         public void RemoveUVAt(int index) => RemoveAt<Vector2>(m_uv, m_uvSafety, index, 1);
+        public void RemoveEdgeAt(int index) => RemoveAt<int>(m_edges, m_edgeSafety, index, 1);
         
         public void RemoveVertexRangeAt(int index, int length) => RemoveAt<Vector3>(m_vertices, m_vertexSafety, index, length);
         public void RemoveNormalRangeAt(int index, int length) => RemoveAt<Vector3>(m_normals, m_normalSafety, index, length);
         public void RemoveTriangleRangeAt(int index, int length) => RemoveAt<int>(m_triangles, m_triangleSafety, index, length);
         public void RemoveUVRangeAt(int index, int length) => RemoveAt<Vector2>(m_uv, m_uvSafety, index, length);
+        public void RemoveEdgeRangeAt(int index, int length) => RemoveAt<int>(m_edges, m_edgeSafety, index, length);
         
-        public bool IsCreated => m_vertices != null && m_normals != null && m_triangles != null && m_uv != null;
+        public bool IsCreated => m_vertices != null && m_normals != null && m_triangles != null && m_uv != null && m_edges != null;
         
         private static void AddRange<T>(in UnsafeList* list, in AtomicSafetyHandle handle, NativeArray<T> elements) where T : unmanaged
         {
@@ -276,7 +302,7 @@ namespace DroNeS.Utils
         public Vector3[] NormalsArray() => AsArray<Vector3>(m_normals, m_normalSafety).ToArray();
         public int[] TriangleArray() => AsArray<int>(m_triangles, m_triangleSafety).ToArray();
         public Vector2[] UVArray() => AsArray<Vector2>(m_uv, m_uvSafety).ToArray();
-
+        public int[] EdgeArray() => AsArray<int>(m_edges, m_edgeSafety).ToArray();
 
         private static NativeArray<T> AsArray<T>(in UnsafeList* list, in AtomicSafetyHandle handle) where T : unmanaged
         {
@@ -303,12 +329,14 @@ namespace DroNeS.Utils
 
         public void SetTriangle(int index, in int value) => SetValue(m_triangles, index, in value);
         public void SetUV(int index, in Vector2 value) => SetValue(m_uv, index, in value);
+        public void SetEdge(int index, in int value) => SetValue(m_edges, index, in value);
 
 
         public int VertexCount => GetCount(m_vertices);
         public int NormalCount => GetCount(m_normals);
         public int TriangleCount => GetCount(m_triangles);
         public int UVCount => GetCount(m_uv);
+        public int EdgeCount => GetCount(m_edges);
         
         public int VerticesCapacity
         {
@@ -330,28 +358,37 @@ namespace DroNeS.Utils
             get => GetCapacity(m_uv);
             set => SetCapacity<Vector2>(m_uv, value);
         }
+        public int EdgesCapacity
+        {
+            get => GetCapacity(m_edges);
+            set => SetCapacity<int>(m_edges, value);
+        }
 
         public void AddVertex(in Vector3 element) => Add(m_vertices, element);
         public void AddNormal(in Vector3 element) => Add(m_normals, element);
         public void AddTriangleValue(in int element) => Add(m_triangles, element);
         public void AddUV(in Vector2 element) => Add(m_uv, element);
+        public void AddEdgeValue(in int element) => Add(m_edges, element);        
 
         public void AddRangeVertices(in NativeArray<Vector3> elements) => AddRange(m_vertices, elements);
         public void AddRangeNormals(in NativeArray<Vector3> elements) => AddRange(m_normals, elements);
         public void AddRangeTriangles(in NativeArray<int> elements) => AddRange(m_triangles, elements);
         public void AddRangeUV(in NativeArray<Vector2> elements) => AddRange(m_uv, elements);
+        public void AddRangeEdges(in NativeArray<int> elements) => AddRange(m_edges, elements);
 
         public void RemoveVertexAt(int index) => RemoveAt<Vector3>(m_vertices, index, 1);
         public void RemoveNormalAt(int index) => RemoveAt<Vector3>(m_normals, index, 1);
         public void RemoveTriangleAt(int index) => RemoveAt<int>(m_triangles, index, 1);
         public void RemoveUVAt(int index) => RemoveAt<Vector2>(m_uv, index, 1);
+        public void RemoveEdgeAt(int index) => RemoveAt<int>(m_edges, index, 1);
         
         public void RemoveVertexRangeAt(int index, int length) => RemoveAt<Vector3>(m_vertices, index, length);
         public void RemoveNormalRangeAt(int index, int length) => RemoveAt<Vector3>(m_normals, index, length);
         public void RemoveTriangleRangeAt(int index, int length) => RemoveAt<int>(m_triangles, index, length);
         public void RemoveUVRangeAt(int index, int length) => RemoveAt<Vector2>(m_uv, index, length);
+        public void RemoveEdgeRangeAt(int index, int length) => RemoveAt<int>(m_edges, index, length);
         
-        public bool IsCreated => m_vertices != null && m_normals != null && m_triangles != null && m_uv != null;
+        public bool IsCreated => m_vertices != null && m_normals != null && m_triangles != null && m_uv != null && m_edges != null;
         
         private static void AddRange<T>(in UnsafeList* list, in AtomicSafetyHandle handle, NativeArray<T> elements) where T : unmanaged
         {
@@ -404,7 +441,7 @@ namespace DroNeS.Utils
         public Vector3[] NormalsArray() => AsArray<Vector3>(m_normals).ToArray();
         public int[] TriangleArray() => AsArray<int>(m_triangles).ToArray();
         public Vector2[] UVArray() => AsArray<Vector2>(m_uv).ToArray();
-
+        public int[] EdgeArray() => AsArray<int>(m_edges).ToArray();
 
         private static NativeArray<T> AsArray<T>(in UnsafeList* list) where T : unmanaged
         {
@@ -418,10 +455,12 @@ namespace DroNeS.Utils
             UnsafeList.Destroy(m_normals);
             UnsafeList.Destroy(m_triangles);
             UnsafeList.Destroy(m_uv);
+            UnsafeList.Destroy(m_edges);
             m_triangles = null;
             m_vertices = null;
             m_normals = null;
             m_uv = null;
+            m_edges = null;
         }
         
         public void Dispose()
@@ -432,6 +471,7 @@ namespace DroNeS.Utils
             AtomicSafetyHandle.Release(m_normalSafety);
             AtomicSafetyHandle.Release(m_triangleSafety);
             AtomicSafetyHandle.Release(m_uvSafety);
+            AtomicSafetyHandle.Release(m_edgeSafety);
 #endif
             Deallocate();
         }
@@ -449,11 +489,13 @@ namespace DroNeS.Utils
             AtomicSafetyHandle.Release(m_normalSafety);
             AtomicSafetyHandle.Release(m_triangleSafety);
             AtomicSafetyHandle.Release(m_uvSafety);
+            AtomicSafetyHandle.Release(m_edgeSafety);
 #endif
             m_vertices = null;
             m_normals = null;
             m_triangles = null;
             m_uv = null;
+            m_edges = null;
 
             return jobHandle;
         }
@@ -476,11 +518,13 @@ namespace DroNeS.Utils
             AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_normalSafety);
             AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_triangleSafety);
             AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_uvSafety);
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(m_edgeSafety);
 #endif
             m_vertices->Clear();
             m_normals->Clear();
             m_triangles->Clear();
             m_uv->Clear();
+            m_edges->Clear();
         }
 
         public Mesh AsMesh()
@@ -517,7 +561,7 @@ namespace DroNeS.Utils
         public static void* GetNormalsUnsafePtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(list.m_vertexSafety);
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_normalSafety);
 #endif
             return list.m_normals->Ptr;
         }
@@ -525,7 +569,7 @@ namespace DroNeS.Utils
         public static void* GetNormalsUnsafeReadOnlyPtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(list.m_vertexSafety);
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_normalSafety);
 #endif
             return list.m_normals->Ptr;
         }
@@ -533,7 +577,7 @@ namespace DroNeS.Utils
         public static void* GetTrianglesUnsafePtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(list.m_vertexSafety);
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_triangleSafety);
 #endif
             return list.m_triangles->Ptr;
         }
@@ -541,7 +585,7 @@ namespace DroNeS.Utils
         public static void* GetTrianglesUnsafeReadOnlyPtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(list.m_vertexSafety);
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_triangleSafety);
 #endif
             return list.m_triangles->Ptr;
         }
@@ -549,7 +593,7 @@ namespace DroNeS.Utils
         public static void* GetUVUnsafePtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(list.m_vertexSafety);
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_uvSafety);
 #endif
             return list.m_uv->Ptr;
         }
@@ -557,11 +601,27 @@ namespace DroNeS.Utils
         public static void* GetUVUnsafeReadOnlyPtr(this NativeMesh list)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckReadAndThrow(list.m_vertexSafety);
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_uvSafety);
 #endif
             return list.m_uv->Ptr;
         }
 
+        
+        public static void* GetEdgesUnsafePtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndThrow(list.m_edgeSafety);
+#endif
+            return list.m_edges->Ptr;
+        }
+        
+        public static void* GetEdgesUnsafeReadOnlyPtr(this NativeMesh list)
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckReadAndThrow(list.m_edgeSafety);
+#endif
+            return list.m_edges->Ptr;
+        }
     }
 
     internal struct NativeMeshDebugView
@@ -577,6 +637,7 @@ namespace DroNeS.Utils
         public Vector3[] Normals => m_Mesh.NormalsArray();
         public Vector3[] Vertices => m_Mesh.VerticesArray();
         public Vector2[] UV => m_Mesh.UVArray();
+        public int[] Edges => m_Mesh.EdgeArray();
     }
     
     public static class NativeMeshUtilities
@@ -587,6 +648,7 @@ namespace DroNeS.Utils
             target.AddRangeNormals(meshData.Normals);
             target.AddRangeUV(meshData.UV);
             target.AddRangeTriangles(meshData.Triangles);
+            target.AddRangeEdges(meshData.Edges);
         }
     }
 }

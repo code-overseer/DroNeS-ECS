@@ -60,7 +60,7 @@ namespace DroNeS.Mapbox.Custom
 
         public static HashSet<UnwrappedTileId> GetTiles(IMap map)
         {
-            return Test(map);
+            return Actual(map);
         }
 
         private static HashSet<UnwrappedTileId> Actual(IMap map)

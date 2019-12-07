@@ -1,7 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using DroNeS.Mapbox.Interfaces;
+using DroNeS.Utils.Interfaces;
+using DroNeS.Utils.Time;
 using Mapbox.Unity.Map;
-using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Unity.Burst;
 using Unity.Collections;
@@ -12,18 +15,19 @@ namespace DroNeS.Mapbox.Custom.Parallel
 {
     public class ParallelMeshProcessor : IMeshProcessor
     {
-        private readonly CustomMeshModifier[] _modifiers;
-        private readonly HashSet<CustomTile> _processing = new HashSet<CustomTile>();
+	    private readonly HashSet<CustomTile> _processing = new HashSet<CustomTile>();
         private readonly Dictionary<CustomTile, MeshDataStruct> _accumulation = new Dictionary<CustomTile, MeshDataStruct>();
         private readonly Dictionary<CustomTile, int> _indices = new Dictionary<CustomTile, int>();
+        private readonly Dictionary<CustomTile, Queue<CustomFeatureUnity>> _queue = new Dictionary<CustomTile, Queue<CustomFeatureUnity>>();
         private Material _buildingMaterial;
+        private UVModifierOptions _uvOptions;
+        private GeometryExtrusionWithAtlasOptions _atlasOptions;
+        private WaitForFixedUpdate _fixed;
         
         public void SetOptions(UVModifierOptions uvOptions, GeometryExtrusionWithAtlasOptions extrusionOptions)
         {
-            _modifiers[0].SetProperties(uvOptions);
-            _modifiers[1].SetProperties(extrusionOptions);
-            _modifiers[0].Initialize();
-            _modifiers[1].Initialize();
+	        _uvOptions = uvOptions;
+	        _atlasOptions = extrusionOptions;
         }
 
         public Material BuildingMaterial
@@ -38,37 +42,55 @@ namespace DroNeS.Mapbox.Custom.Parallel
         public ParallelMeshProcessor()
         {
 	        Application.quitting += Destroy;
-            _modifiers = new[]
-            {
-                (CustomMeshModifier)ScriptableObject.CreateInstance<JobifiedPolygonMeshModifier>(),
-                ScriptableObject.CreateInstance<JobifiedTextureWallModifier>(),
-            };
+	        _fixed = new WaitForFixedUpdate();
         }
-        public void Execute(CustomTile tile, CustomFeatureUnity feature)
+
+        private int _count = 0;
+        public void Enqueue(CustomTile tile, CustomFeatureUnity feature)
         {
-	        var meshData = new MeshDataStruct(tile.Rect, Allocator.TempJob);
-            if (!_processing.Contains(tile))
+	        if (!_processing.Contains(tile))
             {
 	            _processing.Add(tile);
                 _accumulation.Add(tile, new MeshDataStruct(default, Allocator.Persistent));
                 _indices.Add(tile, 0);
+                _queue.Add(tile, new Queue<CustomFeatureUnity>());
+                ++_count;
             }
+			_queue[tile].Enqueue(feature);
+        }
 
-            foreach (var modifier in _modifiers)
-            {
-                modifier.Run((VectorFeatureUnity)feature, ref meshData);
-            }
-
-            if (_accumulation[tile].Vertices.Length + meshData.Vertices.Length < 65000)
-            {
-                Append(tile, meshData);
-            }
-            else
-            {
-                Terminate(tile, meshData);
-            }
-
-            meshData.Dispose();
+        public IEnumerator RunJob(CustomTile tile)
+        {
+	        if (!_queue.TryGetValue(tile, out var queue)) yield break;
+	        var b = queue.Count == 254;
+	        while (queue.Count > 0)
+	        {
+		        var feature = queue.Dequeue();
+		        var meshData = new MeshDataStruct(tile.Rect, Allocator.Persistent);
+		        var timer = new CustomTimer().Start();
+		        var handle = PolygonMeshModifierJob.Schedule(default, _uvOptions, feature, ref meshData); 
+			    handle = TextureSideWallModifierJob.Schedule(handle, _atlasOptions, feature, ref meshData);
+			    while (!handle.IsCompleted)
+			    {
+				    if (b) Debug.Log($"Queue Count {queue.Count.ToString()}");
+				    yield return _fixed;
+				    timer.Restart();
+			    }
+		        handle.Complete();
+		        
+		        if (_accumulation[tile].Vertices.Length + meshData.Vertices.Length < 65000)
+		        {
+			        Append(tile, meshData);
+		        }
+		        else
+		        {
+			        Terminate(tile, meshData);
+		        }
+		        meshData.Dispose();
+		        
+		        if (timer.ElapsedMilliseconds > 8) yield return _fixed;
+	        }
+	        Terminate(tile);
         }
         
         [BurstCompile]
@@ -79,7 +101,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 
 	        public static JobHandle Schedule(JobHandle dependencies, NativeArray<int> triangles, int verts)
 	        {
-		        return new TriangleUpdateJob(triangles, verts).Schedule(triangles.Length, 128, dependencies);
+		        return new TriangleUpdateJob(triangles, verts).Schedule(triangles.Length, 64, dependencies);
 	        }
 	        
 	        private TriangleUpdateJob(NativeArray<int> triangles, int verts)
@@ -96,13 +118,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 
         private void Append(CustomTile tile, in MeshDataStruct data)
 	    {
-		    if (!_accumulation.TryGetValue(tile, out var value))
-		    {
-			    _accumulation.Add(tile, new MeshDataStruct(default, Allocator.Persistent));
-			    _accumulation[tile].CopyFrom(data);   
-			    value = _accumulation[tile];
-		    }
-		    if (data.Vertices.Length <= 3) return;
+		    if (!_accumulation.TryGetValue(tile, out var value) || value.Vertices.Length <= 3) return;
 		    
 		    TriangleUpdateJob.Schedule(default, data.Triangles, value.Vertices.Length).Complete();
 		    value.Vertices.AddRange(data.Vertices);
@@ -136,7 +152,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		    value.CopyFrom(in data);
 	    }
 	    
-	    public void Terminate(CustomTile tile)
+	    private void Terminate(CustomTile tile)
 	    {
 		    if (!_accumulation.TryGetValue(tile, out var value) || value.Vertices.Length <= 3) return;
 		    
@@ -144,6 +160,8 @@ namespace DroNeS.Mapbox.Custom.Parallel
 		    tile.VectorDataState = TilePropertyState.Loaded;
 		    _accumulation[tile].Dispose();
 		    _accumulation.Remove(tile);
+		    _queue.Remove(tile);
+		    _indices.Remove(tile);
 	    }
 
 	    private void Destroy()

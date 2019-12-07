@@ -44,6 +44,8 @@ namespace DroNeS.Utils
             internal UnsafeList* m_triangles;
             [NativeDisableUnsafePtrRestriction]
             internal UnsafeList* m_uv;
+            [NativeDisableUnsafePtrRestriction]
+            internal UnsafeList* m_edges;
 
             internal NativeMeshElement(NativeMesh mesh, Allocator allocator)
             {
@@ -62,6 +64,10 @@ namespace DroNeS.Utils
                 length = mesh.m_uv->Length;
                 m_uv = UnsafeList.Create(UnsafeUtility.SizeOf<Vector2>(), UnsafeUtility.AlignOf<Vector2>(), length, allocator);
                 UnsafeUtility.MemCpy(m_uv, mesh.m_uv, (long)sizeof(Vector2) * length);
+                
+                length = mesh.m_edges->Length;
+                m_edges = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), length, allocator);
+                UnsafeUtility.MemCpy(m_edges, mesh.m_edges, (long)sizeof(int) * length);
             }
         }
 
@@ -135,15 +141,17 @@ namespace DroNeS.Utils
                 
 #endif
                 var element = (NativeMeshElement*) ( (IntPtr) m_Buffer + index * sizeof(NativeMeshElement));
+                UnsafeList.Destroy(element->m_vertices);
                 UnsafeList.Destroy(element->m_normals);
                 UnsafeList.Destroy(element->m_triangles);
-                UnsafeList.Destroy(element->m_vertices);
                 UnsafeList.Destroy(element->m_uv);
+                UnsafeList.Destroy(element->m_edges);
                 
-                element->m_triangles = null;
                 element->m_vertices = null;
                 element->m_normals = null;
+                element->m_triangles = null;
                 element->m_uv = null;
+                element->m_edges = null;
             }
             
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -300,11 +308,13 @@ namespace DroNeS.Utils
             UnsafeList.Destroy(element->m_triangles);
             UnsafeList.Destroy(element->m_vertices);
             UnsafeList.Destroy(element->m_uv);
+            UnsafeList.Destroy(element->m_edges);
                 
-            element->m_triangles = null;
             element->m_vertices = null;
             element->m_normals = null;
+            element->m_triangles = null;
             element->m_uv = null;
+            element->m_edges = null;
         }
         
         public bool IsCreated => m_Buffer != null;
@@ -368,6 +378,7 @@ namespace DroNeS.Utils
             element->m_vertices->Clear();
             element->m_normals->Clear();
             element->m_uv->Clear();
+            element->m_edges->Clear();
         }
 
         private static NativeMesh AsNativeMesh(NativeMeshElement element, in AtomicSafetyHandle instanceSafety)
@@ -382,11 +393,13 @@ namespace DroNeS.Utils
                 m_normals = element.m_normals,
                 m_vertices = element.m_vertices,
                 m_uv = element.m_uv,
+                m_edges = element.m_edges,
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 m_vertexSafety = default,
                 m_normalSafety = default,
                 m_triangleSafety = default,
-                m_uvSafety = default
+                m_uvSafety = default,
+                m_edgeSafety = default
 #endif
             };
         }
@@ -445,6 +458,10 @@ namespace DroNeS.Utils
             length = data.UV.Length;
             output.m_uv = UnsafeList.Create(UnsafeUtility.SizeOf<Vector2>(), UnsafeUtility.AlignOf<Vector2>(), length, allocator);
             UnsafeUtility.MemCpy(output.m_uv, data.UV.GetUnsafeReadOnlyPtr(), (long)sizeof(Vector2) * length);
+            
+            length = data.Edges.Length;
+            output.m_edges = UnsafeList.Create(UnsafeUtility.SizeOf<int>(), UnsafeUtility.AlignOf<int>(), length, allocator);
+            UnsafeUtility.MemCpy(output.m_edges, data.Edges.GetUnsafeReadOnlyPtr(), (long)sizeof(int) * length);
 
             return output;
 

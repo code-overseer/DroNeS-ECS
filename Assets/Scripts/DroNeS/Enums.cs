@@ -35,4 +35,12 @@
         Emergency,
         Delivery
     }
+
+    public enum CoroutineType
+    {
+        Fixed,
+        Normal,
+        Late,
+        Timed
+    }
 }
