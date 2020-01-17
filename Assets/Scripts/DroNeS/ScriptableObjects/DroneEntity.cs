@@ -1,4 +1,5 @@
 ﻿using DroNeS.Utils;
+using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Rendering;
@@ -14,6 +15,7 @@ namespace DroNeS.ScriptableObjects
         private Material _material;
         private Mesh _mesh;
         private BoxCollider _geometry;
+        private BlobAssetReference<Unity.Physics.Collider> _collider;
         
         private Material _highlightMaterial;
         private Material _propellerMaterial;
@@ -74,7 +76,7 @@ namespace DroNeS.ScriptableObjects
             }
         }
 
-        public BoxGeometry BoxGeometry
+        private BoxGeometry BoxGeometry
         {
             get
             {
@@ -90,6 +92,25 @@ namespace DroNeS.ScriptableObjects
                     Orientation = quaternion.identity,
                     BevelRadius = 0.05f * _geometry.size.MinComponent()
                 };
+            }
+        }
+
+        public BlobAssetReference<Unity.Physics.Collider> BoxCollider
+        {
+            get
+            {
+                if (!_collider.IsCreated)
+                {
+                    _collider = Unity.Physics.BoxCollider.Create(BoxGeometry,
+                        new CollisionFilter
+                        {
+                            BelongsTo = CollisionGroups.Drone,
+                            CollidesWith = CollisionGroups.Buildings | CollisionGroups.Cast,
+                            GroupIndex = 0
+                        });
+                }
+
+                return _collider;
             }
         }
 

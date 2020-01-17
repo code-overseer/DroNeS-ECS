@@ -41,6 +41,7 @@ namespace DroNeS.Mapbox.Custom
 			var tilesCount = ManhattanTileProvider.Tiles.Count;
 			_textures = new Texture2D[tilesCount];
 			_combineInstances = new CombineInstance[tilesCount];
+			_textureArray = new Texture2DArray(512,512, _textures.Length, TextureFormat.RGB24, false);
 		}
 		
 		private void OnImageReceived(CustomTile tile, RasterTile rasterTile)
@@ -66,13 +67,15 @@ namespace DroNeS.Mapbox.Custom
 
 		private void OnComplete()
 		{
-			_textureArray = new Texture2DArray(512,512, _textures.Length, TextureFormat.RGB24, false);
 			for (var i = 0; i < _textures.Length; ++i)
 			{
 				_textureArray.SetPixels(_textures[i].GetPixels(), i);
+				
+				Object.Destroy(_textures[i]);
 			}
 			_textures = null;
 			_textureArray.Apply();
+			
 			var mesh = new Mesh();
 			mesh.CombineMeshes(_combineInstances);
 			_combineInstances = null;

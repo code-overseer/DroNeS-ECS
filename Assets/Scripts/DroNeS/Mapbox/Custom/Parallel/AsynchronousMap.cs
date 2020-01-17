@@ -48,7 +48,7 @@ namespace DroNeS.Mapbox.Custom.Parallel
             {
                 var tile = new CustomTile(transform, _map, in tileId);
                 _imageFactory.Register(tile);
-                _meshFactory.Register(tile);
+//                _meshFactory.Register(tile);
             }
 
             while (CoroutineManager.Count > 0) yield return null; 

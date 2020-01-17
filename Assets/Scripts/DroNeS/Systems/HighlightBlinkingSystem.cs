@@ -15,8 +15,8 @@ namespace DroNeS.Systems
         protected override void OnUpdate()
         {
             _highlight.a = math.sin(8 * Time.unscaledTime);
-            EntityData.Drone.HighlightMaterial.color = _highlight;
-            EntityData.Hub.HighlightMaterial.color = _highlight;
+            AssetData.Drone.HighlightMaterial.color = _highlight;
+            AssetData.Hub.HighlightMaterial.color = _highlight;
         }
     }
 }

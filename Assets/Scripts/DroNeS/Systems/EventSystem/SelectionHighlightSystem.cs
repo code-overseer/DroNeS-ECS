@@ -13,7 +13,7 @@ namespace DroNeS.Systems.EventSystem
     }
     
     [DisableAutoCreation]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup)), UpdateBefore(typeof(InterStreamingSystem))]
+    [UpdateInGroup(typeof(LateSimulationSystemGroup)), UpdateBefore(typeof(MessagePassingSystem))]
     public class SelectionHighlightSystem : ComponentSystem
     {
         private EntityQuery _clicked;
@@ -26,10 +26,10 @@ namespace DroNeS.Systems.EventSystem
         protected override void OnCreate()
         {
             base.OnCreate();
-            _droneMesh = EntityData.Drone.ToRenderMesh();
-            _droneHighlight = EntityData.Drone.ToHighlightMesh();
-            _hubHighlight = EntityData.Hub.ToHighlightMesh();
-            _hubMesh = EntityData.Hub.ToRenderMesh();
+            _droneMesh = AssetData.Drone.ToRenderMesh();
+            _droneHighlight = AssetData.Drone.ToHighlightMesh();
+            _hubHighlight = AssetData.Hub.ToHighlightMesh();
+            _hubMesh = AssetData.Hub.ToRenderMesh();
             _clicked = GetEntityQuery(typeof(PreSelectionTag));
             _selected = GetEntityQuery(typeof(SelectionTag));
         }

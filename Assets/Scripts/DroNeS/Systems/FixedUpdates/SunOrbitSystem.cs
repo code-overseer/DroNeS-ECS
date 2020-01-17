@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using DroNeS.Components.Singletons;
+using DroNeS.Utils.Time;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -26,9 +26,8 @@ namespace DroNeS.Systems.FixedUpdates
             {Speed.Wtf, 16}
         };
 
-        private readonly Stopwatch _watch = new Stopwatch();
+        private CustomTimer _watch = new CustomTimer();
         public float SpeedFactor { get; private set; }
-
         protected override void OnCreate()
         {
             base.OnCreate();
@@ -47,7 +46,7 @@ namespace DroNeS.Systems.FixedUpdates
         {
             var job = new SunMovementJob
             {
-                Delta = _watch.ElapsedMilliseconds * 0.001f * SpeedFactor,
+                Delta = _watch.ElapsedSeconds * SpeedFactor,
             };
             _watch.Restart();
             return new UpdateClockJob{ Delta = job.Delta }.Schedule(this, job.Schedule(this, input));

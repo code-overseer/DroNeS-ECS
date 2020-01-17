@@ -287,37 +287,6 @@ namespace DroNeS.Utils
         }
 
         [WriteAccessRequired]
-        public bool CopyFrom(NativeMesh other)
-        {
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-            AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
-            
-            if ((uint)other.VertexCount != (uint)VertexCount)
-                throw new ArgumentException($"Vertex array size mismatch");
-            UnsafeUtility.MemCpy(Vertices, other.GetVerticesUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * VertexCount);
-            if ((uint)other.NormalCount != (uint)NormalCount)
-                throw new ArgumentException($"Normal array size mismatch");
-            UnsafeUtility.MemCpy(Normals, other.GetNormalsUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * NormalCount);
-            if ((uint)other.TriangleCount != (uint)TriangleCount)
-                throw new ArgumentException($"Triangle array size mismatch");
-            UnsafeUtility.MemCpy(Triangles, other.GetTrianglesUnsafeReadOnlyPtr(), (long)sizeof(int) * TriangleCount);
-            if ((uint)other.UVCount != (uint)UVCount)
-                throw new ArgumentException($"UV array size mismatch");
-            UnsafeUtility.MemCpy(UV, other.GetUVUnsafeReadOnlyPtr(), (long)sizeof(Vector2) * UVCount);
-#else
-            if ((uint) other.VertexCount != (uint) VertexCount) return false;
-            UnsafeUtility.MemCpy(Vertices, other.GetVerticesUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * VertexCount);
-            if ((uint) other.NormalCount != (uint) NormalCount) return false;
-            UnsafeUtility.MemCpy(Normals, other.GetNormalsUnsafeReadOnlyPtr(), (long)sizeof(Vector3) * NormalCount);
-            if ((uint) other.TriangleCount != (uint) TriangleCount) return false;
-            UnsafeUtility.MemCpy(Triangles, other.GetTrianglesUnsafeReadOnlyPtr(), (long)sizeof(int) * TriangleCount);
-            if ((uint) other.UVCount != (uint) UVCount) return false;
-            UnsafeUtility.MemCpy(UV, other.GetUVUnsafeReadOnlyPtr(), (long)sizeof(Vector2) * UVCount);
-#endif
-            return true;
-        }
-        
-        [WriteAccessRequired]
         public bool CopyFrom(MeshDataStruct other)
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS

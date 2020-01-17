@@ -17,43 +17,28 @@ namespace DroNeS.Systems.EventSystem
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public class HubBuilderSystem : ComponentSystem
     {
+        private int _hubUid;
+        private const float Altitude = 800;
         private EntityArchetype _hub;
         private RenderMesh _hubMesh;
         private BlobAssetReference<Collider> _hubCollider;
-        private int _hubUid;
         private Random _rand = new Random(1u);
-        private const float Altitude = 800;
         private NativeQueue<float4> _buildQueue;
-        private static EntityManager Manager => World.Active.EntityManager;
         protected override void OnCreate()
         {
             base.OnCreate();
             _buildQueue = new NativeQueue<float4>(Allocator.Persistent);
-            _hub = Manager.CreateArchetype(
-                ComponentType.ReadOnly<HubUID>(),
-                typeof(Translation),
-                typeof(Rotation),
-                typeof(LocalToWorld),
-                typeof(JobGenerationCounter),
-                typeof(JobGenerationRate),
-                typeof(JobGenerationTimeMark),
-                typeof(PhysicsCollider)
-            );
             _hubUid = 0;
-            _hubMesh = EntityData.Hub.ToRenderMesh();
-            _hubCollider = BoxCollider.Create(EntityData.Hub.BoxGeometry,
-                new CollisionFilter
-                {
-                    BelongsTo = CollisionGroups.Hub,
-                    CollidesWith = CollisionGroups.Cast,
-                    GroupIndex = 0
-                });
+            _hub = Archetypes.Hub;
+            _hubMesh = AssetData.Hub.ToRenderMesh();
+            _hubCollider = AssetData.Hub.BoxCollider;
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
             _buildQueue.Dispose();
+            _hubCollider.Dispose();
         }
 
         public void BuildHub(float rate, float3 position)
@@ -85,7 +70,7 @@ namespace DroNeS.Systems.EventSystem
                 EntityManager.SetComponentData(hubs[idx], new JobGenerationRate {Value = info.x} );
                 EntityManager.SetComponentData(hubs[idx], new JobGenerationTimeMark { Value = CurrentMark(in info.x) });
                 EntityManager.SetComponentData(hubs[idx], new PhysicsCollider{ Value = _hubCollider });
-                EntityManager.AddSharedComponentData(hubs[idx], _hubMesh);
+                EntityManager.SetSharedComponentData(hubs[idx], _hubMesh);
                 ++idx;
             }
             hubs.Dispose();

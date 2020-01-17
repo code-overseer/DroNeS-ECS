@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using DroNeS.Utils;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine.Assertions;
-using Debug = UnityEngine.Debug;
 
 namespace DroNeS.Systems.EventSystem
 {
     [DisableAutoCreation]
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
-    public class InterStreamingSystem : ComponentSystem
+    public class MessagePassingSystem : ComponentSystem
     {
         private struct StreamPair
         {
             public NativeStream Stream;
+            // ReSharper disable once FieldCanBeMadeReadOnly.Local
             public int ForEachCount;
 
             public StreamPair(int count)

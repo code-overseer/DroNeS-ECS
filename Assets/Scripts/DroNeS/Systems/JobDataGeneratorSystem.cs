@@ -27,9 +27,9 @@ namespace DroNeS.Systems
     }
     [DisableAutoCreation]
     [UpdateAfter(typeof(BuildPhysicsWorld)), UpdateBefore(typeof(EndFramePhysicsSystem))]
-    public class JobGeneratorSystem : JobComponentSystem
+    public class JobDataGeneratorSystem : JobComponentSystem
     {
-        private InterStreamingSystem _eventSystem;
+        private MessagePassingSystem _eventSystem;
         private BuildPhysicsWorld _buildPhysicsWorld;
         private EndFramePhysicsSystem _endFramePhysicsSystem;
         private EntityQuery _query;
@@ -37,7 +37,7 @@ namespace DroNeS.Systems
         protected override void OnCreate()
         {
             base.OnCreate();
-            _eventSystem = World.GetOrCreateSystem<InterStreamingSystem>();
+            _eventSystem = World.GetOrCreateSystem<MessagePassingSystem>();
             _query = GetEntityQuery(new EntityQueryDesc
                 {
                     All = new[]

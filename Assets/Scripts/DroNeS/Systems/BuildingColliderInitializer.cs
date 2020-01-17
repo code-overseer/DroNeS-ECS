@@ -26,15 +26,15 @@ namespace DroNeS.Systems
                 typeof(PhysicsCollider)
             );
             
-            _cubeMesh = EntityData.BuildingCollider.ToRenderMesh();
-            _collider = BoxCollider.Create(EntityData.BuildingCollider.BoxGeometry,
+            _cubeMesh = AssetData.BuildingCollider.ToRenderMesh();
+            _collider = BoxCollider.Create(AssetData.BuildingCollider.BoxGeometry,
                 new CollisionFilter
                 {
                     BelongsTo = CollisionGroups.Buildings,
                     CollidesWith = CollisionGroups.Cast,//CollisionGroups.Drone | CollisionGroups.Cast, TODO ignore drones for now
                     GroupIndex = 0
                 });
-            var t = EntityData.BuildingCollider.Parent;
+            var t = AssetData.BuildingCollider.Parent;
             var entities = new NativeArray<Entity>(t.childCount, Allocator.TempJob);
             EntityManager.CreateEntity(_buildingCollider, entities);
             for (var i = 0; i < t.childCount; ++i)

@@ -8,23 +8,23 @@ using Unity.Jobs;
 namespace DroNeS.Systems
 {
     [DisableAutoCreation]
-    [UpdateAfter(typeof(JobGeneratorSystem))]
-    public class JobEntitySystem : JobComponentSystem
+    [UpdateAfter(typeof(JobDataGeneratorSystem))]
+    public class JobEntityGeneratorSystem : JobComponentSystem
     {
         private EndSimulationEntityCommandBufferSystem _barrier;
-        private InterStreamingSystem _eventSystem;
+        private MessagePassingSystem _eventSystem;
         protected override void OnCreate()
         {
             base.OnCreate();
-            JobSpawner.Job = World.Active.EntityManager.CreateArchetype(
+            _barrier = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            _eventSystem = World.GetOrCreateSystem<MessagePassingSystem>();
+            JobSpawner.Job = World.EntityManager.CreateArchetype(
                 ComponentType.ReadOnly<JobTag>(),
                 ComponentType.ReadOnly<JobUID>(),
                 ComponentType.ReadOnly<JobOrigin>(),
                 ComponentType.ReadOnly<JobDestination>(),
                 ComponentType.ReadOnly<JobCreationTime>(),
                 ComponentType.ReadOnly<CostFunction>());
-            _barrier = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-            _eventSystem = World.GetOrCreateSystem<InterStreamingSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

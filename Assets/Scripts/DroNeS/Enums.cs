@@ -43,4 +43,11 @@
         Late,
         Timed
     }
+
+    public enum ArchetypeKey
+    {
+        Drone,
+        Propeller,
+        Hub
+    }
 }

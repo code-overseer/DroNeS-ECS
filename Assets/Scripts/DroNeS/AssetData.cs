@@ -1,9 +1,10 @@
 ﻿using DroNeS.ScriptableObjects;
 using UnityEngine;
+using BoxCollider = Unity.Physics.BoxCollider;
 
 namespace DroNeS
 {
-    public static class EntityData
+    public static class AssetData
     {
         private static HubEntity _hub;
         private static DroneEntity _drone;
@@ -38,7 +39,6 @@ namespace DroNeS
                 return _building;
             }
         }
-        
-        
+
     }
 }

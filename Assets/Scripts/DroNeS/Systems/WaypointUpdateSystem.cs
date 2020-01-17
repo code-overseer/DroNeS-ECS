@@ -15,7 +15,6 @@ namespace DroNeS.Systems
     [UpdateAfter(typeof(DroneMovementSystem))]
     public class WaypointUpdateSystem : JobComponentSystem
     {
-        private EntityCommandBuffer _commandBuffer;
         private NativeQueue<int> _queuesToClear;
         private EntityQuery _droneQuery;
 
@@ -141,16 +140,17 @@ namespace DroNeS.Systems
             {
                 var droneIds = chunk.GetNativeArray(DroneId);
                 var stats = chunk.GetNativeArray(Statuses);
-                for (var i = 0; i < chunk.Count; ++i)
-                {
-                    if (stats[i].Value != Status.RequestingWaypoints) continue;
-                    for (var j = 0; j < 15; ++j)
-                    {
-                        var p = new float3(Rand.NextFloat(), Rand.NextFloat(), Rand.NextFloat()) * 25;
-                        AllQueues.Add(droneIds[i].Value, new Waypoint(p, j, 15));
-                    }
-                    stats[i] = new DroneStatus(Status.Ready);
-                }
+                // Todo
+//                for (var i = 0; i < chunk.Count; ++i)
+//                {
+//                    if (stats[i].Value != Status.RequestingWaypoints) continue;
+//                    for (var j = 0; j < 15; ++j)
+//                    {
+//                        var p = new float3(Rand.NextFloat(), Rand.NextFloat(), Rand.NextFloat()) * 25;
+//                        AllQueues.Add(droneIds[i].Value, new Waypoint(p, j, 15));
+//                    }
+//                    stats[i] = new DroneStatus(Status.Ready);
+//                }
             }
         }
 
@@ -176,8 +176,7 @@ namespace DroNeS.Systems
                         if (p.index != points[i].index + 1) continue;
                         points[i] = p;
                         break;
-                    }
-                    while (AllQueues.TryGetNextValue(out p, ref it));
+                    } while (AllQueues.TryGetNextValue(out p, ref it));
                     
                 }
             }
